@@ -100,7 +100,7 @@ Tablas principales:
 - `pedidos_whatsapp`
 - `pedidos_whatsapp_detalles`
 - `clientes`
-- `carrito_compras_web`
+- `carritos_web`
 - `productos`
 - `productos_presentaciones`
 - `productos_imagenes`

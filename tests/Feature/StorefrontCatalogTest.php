@@ -133,7 +133,7 @@ class StorefrontCatalogTest extends TestCase
                 'cantidad' => 1,
             ]);
 
-        $this->assertDatabaseHas('carrito_compras_web', [
+        $this->assertDatabaseHas('carritos_web', [
             'id_cliente' => $cliente->id_cliente,
             'id_presentacion' => $presentation->id_presentacion,
             'cantidad' => 1,

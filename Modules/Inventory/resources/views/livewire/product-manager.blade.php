@@ -158,7 +158,7 @@
                                 <td style="font-weight: 600; color: var(--text-primary);">{{ $pres->nombre_variante }}</td>
                                 <td style="font-family: monospace; background: rgba(0,0,0,0.03); padding: 4px 8px; border-radius: 4px;">{{ $pres->codigo_barras ?: '---' }}</td>
                                 <td>{{ $pres->unidadMedida->nombre ?? 'Otr' }}</td>
-                                <td>{{ number_format($pres->costo_compra, 2) }}</td>
+                                <td>{{ number_format($pres->costo_reposicion, 2) }}</td>
                                 <td style="font-weight: 700; color: var(--primary);">{{ number_format($pres->precio, 2) }}</td>
                                 <td>
                                     @if ($pres->stock <= $pres->stock_minimo)
@@ -286,7 +286,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <input type="number" step="0.01" class="form-control" wire:model="presentaciones.{{ $index }}.costo_compra" placeholder="0.00">
+                                    <input type="number" step="0.01" class="form-control" wire:model="presentaciones.{{ $index }}.costo_reposicion" placeholder="0.00">
                                 </div>
                                 <div>
                                     <input type="number" step="0.01" class="form-control" wire:model="presentaciones.{{ $index }}.precio" placeholder="0.00">

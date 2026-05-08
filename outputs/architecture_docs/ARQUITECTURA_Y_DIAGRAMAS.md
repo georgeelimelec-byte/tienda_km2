@@ -42,7 +42,7 @@ flowchart TB
 
 ```mermaid
 erDiagram
-    CLIENTES ||--o{ CARRITO_COMPRAS_WEB : tiene
+    CLIENTES ||--o{ CARRITOS_WEB : tiene
     CLIENTES ||--o{ PEDIDOS_WHATSAPP : genera
     PEDIDOS_WHATSAPP ||--o{ PEDIDOS_WHATSAPP_DETALLES : contiene
     PRODUCTOS ||--o{ PRODUCTOS_PRESENTACIONES : define

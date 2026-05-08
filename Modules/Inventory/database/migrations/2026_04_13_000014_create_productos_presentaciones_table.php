@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('id_unidad')->default(1);
             $table->string('nombre_variante', 100);
             $table->string('codigo_barras', 100)->unique()->nullable();
-            $table->decimal('costo_compra', 10, 2)->default(0);
+            $table->decimal('costo_reposicion', 10, 2)->default(0);
             $table->decimal('precio', 10, 2);
             $table->decimal('precio_oferta', 10, 2)->nullable();
             $table->integer('stock')->default(0);

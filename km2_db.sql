@@ -1,9 +1,7 @@
--- Market KM2 - esquema vigente
--- Alcance: tienda virtual y pedidos WhatsApp.
--- Generado desde la base actual. No incluye datos sensibles.
+-- Market KM2 - esquema tienda WhatsApp
 SET FOREIGN_KEY_CHECKS=0;
 
-DROP TABLE IF EXISTS `banners_web`;
+DROP TABLE IF EXISTS banners_web;
 CREATE TABLE `banners_web` (
   `id_banner` int unsigned NOT NULL AUTO_INCREMENT,
   `titulo` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -12,9 +10,9 @@ CREATE TABLE `banners_web` (
   `posicion` enum('Carrusel','Lateral','Pop_up') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Carrusel',
   `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   PRIMARY KEY (`id_banner`)
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `cache`;
+DROP TABLE IF EXISTS cache;
 CREATE TABLE `cache` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -22,7 +20,7 @@ CREATE TABLE `cache` (
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `cache_locks`;
+DROP TABLE IF EXISTS cache_locks;
 CREATE TABLE `cache_locks` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -30,20 +28,20 @@ CREATE TABLE `cache_locks` (
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `carrito_compras_web`;
-CREATE TABLE `carrito_compras_web` (
+DROP TABLE IF EXISTS carritos_web;
+CREATE TABLE `carritos_web` (
   `id_carrito` int unsigned NOT NULL AUTO_INCREMENT,
   `id_cliente` int unsigned NOT NULL,
   `id_presentacion` int unsigned NOT NULL,
   `cantidad` int unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_carrito`),
   UNIQUE KEY `carrito_cliente_presentacion_unique` (`id_cliente`,`id_presentacion`),
-  KEY `carrito_compras_web_id_presentacion_foreign` (`id_presentacion`),
-  CONSTRAINT `carrito_compras_web_id_cliente_foreign` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `carrito_compras_web_id_presentacion_foreign` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `carritos_web_id_presentacion_foreign` (`id_presentacion`),
+  CONSTRAINT `carritos_web_id_cliente_foreign` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `carritos_web_id_presentacion_foreign` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `categorias`;
+DROP TABLE IF EXISTS categorias;
 CREATE TABLE `categorias` (
   `id_categoria` int unsigned NOT NULL AUTO_INCREMENT,
   `id_categoria_padre` int unsigned DEFAULT NULL,
@@ -52,9 +50,9 @@ CREATE TABLE `categorias` (
   PRIMARY KEY (`id_categoria`),
   KEY `categorias_id_categoria_padre_foreign` (`id_categoria_padre`),
   CONSTRAINT `categorias_id_categoria_padre_foreign` FOREIGN KEY (`id_categoria_padre`) REFERENCES `categorias` (`id_categoria`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `clientes`;
+DROP TABLE IF EXISTS clientes;
 CREATE TABLE `clientes` (
   `id_cliente` int unsigned NOT NULL AUTO_INCREMENT,
   `tipo_documento` enum('DNI','RUC','CE','Sin Documento') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Sin Documento',
@@ -68,9 +66,9 @@ CREATE TABLE `clientes` (
   PRIMARY KEY (`id_cliente`),
   UNIQUE KEY `clientes_celular_unique` (`celular`),
   KEY `idx_documento` (`numero_documento`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `empresa_configuracion`;
+DROP TABLE IF EXISTS empresa_configuracion;
 CREATE TABLE `empresa_configuracion` (
   `id_empresa` int unsigned NOT NULL AUTO_INCREMENT,
   `ruc` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -89,15 +87,15 @@ CREATE TABLE `empresa_configuracion` (
   PRIMARY KEY (`id_empresa`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `migrations`;
+DROP TABLE IF EXISTS migrations;
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `modulos`;
+DROP TABLE IF EXISTS modulos;
 CREATE TABLE `modulos` (
   `id_modulo` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -106,7 +104,7 @@ CREATE TABLE `modulos` (
   PRIMARY KEY (`id_modulo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `pedidos_whatsapp`;
+DROP TABLE IF EXISTS pedidos_whatsapp;
 CREATE TABLE `pedidos_whatsapp` (
   `id_pedido_whatsapp` int unsigned NOT NULL AUTO_INCREMENT,
   `codigo_pedido` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -131,9 +129,9 @@ CREATE TABLE `pedidos_whatsapp` (
   KEY `pedidos_whatsapp_id_operador_foreign` (`id_operador`),
   CONSTRAINT `pedidos_whatsapp_id_operador_foreign` FOREIGN KEY (`id_operador`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL,
   CONSTRAINT `pedidos_whatsapp_id_zona_delivery_foreign` FOREIGN KEY (`id_zona_delivery`) REFERENCES `zonas_delivery` (`id_zona`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `pedidos_whatsapp_detalles`;
+DROP TABLE IF EXISTS pedidos_whatsapp_detalles;
 CREATE TABLE `pedidos_whatsapp_detalles` (
   `id_detalle` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_pedido_whatsapp` int unsigned NOT NULL,
@@ -152,9 +150,9 @@ CREATE TABLE `pedidos_whatsapp_detalles` (
   CONSTRAINT `pedidos_whatsapp_detalles_id_pedido_whatsapp_foreign` FOREIGN KEY (`id_pedido_whatsapp`) REFERENCES `pedidos_whatsapp` (`id_pedido_whatsapp`) ON DELETE CASCADE,
   CONSTRAINT `pedidos_whatsapp_detalles_id_presentacion_foreign` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE SET NULL,
   CONSTRAINT `pedidos_whatsapp_detalles_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `permisos_rol`;
+DROP TABLE IF EXISTS permisos_rol;
 CREATE TABLE `permisos_rol` (
   `id_rol` int unsigned NOT NULL,
   `id_modulo` int unsigned NOT NULL,
@@ -168,7 +166,7 @@ CREATE TABLE `permisos_rol` (
   CONSTRAINT `permisos_rol_id_rol_foreign` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `permisos_usuario`;
+DROP TABLE IF EXISTS permisos_usuario;
 CREATE TABLE `permisos_usuario` (
   `id_usuario` int unsigned NOT NULL,
   `id_modulo` int unsigned NOT NULL,
@@ -182,7 +180,7 @@ CREATE TABLE `permisos_usuario` (
   CONSTRAINT `permisos_usuario_id_usuario_foreign` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `personal_access_tokens`;
+DROP TABLE IF EXISTS personal_access_tokens;
 CREATE TABLE `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -197,9 +195,9 @@ CREATE TABLE `personal_access_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `productos`;
+DROP TABLE IF EXISTS productos;
 CREATE TABLE `productos` (
   `id_producto` int unsigned NOT NULL AUTO_INCREMENT,
   `id_categoria` int unsigned NOT NULL,
@@ -212,7 +210,7 @@ CREATE TABLE `productos` (
   CONSTRAINT `productos_id_categoria_foreign` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `productos_imagenes`;
+DROP TABLE IF EXISTS productos_imagenes;
 CREATE TABLE `productos_imagenes` (
   `id_imagen` int unsigned NOT NULL AUTO_INCREMENT,
   `id_producto` int unsigned NOT NULL,
@@ -224,16 +222,16 @@ CREATE TABLE `productos_imagenes` (
   KEY `productos_imagenes_presentacion_idx` (`id_presentacion`),
   CONSTRAINT `productos_imagenes_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE,
   CONSTRAINT `productos_imagenes_presentacion_fk` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `productos_presentaciones`;
+DROP TABLE IF EXISTS productos_presentaciones;
 CREATE TABLE `productos_presentaciones` (
   `id_presentacion` int unsigned NOT NULL AUTO_INCREMENT,
   `id_producto` int unsigned NOT NULL,
   `id_unidad` int unsigned NOT NULL DEFAULT '1',
   `nombre_variante` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `codigo_barras` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `costo_compra` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `costo_reposicion` decimal(10,2) NOT NULL DEFAULT '0.00',
   `precio` decimal(10,2) NOT NULL,
   `precio_oferta` decimal(10,2) DEFAULT NULL,
   `stock` int NOT NULL DEFAULT '0',
@@ -246,9 +244,9 @@ CREATE TABLE `productos_presentaciones` (
   KEY `idx_barras` (`codigo_barras`),
   CONSTRAINT `productos_presentaciones_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE RESTRICT,
   CONSTRAINT `productos_presentaciones_id_unidad_foreign` FOREIGN KEY (`id_unidad`) REFERENCES `unidades_medida` (`id_unidad`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `resenas`;
+DROP TABLE IF EXISTS resenas;
 CREATE TABLE `resenas` (
   `id_resena` int unsigned NOT NULL AUTO_INCREMENT,
   `id_producto` int unsigned NOT NULL,
@@ -264,7 +262,7 @@ CREATE TABLE `resenas` (
   CONSTRAINT `resenas_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `roles`;
+DROP TABLE IF EXISTS roles;
 CREATE TABLE `roles` (
   `id_rol` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre_rol` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -273,7 +271,7 @@ CREATE TABLE `roles` (
   PRIMARY KEY (`id_rol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `sessions`;
+DROP TABLE IF EXISTS sessions;
 CREATE TABLE `sessions` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
@@ -286,7 +284,7 @@ CREATE TABLE `sessions` (
   KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `storefront_settings`;
+DROP TABLE IF EXISTS storefront_settings;
 CREATE TABLE `storefront_settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `store_name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Market KM2',
@@ -305,7 +303,7 @@ CREATE TABLE `storefront_settings` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `unidades_medida`;
+DROP TABLE IF EXISTS unidades_medida;
 CREATE TABLE `unidades_medida` (
   `id_unidad` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -314,7 +312,7 @@ CREATE TABLE `unidades_medida` (
   PRIMARY KEY (`id_unidad`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `usuarios`;
+DROP TABLE IF EXISTS usuarios;
 CREATE TABLE `usuarios` (
   `id_usuario` int unsigned NOT NULL AUTO_INCREMENT,
   `id_rol` int unsigned NOT NULL,
@@ -330,7 +328,7 @@ CREATE TABLE `usuarios` (
   CONSTRAINT `usuarios_id_rol_foreign` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `zonas_delivery`;
+DROP TABLE IF EXISTS zonas_delivery;
 CREATE TABLE `zonas_delivery` (
   `id_zona` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,

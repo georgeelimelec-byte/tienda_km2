@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Inventory\Models\ProductoPresentacion;
-use Modules\Storefront\Models\CarritoComprasWeb;
+use Modules\Storefront\Models\CarritoWeb;
 
 class CartController extends Controller
 {
@@ -17,7 +17,7 @@ class CartController extends Controller
             return response()->json(['message' => 'Carrito API disponible solo para clientes autenticados.'], 403);
         }
 
-        $items = CarritoComprasWeb::with('presentacion.imagenes', 'presentacion.producto.imagenes')
+        $items = CarritoWeb::with('presentacion.imagenes', 'presentacion.producto.imagenes')
             ->where('id_cliente', $clienteId)
             ->get();
 
@@ -41,7 +41,7 @@ class CartController extends Controller
             return response()->json(['message' => 'Stock insuficiente.'], 422);
         }
 
-        $item = CarritoComprasWeb::updateOrCreate(
+        $item = CarritoWeb::updateOrCreate(
             ['id_cliente' => $clienteId, 'id_presentacion' => $presentacion->id_presentacion],
             ['cantidad' => $data['cantidad']]
         );
@@ -57,7 +57,7 @@ class CartController extends Controller
         }
 
         $data = $request->validate(['cantidad' => 'required|integer|min:1']);
-        $item = CarritoComprasWeb::where('id_cliente', $clienteId)->findOrFail($id);
+        $item = CarritoWeb::where('id_cliente', $clienteId)->findOrFail($id);
         $item->update(['cantidad' => $data['cantidad']]);
 
         return response()->json($item->fresh('presentacion.imagenes', 'presentacion.producto.imagenes'));
@@ -70,7 +70,7 @@ class CartController extends Controller
             return response()->json(['message' => 'Carrito API disponible solo para clientes autenticados.'], 403);
         }
 
-        CarritoComprasWeb::where('id_cliente', $clienteId)->findOrFail($id)->delete();
+        CarritoWeb::where('id_cliente', $clienteId)->findOrFail($id)->delete();
 
         return response()->json(['message' => 'Item eliminado.']);
     }

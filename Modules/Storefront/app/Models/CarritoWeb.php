@@ -4,9 +4,9 @@ namespace Modules\Storefront\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CarritoComprasWeb extends Model
+class CarritoWeb extends Model
 {
-    protected $table = 'carrito_compras_web';
+    protected $table = 'carritos_web';
     protected $primaryKey = 'id_carrito';
     public $timestamps = false;
     protected $fillable = ['id_cliente', 'id_presentacion', 'cantidad'];

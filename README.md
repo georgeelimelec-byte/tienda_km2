@@ -28,7 +28,7 @@ Tablas principales del alcance actual:
 - `clientes`
 - `productos`, `productos_presentaciones`, `productos_imagenes`
 - `categorias`, `unidades_medida`
-- `carrito_compras_web`
+- `carritos_web`
 - `pedidos_whatsapp`, `pedidos_whatsapp_detalles`
 - `banners_web`, `zonas_delivery`, `storefront_settings`, `resenas`
 - `usuarios`, `roles`, `modulos`, `permisos_rol`, `permisos_usuario`

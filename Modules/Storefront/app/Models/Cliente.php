@@ -18,7 +18,7 @@ class Cliente extends Authenticatable
     ];
     protected $hidden = ['password'];
 
-    public function carrito() { return $this->hasMany(CarritoComprasWeb::class, 'id_cliente', 'id_cliente'); }
+    public function carrito() { return $this->hasMany(CarritoWeb::class, 'id_cliente', 'id_cliente'); }
     public function pedidosWhatsapp() { return $this->hasMany(PedidoWhatsapp::class, 'cliente_whatsapp', 'celular'); }
 
     public function getTelefonoAttribute(): ?string

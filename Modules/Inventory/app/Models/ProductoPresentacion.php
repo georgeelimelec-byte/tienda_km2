@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id_unidad
  * @property string $nombre_variante
  * @property string|null $codigo_barras
- * @property float $costo_compra
+ * @property float $costo_reposicion
  * @property float $precio
  * @property float|null $precio_oferta
  * @property int $stock
@@ -28,13 +28,13 @@ class ProductoPresentacion extends Model
 
     protected $fillable = [
         'id_producto', 'id_unidad', 'nombre_variante', 'codigo_barras',
-        'costo_compra', 'precio', 'precio_oferta', 'stock', 'stock_minimo', 'estado',
+        'costo_reposicion', 'precio', 'precio_oferta', 'stock', 'stock_minimo', 'estado',
     ];
 
     protected $casts = [
         'precio' => 'decimal:2',
         'precio_oferta' => 'decimal:2',
-        'costo_compra' => 'decimal:2',
+        'costo_reposicion' => 'decimal:2',
     ];
 
     public function producto()

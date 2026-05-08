@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Migración para la tabla 'roles'.
- * Define los roles del sistema (Admin General, Administrador, Vendedor).
+ * Define los roles del sistema administrativo de la tienda WhatsApp.
  */
 return new class extends Migration
 {

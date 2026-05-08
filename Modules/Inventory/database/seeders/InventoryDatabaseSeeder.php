@@ -216,7 +216,7 @@ class InventoryDatabaseSeeder extends Seeder
                         'id_producto' => $product->id_producto,
                         'id_unidad' => 1,
                         'nombre_variante' => $presentationData['variant'],
-                        'costo_compra' => 0,
+                        'costo_reposicion' => 0,
                         'precio' => $presentationData['price'],
                         'precio_oferta' => $presentationData['offer'],
                         'stock' => $presentationData['stock'],

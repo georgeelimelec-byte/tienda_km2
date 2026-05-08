@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         foreach ([
             ['id_rol' => 1, 'nombre_rol' => 'Admin General', 'nivel_acceso' => 1, 'estado' => 'Activo'],
             ['id_rol' => 2, 'nombre_rol' => 'Administrador', 'nivel_acceso' => 2, 'estado' => 'Activo'],
-            ['id_rol' => 3, 'nombre_rol' => 'Vendedor', 'nivel_acceso' => 3, 'estado' => 'Activo'],
+            ['id_rol' => 3, 'nombre_rol' => 'Atencion WhatsApp', 'nivel_acceso' => 3, 'estado' => 'Activo'],
             ['id_rol' => 4, 'nombre_rol' => 'Operador WhatsApp', 'nivel_acceso' => 4, 'estado' => 'Activo'],
         ] as $role) {
             DB::table('roles')->updateOrInsert(['id_rol' => $role['id_rol']], $role);
@@ -37,11 +37,11 @@ class DatabaseSeeder extends Seeder
     {
         foreach ([
             ['id_modulo' => 1, 'nombre' => 'Pedidos', 'descripcion' => 'Bandeja de pedidos WhatsApp y cambios de estado', 'estado' => 'Activo'],
-            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, categorias, precios y stock directo', 'estado' => 'Activo'],
-            ['id_modulo' => 3, 'nombre' => 'Tienda Virtual', 'descripcion' => 'Banners, delivery y configuracion de vitrina web', 'estado' => 'Activo'],
-            ['id_modulo' => 4, 'nombre' => 'Reportes', 'descripcion' => 'Visualizacion de metricas y ventas', 'estado' => 'Activo'],
-            ['id_modulo' => 5, 'nombre' => 'Configuracion', 'descripcion' => 'Datos de la empresa y sistema', 'estado' => 'Activo'],
-            ['id_modulo' => 6, 'nombre' => 'Usuarios', 'descripcion' => 'Gestion de staff y roles', 'estado' => 'Activo'],
+            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock directo', 'estado' => 'Activo'],
+            ['id_modulo' => 3, 'nombre' => 'Tienda Virtual', 'descripcion' => 'Banners, zonas de delivery, promociones y vitrina web', 'estado' => 'Activo'],
+            ['id_modulo' => 4, 'nombre' => 'Reportes', 'descripcion' => 'Metricas y exportaciones de pedidos WhatsApp', 'estado' => 'Activo'],
+            ['id_modulo' => 5, 'nombre' => 'Configuracion', 'descripcion' => 'Datos comerciales, apariencia y ajustes del sistema', 'estado' => 'Activo'],
+            ['id_modulo' => 6, 'nombre' => 'Usuarios', 'descripcion' => 'Usuarios, roles y permisos internos', 'estado' => 'Activo'],
         ] as $module) {
             DB::table('modulos')->updateOrInsert(['id_modulo' => $module['id_modulo']], $module);
         }
