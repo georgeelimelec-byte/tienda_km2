@@ -131,7 +131,6 @@ Tablas principales:
 - `banners_web`
 - `zonas_delivery`
 - `storefront_settings`
-- `resenas`
 - `usuarios`
 - `roles`
 - `modulos`

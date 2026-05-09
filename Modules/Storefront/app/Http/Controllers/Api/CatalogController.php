@@ -26,8 +26,6 @@ class CatalogController extends Controller
             })
             ->when($request->filled('categoria_id'), fn ($q) => $q->where('id_categoria', $request->integer('categoria_id')))
             ->with($this->relations())
-            ->withAvg(['resenas as valoracion_promedio' => fn ($q) => $q->where('estado', 'Aprobado')], 'calificacion')
-            ->withCount(['resenas as total_resenas' => fn ($q) => $q->where('estado', 'Aprobado')])
             ->orderBy('nombre_base')
             ->paginate($request->integer('per_page', 20));
 
@@ -40,8 +38,6 @@ class CatalogController extends Controller
             ->where('estado', 'Activo')
             ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
             ->with($this->relations())
-            ->withAvg(['resenas as valoracion_promedio' => fn ($q) => $q->where('estado', 'Aprobado')], 'calificacion')
-            ->withCount(['resenas as total_resenas' => fn ($q) => $q->where('estado', 'Aprobado')])
             ->findOrFail($id);
 
         return response()->json($this->productPayload($product));
@@ -116,8 +112,6 @@ class CatalogController extends Controller
                 ])->values(),
             ])->values(),
             'stock_total' => $product->stock_total,
-            'valoracion_promedio' => $product->valoracion_promedio ? round((float) $product->valoracion_promedio, 2) : null,
-            'total_resenas' => (int) $product->total_resenas,
         ];
     }
 }

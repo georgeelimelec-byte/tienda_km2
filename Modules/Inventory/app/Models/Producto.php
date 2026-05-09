@@ -57,16 +57,6 @@ class Producto extends Model
             ->orderBy('orden');
     }
 
-    public function resenas()
-    {
-        return $this->hasMany(\Modules\Storefront\Models\Resena::class, 'id_producto', 'id_producto');
-    }
-
-    public function resenasAprobadas()
-    {
-        return $this->resenas()->where('estado', 'Aprobado');
-    }
-
     public function getNombreAttribute(): string
     {
         return $this->nombre_base;

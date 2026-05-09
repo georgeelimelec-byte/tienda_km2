@@ -265,7 +265,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -274,7 +274,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (1,'2026_04_13_000001_create_roles_table',1),(2,'2026_04_13_000002_create_modulos_table',1),(3,'2026_04_13_000003_create_usuarios_table',1),(4,'2026_04_13_000004_create_permisos_rol_table',1),(5,'2026_04_13_000005_create_permisos_usuario_table',1),(6,'2026_04_13_000010_create_categorias_table',1),(7,'2026_04_13_000011_create_unidades_medida_table',1),(9,'2026_04_13_000013_create_productos_table',1),(10,'2026_04_13_000014_create_productos_presentaciones_table',1),(11,'2026_04_13_000015_create_productos_imagenes_table',1),(16,'2026_04_13_000020_create_clientes_table',1),(20,'2026_04_13_000024_create_banners_web_table',1),(21,'2026_04_13_000026_create_resenas_table',1),(22,'2026_04_13_000027_create_zonas_delivery_table',1),(25,'2026_04_13_000050_create_shared_tables',1),(26,'2026_04_13_005348_create_sessions_table',1),(27,'2026_04_13_063244_create_cache_table',1),(29,'2026_04_20_000001_add_id_presentacion_to_productos_imagenes_table',3),(30,'2026_04_20_000002_create_storefront_settings_table',4),(31,'2026_04_26_000001_add_operational_fields_to_empresa_configuracion',5),(43,'2026_04_13_000028_create_pedidos_whatsapp_tables',15),(47,'2026_05_06_000004_refactor_access_catalog_for_whatsapp_store',18),(49,'2026_05_07_000001_drop_unmatched_store_schema',19),(50,'2026_04_13_000025_create_carritos_web_table',20),(51,'2026_04_26_000002_add_whatsapp_operator_role',20),(52,'2026_05_06_000002_remove_legacy_user_access_field',20),(53,'2026_05_06_000003_drop_out_of_scope_operational_tables',20),(54,'2026_05_08_000001_align_whatsapp_store_database_contract',20),(55,'2026_05_08_000002_create_promotions_audit_and_stock_tables',21),(56,'2026_05_08_000003_refine_whatsapp_order_contract',22);
+INSERT INTO `migrations` VALUES (1,'2026_04_13_000001_create_roles_table',1),(2,'2026_04_13_000002_create_modulos_table',1),(3,'2026_04_13_000003_create_usuarios_table',1),(4,'2026_04_13_000004_create_permisos_rol_table',1),(5,'2026_04_13_000005_create_permisos_usuario_table',1),(6,'2026_04_13_000010_create_categorias_table',1),(7,'2026_04_13_000011_create_unidades_medida_table',1),(9,'2026_04_13_000013_create_productos_table',1),(10,'2026_04_13_000014_create_productos_presentaciones_table',1),(11,'2026_04_13_000015_create_productos_imagenes_table',1),(16,'2026_04_13_000020_create_clientes_table',1),(20,'2026_04_13_000024_create_banners_web_table',1),(22,'2026_04_13_000027_create_zonas_delivery_table',1),(25,'2026_04_13_000050_create_shared_tables',1),(26,'2026_04_13_005348_create_sessions_table',1),(27,'2026_04_13_063244_create_cache_table',1),(29,'2026_04_20_000001_add_id_presentacion_to_productos_imagenes_table',3),(30,'2026_04_20_000002_create_storefront_settings_table',4),(31,'2026_04_26_000001_add_operational_fields_to_empresa_configuracion',5),(43,'2026_04_13_000028_create_pedidos_whatsapp_tables',15),(47,'2026_05_06_000004_refactor_access_catalog_for_whatsapp_store',18),(49,'2026_05_07_000001_drop_unmatched_store_schema',19),(50,'2026_04_13_000025_create_carritos_web_table',20),(51,'2026_04_26_000002_add_whatsapp_operator_role',20),(52,'2026_05_06_000002_remove_legacy_user_access_field',20),(53,'2026_05_06_000003_drop_out_of_scope_operational_tables',20),(54,'2026_05_08_000001_align_whatsapp_store_database_contract',20),(55,'2026_05_08_000002_create_promotions_audit_and_stock_tables',21),(56,'2026_05_08_000003_refine_whatsapp_order_contract',22),(57,'2026_05_08_000004_drop_reviews_from_whatsapp_scope',23);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -669,39 +669,6 @@ LOCK TABLES `promociones` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `resenas`
---
-
-DROP TABLE IF EXISTS `resenas`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `resenas` (
-  `id_resena` int unsigned NOT NULL AUTO_INCREMENT,
-  `id_producto` int unsigned NOT NULL,
-  `id_cliente` int unsigned NOT NULL,
-  `calificacion` tinyint NOT NULL,
-  `comentario` text COLLATE utf8mb4_unicode_ci,
-  `estado` enum('Pendiente','Aprobado','Oculto') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Aprobado',
-  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_resena`),
-  KEY `resenas_id_producto_foreign` (`id_producto`),
-  KEY `resenas_id_cliente_foreign` (`id_cliente`),
-  CONSTRAINT `resenas_id_cliente_foreign` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE,
-  CONSTRAINT `resenas_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `resenas`
---
-
-LOCK TABLES `resenas` WRITE;
-/*!40000 ALTER TABLE `resenas` DISABLE KEYS */;
-INSERT INTO `resenas` VALUES (1,1,1,5,'Producto llego en buen estado y el precio fue claro.','Aprobado','2026-04-18 05:15:40'),(2,2,2,4,'Buena atencion por WhatsApp y entrega rapida.','Aprobado','2026-04-18 05:15:40'),(3,3,3,5,'La descripcion coincide con lo recibido.','Aprobado','2026-04-18 05:15:40'),(4,4,1,4,'Buen producto para el precio.','Aprobado','2026-04-18 05:15:40'),(5,5,2,5,'Compra sencilla desde el catalogo.','Aprobado','2026-04-18 05:15:40'),(6,8,1,5,'Cafe fresco y productos de vitrina listos para recoger.','Aprobado','2026-04-18 19:59:50'),(7,9,2,4,'La compra por WhatsApp fue rapida y el pedido llego completo.','Aprobado','2026-04-18 19:59:50'),(8,10,3,5,'Buenos precios para abarrotes y snacks del dia.','Aprobado','2026-04-18 19:59:50'),(9,11,1,4,'El sandwich llego caliente y bien empacado.','Aprobado','2026-04-18 19:59:50'),(10,12,2,5,'Catalogo claro para comprar cafe, panaderia y basicos.','Aprobado','2026-04-18 19:59:50');
-/*!40000 ALTER TABLE `resenas` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `roles`
 --
 
@@ -753,7 +720,7 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES ('21EKHzolqV9MBXn6KsC2QlYW1FUcoAzf7GCtUzsq',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo0OntzOjY6Il90b2tlbiI7czo0MDoibUExSEtVRmdQSW56NzdXYnNySTkwV2ZXY0JNVzNQbFZXM1F4NTlPcCI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Jhbm5lcnMiO31zOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozNToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Jhbm5lcnMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19',1778255378),('FUgryEjQkjgZZJNd63lOFArlmfJkRBp1JT9bDvfU',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT; Windows NT 10.0; es-PE) WindowsPowerShell/5.1.26100.8328','YTozOntzOjY6Il90b2tlbiI7czo0MDoiM2IyR09pZmtQRHByNlVvQ1RFU0pHNmt0dFhhT01DcWo0Y3VEWlphWiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1778214050),('nYNgZtgDtvQGfhc1Wwg7i3ihDbu6rtIWDaTqJyAQ',1,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo1OntzOjY6Il90b2tlbiI7czo0MDoieHQ0NXlkRTRjZ1gwQ1haUWRUWlVhVE9XUDJ4Y1BLc0Z2dW9FYkFlQSI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjQxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4vY29uZmlndXJhY2lvbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==',1778240103),('ptmhSSOByvIg9DrCMXD5KVuXQ253IJUUShmSVr2r',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo0OntzOjY6Il90b2tlbiI7czo0MDoiUWc2WTFBVzBaS2ZmVUVSSkVEd3JmcEk4VUY3amxFc0oyT0NVMEF6ayI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Jhbm5lcnMiO31zOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czoyNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2xvZ2luIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1778255379),('Txqx2t8uI8s3vy7WjSozs0pBt1DX0DECXtvumcIs',1,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo1OntzOjY6Il90b2tlbiI7czo0MDoiajd2Z1NWY2dzRTJoRzd6YnlHaWlBdnBRYnJ0cVVma1Uzemd5MXpTNSI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI3OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=',1778164947),('xubMLIgxSm1X7Vvryh1D4P28UTJhLLTwHDTXF7Gp',1,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo1OntzOjY6Il90b2tlbiI7czo0MDoiTE5yRGhBRFBEeHMxbWo4WVZNMFRnVzBNeThyaWlDVjlvTGNRWFdlRiI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI3OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=',1778213029);
+INSERT INTO `sessions` VALUES ('jabz5ZRaX5NqcCMqB7UOCaXPLNSC0e8doBuVLzUC',1,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZURNS0tsc3ppWGNtWTdGa1Z4SEpPenY2ajU2aTVQeTlKdHNCVUU5TiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9wcm9kdWN0b3MiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=',1778290457);
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -931,4 +898,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-08 17:20:04
+-- Dump completed on 2026-05-08 20:41:30

@@ -41,7 +41,6 @@
             'images' => $images->values(),
         ];
     })->values();
-    $rating = $producto->valoracion_promedio ? round($producto->valoracion_promedio, 1) : null;
     $category = $producto->categoria;
     $categoryName = $category->nombre ?? 'Sin categoria';
     $parentName = $category && $category->padre ? $category->padre->nombre : $categoryName;
@@ -90,11 +89,7 @@
                         <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold uppercase rounded-md flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-1.5"></span> Agotado</span>
                     </template>
                     <span class="text-sm text-gray-400 font-medium">{{ $parentName }} / {{ $categoryName }}</span>
-                    @if($rating)
-                        <span class="text-sm text-gray-500">{{ $rating }}/5 ({{ $producto->total_resenas }} resena(s))</span>
-                    @else
-                        <span class="text-sm text-gray-500">Sin resenas aun</span>
-                    @endif
+                    <span class="text-sm text-gray-500">Pedido por WhatsApp</span>
                 </div>
 
                 <h1 class="text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
@@ -151,23 +146,6 @@
             </div>
         </div>
     </section>
-
-    @if($producto->resenasAprobadas->count() > 0)
-        <section class="mb-12">
-            <h2 class="text-2xl font-extrabold text-gray-900 mb-6">Valoraciones</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($producto->resenasAprobadas->take(4) as $resena)
-                    <article class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="font-bold text-gray-900">{{ $resena->cliente->nombre_o_razon_social ?? 'Cliente' }}</p>
-                            <span class="text-sm font-bold text-brand">{{ $resena->calificacion }}/5</span>
-                        </div>
-                        <p class="text-gray-600 text-sm">{{ $resena->comentario ?: 'Sin comentario adicional.' }}</p>
-                    </article>
-                @endforeach
-            </div>
-        </section>
-    @endif
 
     @if($relacionados->count() > 0)
         <section>

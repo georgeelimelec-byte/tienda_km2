@@ -4,12 +4,8 @@ namespace Modules\Storefront\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Modules\Inventory\Models\Producto;
 use Modules\Storefront\Models\BannerWeb;
-use Modules\Storefront\Models\Cliente;
 use Modules\Storefront\Models\Promocion;
-use Modules\Storefront\Models\Resena;
 use Modules\Storefront\Models\ZonaDelivery;
 
 class StorefrontDatabaseSeeder extends Seeder
@@ -23,7 +19,6 @@ class StorefrontDatabaseSeeder extends Seeder
         $this->seedDeliveryZones();
         $this->seedBanners();
         $this->seedPromotions();
-        $this->seedReviews();
     }
 
     private function seedCompany(): void
@@ -116,38 +111,4 @@ class StorefrontDatabaseSeeder extends Seeder
         $promo->categorias()->sync([5, 6, 7]);
     }
 
-    private function seedReviews(): void
-    {
-        $clients = [
-            ['celular' => '51911111111', 'nombre_o_razon_social' => 'Maria Torres', 'email' => 'maria@example.test'],
-            ['celular' => '51922222222', 'nombre_o_razon_social' => 'Luis Ramirez', 'email' => 'luis@example.test'],
-            ['celular' => '51933333333', 'nombre_o_razon_social' => 'Carla Mendoza', 'email' => 'carla@example.test'],
-        ];
-
-        $clientModels = collect($clients)->map(fn ($client) => Cliente::updateOrCreate(
-            ['celular' => $client['celular']],
-            $client + [
-                'tipo_documento' => 'Sin Documento',
-                'password' => Hash::make('cliente123'),
-            ]
-        ));
-
-        foreach (Producto::where('estado', 'Activo')->take(5)->get() as $index => $product) {
-            $client = $clientModels[$index % $clientModels->count()];
-            Resena::updateOrCreate(
-                ['id_producto' => $product->id_producto, 'id_cliente' => $client->id_cliente],
-                [
-                    'calificacion' => [5, 4, 5, 4, 5][$index] ?? 5,
-                    'comentario' => [
-                        'Cafe fresco y productos de vitrina listos para recoger.',
-                        'El pedido por WhatsApp fue rapido y llego completo.',
-                        'Buenos precios para abarrotes y snacks del dia.',
-                        'El sandwich llego caliente y bien empacado.',
-                        'Catalogo claro para comprar cafe, panaderia y basicos.',
-                    ][$index] ?? 'Buen producto de minimarket.',
-                    'estado' => 'Aprobado',
-                ]
-            );
-        }
-    }
 }

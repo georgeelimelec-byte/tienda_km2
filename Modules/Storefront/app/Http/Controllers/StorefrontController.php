@@ -89,8 +89,6 @@ class StorefrontController extends Controller
                 });
             })
             ->with($this->catalogRelations())
-            ->withAvg(['resenas as valoracion_promedio' => fn ($q) => $q->where('estado', 'Aprobado')], 'calificacion')
-            ->withCount(['resenas as total_resenas' => fn ($q) => $q->where('estado', 'Aprobado')])
             ->orderBy('nombre_base')
             ->get();
 
@@ -111,8 +109,6 @@ class StorefrontController extends Controller
             ->where('estado', 'Activo')
             ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
             ->with($this->catalogRelations())
-            ->withAvg(['resenas as valoracion_promedio' => fn ($q) => $q->where('estado', 'Aprobado')], 'calificacion')
-            ->withCount(['resenas as total_resenas' => fn ($q) => $q->where('estado', 'Aprobado')])
             ->findOrFail($id);
 
         $igv = $this->igvPercent();
@@ -122,8 +118,6 @@ class StorefrontController extends Controller
             ->where('id_categoria', $producto->id_categoria)
             ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
             ->with($this->catalogRelations())
-            ->withAvg(['resenas as valoracion_promedio' => fn ($q) => $q->where('estado', 'Aprobado')], 'calificacion')
-            ->withCount(['resenas as total_resenas' => fn ($q) => $q->where('estado', 'Aprobado')])
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -354,7 +348,6 @@ class StorefrontController extends Controller
             },
             'presentaciones.unidadMedida',
             'presentaciones.imagenes',
-            'resenasAprobadas.cliente',
         ];
     }
 

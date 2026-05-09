@@ -33,7 +33,7 @@ Tablas principales del alcance actual:
 - `pedidos_whatsapp`, `pedidos_whatsapp_detalles`
 - `promociones`, `promocion_productos`, `promocion_categorias`
 - `auditoria_operativa`, `stock_web_movimientos`
-- `banners_web`, `zonas_delivery`, `storefront_settings`, `resenas`
+- `banners_web`, `zonas_delivery`, `storefront_settings`
 - `usuarios`, `roles`, `modulos`, `permisos_rol`, `permisos_usuario`
 - `empresa_configuracion`
 - `personal_access_tokens`, `sessions`, `cache`, `cache_locks`, `migrations`

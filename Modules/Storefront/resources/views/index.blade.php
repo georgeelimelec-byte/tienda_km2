@@ -376,7 +376,6 @@
                     : (($presentacion->tiene_promocion && $basePrice > $price) ? $basePrice : null);
                 $stockWeb = (int) $presentacion->stock_web;
                 $igvAmount = $igv > 0 ? $price * ($igv / (100 + $igv)) : 0;
-                $rating = $producto->valoracion_promedio ? round($producto->valoracion_promedio, 1) : null;
                 $category = $producto->categoria;
                 $categoryName = $category->nombre ?? 'Sin categoria';
                 $parentName = $category && $category->padre ? $category->padre->nombre : $categoryName;
@@ -435,12 +434,8 @@
                                 <p class="text-brand font-black text-xl">S/ {{ number_format($price, 2) }}</p>
                             </div>
                             <div class="text-right text-xs text-gray-500">
-                                @if($rating)
-                                    <p class="font-bold text-gray-700">{{ $rating }}/5</p>
-                                    <p>{{ $producto->total_resenas }} resena(s)</p>
-                                @else
-                                    <p>Sin resenas</p>
-                                @endif
+                                <p class="font-bold text-gray-700">{{ $stockWeb }} disp.</p>
+                                <p>Stock web</p>
                             </div>
                         </div>
                         <p class="text-[11px] text-gray-400">IGV incluido: S/ {{ number_format($igvAmount, 2) }}</p>
