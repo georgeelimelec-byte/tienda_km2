@@ -48,7 +48,7 @@ return new class extends Migration
     {
         return [
             ['id_modulo' => 1, 'nombre' => 'Pedidos', 'descripcion' => 'Bandeja de pedidos WhatsApp y cambios de estado'],
-            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock directo'],
+            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock web'],
             ['id_modulo' => 3, 'nombre' => 'Tienda Virtual', 'descripcion' => 'Banners, zonas de delivery, promociones y vitrina web'],
             ['id_modulo' => 4, 'nombre' => 'Reportes', 'descripcion' => 'Metricas y exportaciones de pedidos WhatsApp'],
             ['id_modulo' => 5, 'nombre' => 'Configuracion', 'descripcion' => 'Datos comerciales, apariencia y ajustes del sistema'],

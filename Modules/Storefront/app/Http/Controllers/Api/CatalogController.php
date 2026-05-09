@@ -77,8 +77,8 @@ class CatalogController extends Controller
             'categoria',
             'imagenes',
             'presentaciones' => fn ($q) => $q->where('estado', 'Activo')
-                ->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END')
-                ->orderByRaw('COALESCE(precio_oferta, precio)'),
+                ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
+                ->orderBy('precio'),
             'presentaciones.unidadMedida',
             'presentaciones.imagenes',
         ];
@@ -102,9 +102,11 @@ class CatalogController extends Controller
                 'nombre_variante' => $presentation->nombre_variante,
                 'codigo_barras' => $presentation->codigo_barras,
                 'precio' => (float) $presentation->precio,
-                'precio_oferta' => $presentation->precio_oferta !== null ? (float) $presentation->precio_oferta : null,
+                'precio_referencial' => $presentation->precio_referencial !== null ? (float) $presentation->precio_referencial : null,
                 'precio_efectivo' => (float) $presentation->precio_efectivo,
-                'stock' => (int) $presentation->stock,
+                'stock_web' => (int) $presentation->stock_web,
+                'tiene_promocion' => (bool) $presentation->tiene_promocion,
+                'promocion_activa' => optional($presentation->promocion_activa)->nombre,
                 'unidad' => $presentation->unidadMedida,
                 'imagen_principal_url' => optional($presentation->imagenes->first())->url ?: $product->imagen_principal_url,
                 'imagenes' => $presentation->imagenes->map(fn ($image) => [

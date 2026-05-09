@@ -34,7 +34,7 @@
         <div class="section">
             @foreach($pedido->detalles as $detalle)
                 <div class="row">
-                    <span>{{ $detalle->cantidad }} x {{ $detalle->nombre_producto }}</span>
+                    <span>{{ $detalle->cantidad_confirmada }} x {{ $detalle->nombre_producto }}</span>
                     <strong>S/ {{ number_format((float) $detalle->subtotal, 2) }}</strong>
                 </div>
             @endforeach

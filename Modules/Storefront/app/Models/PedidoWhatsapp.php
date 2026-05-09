@@ -22,7 +22,7 @@ class PedidoWhatsapp extends Model
         'total_pedido',
         'estado',
         'whatsapp_url',
-        'comprobante_referencia',
+        'referencia_atencion',
         'nota_interna',
         'id_operador',
     ];

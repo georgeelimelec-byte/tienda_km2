@@ -2,9 +2,9 @@
 
 ## Enfoque
 
-El proyecto se organiza con Scrum para entregar incrementos funcionales de una tienda virtual con pedidos por WhatsApp. El backlog se centra en catalogo, storefront, checkout, bandeja de pedidos, reportes, configuracion y seguridad.
+El proyecto se organiza con Scrum para entregar incrementos funcionales de una tienda virtual con pedidos por WhatsApp. El backlog se centra en catalogo, storefront, cuenta de cliente, checkout, stock web, promociones, bandeja de pedidos, auditoria, reportes, configuracion y seguridad.
 
-Quedan excluidos del backlog actual: POS, caja, reservas, almacenes, compras, proveedores, lotes, kardex y hardware.
+Quedan excluidos del backlog actual: POS, caja, SUNAT, boletas, facturas, reservas, almacenes, compras, proveedores, lotes, kardex y hardware.
 
 ## Roles
 
@@ -21,10 +21,13 @@ Epicas vigentes:
 
 - Acceso, usuarios, roles y permisos.
 - Configuracion comercial.
-- Catalogo tecnico de productos.
+- Catalogo tecnico de productos y stock web.
+- Cuenta de cliente.
 - Tienda virtual publica.
-- Carrito y checkout.
+- Promociones por productos o categorias.
+- Carrito y checkout con reserva de stock web.
 - Pedidos por WhatsApp.
+- Auditoria operativa.
 - Delivery y zonas.
 - Reportes y analitica.
 - APIs de storefront.
@@ -39,7 +42,7 @@ Entregable: panel administrativo protegido y datos base del negocio.
 
 ### Sprint 2. Catalogo tecnico
 
-Objetivo: administrar categorias, productos, presentaciones, imagenes, precios y stock directo.
+Objetivo: administrar categorias, productos, presentaciones, imagenes, precios, precio referencial y stock web.
 
 Entregable: catalogo interno listo para publicar productos.
 
@@ -49,17 +52,17 @@ Objetivo: publicar catalogo, banners, busqueda, detalle de producto y zonas de d
 
 Entregable: storefront navegable para clientes.
 
-### Sprint 4. Checkout y pedidos WhatsApp
+### Sprint 4. Cuenta de cliente, checkout y pedidos WhatsApp
 
-Objetivo: convertir carrito en pedido, guardar cabecera/detalle y enviar el resumen a WhatsApp.
+Objetivo: registrar clientes, convertir carrito en pedido, reservar stock web, guardar cabecera/detalle y enviar el resumen a WhatsApp.
 
 Entregable: flujo completo desde tienda hasta WhatsApp.
 
-### Sprint 5. Operacion interna
+### Sprint 5. Operacion interna y auditoria
 
-Objetivo: gestionar pedidos por estado, tickets operativos y atencion del cliente.
+Objetivo: gestionar pedidos en tabla operativa, ajustar cantidades, devolver stock al cancelar, generar tickets y registrar auditoria.
 
-Entregable: bandeja administrativa de pedidos.
+Entregable: bandeja administrativa de pedidos y trazabilidad operativa.
 
 ### Sprint 6. Reportes y analitica
 

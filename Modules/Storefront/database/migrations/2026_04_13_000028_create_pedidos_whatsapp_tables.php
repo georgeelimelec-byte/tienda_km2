@@ -22,9 +22,9 @@ return new class extends Migration
             $table->decimal('total_productos', 12, 2)->default(0);
             $table->decimal('costo_delivery', 12, 2)->default(0);
             $table->decimal('total_pedido', 12, 2)->default(0);
-            $table->enum('estado', ['Pendiente', 'Confirmado', 'En Preparacion', 'En Reparto', 'Entregado', 'Cancelado'])->default('Pendiente');
+            $table->string('estado', 30)->default('Pendiente');
             $table->string('whatsapp_url', 500)->nullable();
-            $table->string('comprobante_referencia', 80)->nullable();
+            $table->string('referencia_atencion', 80)->nullable();
             $table->text('nota_interna')->nullable();
             $table->unsignedInteger('id_operador')->nullable();
             $table->timestamps();
@@ -45,8 +45,11 @@ return new class extends Migration
             $table->unsignedInteger('id_presentacion')->nullable();
             $table->string('nombre_producto', 180);
             $table->decimal('precio_unitario', 12, 2);
-            $table->integer('cantidad');
+            $table->integer('cantidad_solicitada')->default(0);
+            $table->integer('cantidad_confirmada')->default(0);
             $table->decimal('subtotal', 12, 2);
+            $table->text('motivo_ajuste')->nullable();
+            $table->string('estado_item', 30)->default('Solicitado');
             $table->timestamps();
 
             $table->foreign('id_pedido_whatsapp')

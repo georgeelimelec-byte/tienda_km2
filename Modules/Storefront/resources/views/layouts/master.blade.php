@@ -92,6 +92,9 @@
                 ->orderBy('nombre')
                 ->get();
         $headerActiveRootId = optional($headerCategoriasTree->first())->id_categoria;
+        $storefrontCliente = session('cliente_id')
+            ? \Modules\Storefront\Models\Cliente::find(session('cliente_id'))
+            : null;
 
         if ($headerSelectedCategory) {
             foreach ($headerCategoriasTree as $root) {
@@ -262,6 +265,20 @@
 
                 <!-- Navbar Actions -->
                 <div class="ml-auto flex flex-shrink-0 items-center gap-2 sm:gap-3">
+                    @if($storefrontCliente)
+                        <form method="POST" action="{{ route('storefront.cliente.logout') }}" class="hidden sm:block">
+                            @csrf
+                            <button class="h-11 rounded-lg bg-white px-4 text-sm font-bold text-gray-900 shadow-sm transition hover:bg-orange-50" title="Cerrar sesion de cliente">
+                                {{ \Illuminate\Support\Str::limit($storefrontCliente->nombre_o_razon_social, 18) }}
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('storefront.cliente.login') }}" class="hidden h-11 items-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-gray-900 shadow-sm transition hover:bg-orange-50 sm:flex">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            Cliente
+                        </a>
+                    @endif
+
                     <!-- Admin Login Button -->
                     @if($showLoginLink)
                         @auth
@@ -343,6 +360,22 @@
                             </a>
                         </div>
                     @endif
+                    <div class="mt-2 border-t border-gray-100 pt-2 sm:hidden">
+                        @if($storefrontCliente)
+                            <form method="POST" action="{{ route('storefront.cliente.logout') }}">
+                                @csrf
+                                <button class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
+                                    <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"></path></svg>
+                                    Salir de cuenta cliente
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('storefront.cliente.login') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
+                                <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                Cuenta cliente
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

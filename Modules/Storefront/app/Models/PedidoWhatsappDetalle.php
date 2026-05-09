@@ -17,12 +17,17 @@ class PedidoWhatsappDetalle extends Model
         'id_presentacion',
         'nombre_producto',
         'precio_unitario',
-        'cantidad',
+        'cantidad_solicitada',
+        'cantidad_confirmada',
         'subtotal',
+        'motivo_ajuste',
+        'estado_item',
     ];
 
     protected $casts = [
         'precio_unitario' => 'decimal:2',
+        'cantidad_solicitada' => 'integer',
+        'cantidad_confirmada' => 'integer',
         'subtotal' => 'decimal:2',
     ];
 

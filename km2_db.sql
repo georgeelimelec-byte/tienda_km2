@@ -1,7 +1,63 @@
--- Market KM2 - esquema tienda WhatsApp
-SET FOREIGN_KEY_CHECKS=0;
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
+--
+-- Host: localhost    Database: km2_db
+-- ------------------------------------------------------
+-- Server version	8.4.3
 
-DROP TABLE IF EXISTS banners_web;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `auditoria_operativa`
+--
+
+DROP TABLE IF EXISTS `auditoria_operativa`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `auditoria_operativa` (
+  `id_auditoria` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_usuario` int unsigned DEFAULT NULL,
+  `rol` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `accion` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entidad` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entidad_id` bigint unsigned DEFAULT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor_anterior` text COLLATE utf8mb4_unicode_ci,
+  `valor_nuevo` text COLLATE utf8mb4_unicode_ci,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dispositivo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_auditoria`),
+  KEY `auditoria_operativa_id_usuario_foreign` (`id_usuario`),
+  CONSTRAINT `auditoria_operativa_id_usuario_foreign` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `auditoria_operativa`
+--
+
+LOCK TABLES `auditoria_operativa` WRITE;
+/*!40000 ALTER TABLE `auditoria_operativa` DISABLE KEYS */;
+/*!40000 ALTER TABLE `auditoria_operativa` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `banners_web`
+--
+
+DROP TABLE IF EXISTS `banners_web`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `banners_web` (
   `id_banner` int unsigned NOT NULL AUTO_INCREMENT,
   `titulo` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -10,25 +66,74 @@ CREATE TABLE `banners_web` (
   `posicion` enum('Carrusel','Lateral','Pop_up') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Carrusel',
   `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   PRIMARY KEY (`id_banner`)
-) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS cache;
+--
+-- Dumping data for table `banners_web`
+--
+
+LOCK TABLES `banners_web` WRITE;
+/*!40000 ALTER TABLE `banners_web` DISABLE KEYS */;
+INSERT INTO `banners_web` VALUES (1,'Cafe al paso y panaderia fresca','https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1800','/?categoria_id=5','Pop_up','Activo'),(2,'Promociones de despensa KM2','https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&q=80&w=1800','/?categoria_id=2','Lateral','Activo'),(3,'Bebidas frias, snacks y recojo rapido','https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=1800','/?categoria_id=3','Carrusel','Activo'),(4,'Combos de cafeteria para la oficina','https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&q=80&w=1800','/?categoria_id=6','Carrusel','Activo');
+/*!40000 ALTER TABLE `banners_web` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cache`
+--
+
+DROP TABLE IF EXISTS `cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS cache_locks;
+--
+-- Dumping data for table `cache`
+--
+
+LOCK TABLES `cache` WRITE;
+/*!40000 ALTER TABLE `cache` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cache` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cache_locks`
+--
+
+DROP TABLE IF EXISTS `cache_locks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache_locks` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS carritos_web;
+--
+-- Dumping data for table `cache_locks`
+--
+
+LOCK TABLES `cache_locks` WRITE;
+/*!40000 ALTER TABLE `cache_locks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cache_locks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `carritos_web`
+--
+
+DROP TABLE IF EXISTS `carritos_web`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `carritos_web` (
   `id_carrito` int unsigned NOT NULL AUTO_INCREMENT,
   `id_cliente` int unsigned NOT NULL,
@@ -39,9 +144,25 @@ CREATE TABLE `carritos_web` (
   KEY `carritos_web_id_presentacion_foreign` (`id_presentacion`),
   CONSTRAINT `carritos_web_id_cliente_foreign` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `carritos_web_id_presentacion_foreign` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS categorias;
+--
+-- Dumping data for table `carritos_web`
+--
+
+LOCK TABLES `carritos_web` WRITE;
+/*!40000 ALTER TABLE `carritos_web` DISABLE KEYS */;
+/*!40000 ALTER TABLE `carritos_web` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `categorias`
+--
+
+DROP TABLE IF EXISTS `categorias`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categorias` (
   `id_categoria` int unsigned NOT NULL AUTO_INCREMENT,
   `id_categoria_padre` int unsigned DEFAULT NULL,
@@ -50,9 +171,26 @@ CREATE TABLE `categorias` (
   PRIMARY KEY (`id_categoria`),
   KEY `categorias_id_categoria_padre_foreign` (`id_categoria_padre`),
   CONSTRAINT `categorias_id_categoria_padre_foreign` FOREIGN KEY (`id_categoria_padre`) REFERENCES `categorias` (`id_categoria`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS clientes;
+--
+-- Dumping data for table `categorias`
+--
+
+LOCK TABLES `categorias` WRITE;
+/*!40000 ALTER TABLE `categorias` DISABLE KEYS */;
+INSERT INTO `categorias` VALUES (1,NULL,'Minimarket','Activo'),(2,1,'Abarrotes y despensa','Activo'),(3,1,'Bebidas frias y snacks','Activo'),(4,NULL,'Cafeteria','Activo'),(5,4,'Cafe y bebidas calientes','Activo'),(6,4,'Sandwiches y salados','Activo'),(7,4,'Panaderia y postres','Activo'),(8,1,'Lacteos y refrigerados','Activo'),(9,1,'Cuidado y limpieza','Activo');
+/*!40000 ALTER TABLE `categorias` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `clientes`
+--
+
+DROP TABLE IF EXISTS `clientes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `clientes` (
   `id_cliente` int unsigned NOT NULL AUTO_INCREMENT,
   `tipo_documento` enum('DNI','RUC','CE','Sin Documento') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Sin Documento',
@@ -66,9 +204,26 @@ CREATE TABLE `clientes` (
   PRIMARY KEY (`id_cliente`),
   UNIQUE KEY `clientes_celular_unique` (`celular`),
   KEY `idx_documento` (`numero_documento`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS empresa_configuracion;
+--
+-- Dumping data for table `clientes`
+--
+
+LOCK TABLES `clientes` WRITE;
+/*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
+INSERT INTO `clientes` VALUES (1,'Sin Documento',NULL,'Maria Torres',NULL,'maria@example.test','51911111111',NULL,'2026-04-18 05:15:40'),(2,'Sin Documento',NULL,'Luis Ramirez',NULL,'luis@example.test','51922222222',NULL,'2026-04-18 05:15:40'),(3,'Sin Documento',NULL,'Carla Mendoza',NULL,'carla@example.test','51933333333',NULL,'2026-04-18 05:15:40');
+/*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `empresa_configuracion`
+--
+
+DROP TABLE IF EXISTS `empresa_configuracion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `empresa_configuracion` (
   `id_empresa` int unsigned NOT NULL AUTO_INCREMENT,
   `ruc` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -86,16 +241,50 @@ CREATE TABLE `empresa_configuracion` (
   `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   PRIMARY KEY (`id_empresa`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS migrations;
+--
+-- Dumping data for table `empresa_configuracion`
+--
+
+LOCK TABLES `empresa_configuracion` WRITE;
+/*!40000 ALTER TABLE `empresa_configuracion` DISABLE KEYS */;
+INSERT INTO `empresa_configuracion` VALUES (1,'2010248680','SERVICENTRO MADRID E HIJOS SRL','Market KM2','logo_default.png','Car. Paita-Piura Nro. Km 2 Z.I. Tablazo','999999999','ventas@marketkm2.test','200501',18.00,'SOLES','Lunes a Domingo | 24/7',NULL,'Activo');
+/*!40000 ALTER TABLE `empresa_configuracion` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS modulos;
+--
+-- Dumping data for table `migrations`
+--
+
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'2026_04_13_000001_create_roles_table',1),(2,'2026_04_13_000002_create_modulos_table',1),(3,'2026_04_13_000003_create_usuarios_table',1),(4,'2026_04_13_000004_create_permisos_rol_table',1),(5,'2026_04_13_000005_create_permisos_usuario_table',1),(6,'2026_04_13_000010_create_categorias_table',1),(7,'2026_04_13_000011_create_unidades_medida_table',1),(9,'2026_04_13_000013_create_productos_table',1),(10,'2026_04_13_000014_create_productos_presentaciones_table',1),(11,'2026_04_13_000015_create_productos_imagenes_table',1),(16,'2026_04_13_000020_create_clientes_table',1),(20,'2026_04_13_000024_create_banners_web_table',1),(21,'2026_04_13_000026_create_resenas_table',1),(22,'2026_04_13_000027_create_zonas_delivery_table',1),(25,'2026_04_13_000050_create_shared_tables',1),(26,'2026_04_13_005348_create_sessions_table',1),(27,'2026_04_13_063244_create_cache_table',1),(29,'2026_04_20_000001_add_id_presentacion_to_productos_imagenes_table',3),(30,'2026_04_20_000002_create_storefront_settings_table',4),(31,'2026_04_26_000001_add_operational_fields_to_empresa_configuracion',5),(43,'2026_04_13_000028_create_pedidos_whatsapp_tables',15),(47,'2026_05_06_000004_refactor_access_catalog_for_whatsapp_store',18),(49,'2026_05_07_000001_drop_unmatched_store_schema',19),(50,'2026_04_13_000025_create_carritos_web_table',20),(51,'2026_04_26_000002_add_whatsapp_operator_role',20),(52,'2026_05_06_000002_remove_legacy_user_access_field',20),(53,'2026_05_06_000003_drop_out_of_scope_operational_tables',20),(54,'2026_05_08_000001_align_whatsapp_store_database_contract',20),(55,'2026_05_08_000002_create_promotions_audit_and_stock_tables',21),(56,'2026_05_08_000003_refine_whatsapp_order_contract',22);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `modulos`
+--
+
+DROP TABLE IF EXISTS `modulos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `modulos` (
   `id_modulo` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -103,8 +292,25 @@ CREATE TABLE `modulos` (
   `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   PRIMARY KEY (`id_modulo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS pedidos_whatsapp;
+--
+-- Dumping data for table `modulos`
+--
+
+LOCK TABLES `modulos` WRITE;
+/*!40000 ALTER TABLE `modulos` DISABLE KEYS */;
+INSERT INTO `modulos` VALUES (1,'Pedidos','Bandeja de pedidos WhatsApp y cambios de estado','Activo'),(2,'Catalogo','Productos, presentaciones, precios, fotos y stock directo','Activo'),(3,'Tienda Virtual','Banners, zonas de delivery, promociones y vitrina web','Activo'),(4,'Reportes','Metricas y exportaciones de pedidos WhatsApp','Activo'),(5,'Configuracion','Datos comerciales, apariencia y ajustes del sistema','Activo'),(6,'Usuarios','Usuarios, roles y permisos internos','Activo');
+/*!40000 ALTER TABLE `modulos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pedidos_whatsapp`
+--
+
+DROP TABLE IF EXISTS `pedidos_whatsapp`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pedidos_whatsapp` (
   `id_pedido_whatsapp` int unsigned NOT NULL AUTO_INCREMENT,
   `codigo_pedido` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -116,9 +322,9 @@ CREATE TABLE `pedidos_whatsapp` (
   `total_productos` decimal(12,2) NOT NULL DEFAULT '0.00',
   `costo_delivery` decimal(12,2) NOT NULL DEFAULT '0.00',
   `total_pedido` decimal(12,2) NOT NULL DEFAULT '0.00',
-  `estado` enum('Pendiente','Confirmado','En Preparacion','En Reparto','Entregado','Cancelado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pendiente',
+  `estado` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pendiente',
   `whatsapp_url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `comprobante_referencia` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `referencia_atencion` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nota_interna` text COLLATE utf8mb4_unicode_ci,
   `id_operador` int unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -129,9 +335,25 @@ CREATE TABLE `pedidos_whatsapp` (
   KEY `pedidos_whatsapp_id_operador_foreign` (`id_operador`),
   CONSTRAINT `pedidos_whatsapp_id_operador_foreign` FOREIGN KEY (`id_operador`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL,
   CONSTRAINT `pedidos_whatsapp_id_zona_delivery_foreign` FOREIGN KEY (`id_zona_delivery`) REFERENCES `zonas_delivery` (`id_zona`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS pedidos_whatsapp_detalles;
+--
+-- Dumping data for table `pedidos_whatsapp`
+--
+
+LOCK TABLES `pedidos_whatsapp` WRITE;
+/*!40000 ALTER TABLE `pedidos_whatsapp` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pedidos_whatsapp` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pedidos_whatsapp_detalles`
+--
+
+DROP TABLE IF EXISTS `pedidos_whatsapp_detalles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pedidos_whatsapp_detalles` (
   `id_detalle` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_pedido_whatsapp` int unsigned NOT NULL,
@@ -139,8 +361,11 @@ CREATE TABLE `pedidos_whatsapp_detalles` (
   `id_presentacion` int unsigned DEFAULT NULL,
   `nombre_producto` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
   `precio_unitario` decimal(12,2) NOT NULL,
-  `cantidad` int NOT NULL,
+  `cantidad_solicitada` int NOT NULL DEFAULT '0',
+  `cantidad_confirmada` int NOT NULL DEFAULT '0',
   `subtotal` decimal(12,2) NOT NULL,
+  `motivo_ajuste` text COLLATE utf8mb4_unicode_ci,
+  `estado_item` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Solicitado',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id_detalle`),
@@ -150,9 +375,25 @@ CREATE TABLE `pedidos_whatsapp_detalles` (
   CONSTRAINT `pedidos_whatsapp_detalles_id_pedido_whatsapp_foreign` FOREIGN KEY (`id_pedido_whatsapp`) REFERENCES `pedidos_whatsapp` (`id_pedido_whatsapp`) ON DELETE CASCADE,
   CONSTRAINT `pedidos_whatsapp_detalles_id_presentacion_foreign` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE SET NULL,
   CONSTRAINT `pedidos_whatsapp_detalles_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS permisos_rol;
+--
+-- Dumping data for table `pedidos_whatsapp_detalles`
+--
+
+LOCK TABLES `pedidos_whatsapp_detalles` WRITE;
+/*!40000 ALTER TABLE `pedidos_whatsapp_detalles` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pedidos_whatsapp_detalles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `permisos_rol`
+--
+
+DROP TABLE IF EXISTS `permisos_rol`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `permisos_rol` (
   `id_rol` int unsigned NOT NULL,
   `id_modulo` int unsigned NOT NULL,
@@ -165,8 +406,25 @@ CREATE TABLE `permisos_rol` (
   CONSTRAINT `permisos_rol_id_modulo_foreign` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`) ON DELETE CASCADE,
   CONSTRAINT `permisos_rol_id_rol_foreign` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS permisos_usuario;
+--
+-- Dumping data for table `permisos_rol`
+--
+
+LOCK TABLES `permisos_rol` WRITE;
+/*!40000 ALTER TABLE `permisos_rol` DISABLE KEYS */;
+INSERT INTO `permisos_rol` VALUES (1,1,1,1,1,1),(1,2,1,1,1,1),(1,3,1,1,1,1),(1,4,1,1,1,1),(1,5,1,1,1,1),(1,6,1,1,1,1),(2,1,1,1,1,1),(2,2,1,1,1,1),(2,3,1,1,1,1),(2,4,1,1,1,1),(2,5,1,1,1,1),(2,6,1,1,1,1),(3,1,1,1,1,0),(3,2,1,0,0,0),(3,3,1,0,1,0),(3,4,1,0,0,0),(3,5,0,0,0,0),(3,6,0,0,0,0),(4,1,1,1,1,0),(4,2,1,0,0,0),(4,3,1,0,1,0),(4,4,1,0,0,0),(4,5,0,0,0,0),(4,6,0,0,0,0);
+/*!40000 ALTER TABLE `permisos_rol` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `permisos_usuario`
+--
+
+DROP TABLE IF EXISTS `permisos_usuario`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `permisos_usuario` (
   `id_usuario` int unsigned NOT NULL,
   `id_modulo` int unsigned NOT NULL,
@@ -179,8 +437,24 @@ CREATE TABLE `permisos_usuario` (
   CONSTRAINT `permisos_usuario_id_modulo_foreign` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`) ON DELETE CASCADE,
   CONSTRAINT `permisos_usuario_id_usuario_foreign` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS personal_access_tokens;
+--
+-- Dumping data for table `permisos_usuario`
+--
+
+LOCK TABLES `permisos_usuario` WRITE;
+/*!40000 ALTER TABLE `permisos_usuario` DISABLE KEYS */;
+/*!40000 ALTER TABLE `permisos_usuario` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+DROP TABLE IF EXISTS `personal_access_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -195,9 +469,25 @@ CREATE TABLE `personal_access_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS productos;
+--
+-- Dumping data for table `personal_access_tokens`
+--
+
+LOCK TABLES `personal_access_tokens` WRITE;
+/*!40000 ALTER TABLE `personal_access_tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `personal_access_tokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `productos`
+--
+
+DROP TABLE IF EXISTS `productos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `productos` (
   `id_producto` int unsigned NOT NULL AUTO_INCREMENT,
   `id_categoria` int unsigned NOT NULL,
@@ -209,8 +499,25 @@ CREATE TABLE `productos` (
   KEY `productos_id_categoria_foreign` (`id_categoria`),
   CONSTRAINT `productos_id_categoria_foreign` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS productos_imagenes;
+--
+-- Dumping data for table `productos`
+--
+
+LOCK TABLES `productos` WRITE;
+/*!40000 ALTER TABLE `productos` DISABLE KEYS */;
+INSERT INTO `productos` VALUES (1,2,'Smartphone Galaxy A55','Smartphone con pantalla AMOLED, bateria de larga duracion y camara multiple para uso diario.','https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&q=80&w=900','Inactivo'),(2,3,'Audifonos Bluetooth Pulse','Audifonos inalambricos con estuche de carga, microfono integrado y autonomia para todo el dia.','https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&q=80&w=900','Inactivo'),(3,3,'Cargador USB-C 25W','Cargador compacto de carga rapida compatible con smartphones, tablets y accesorios USB-C.','https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&q=80&w=900','Inactivo'),(4,5,'Freidora de aire 5L','Freidora de aire con canasta antiadherente, control de temperatura y capacidad familiar.','https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&q=80&w=900','Inactivo'),(5,5,'Set de envases hermeticos','Pack de envases resistentes para organizar alimentos secos, snacks y preparaciones.','https://images.unsplash.com/photo-1606914469633-bd39206ea739?auto=format&fit=crop&q=80&w=900','Inactivo'),(6,6,'Detergente liquido Fresh','Detergente liquido concentrado con aroma fresco para ropa blanca y de color.','https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&q=80&w=900','Inactivo'),(7,8,'Shampoo reparacion intensa','Shampoo para uso diario con formula reparadora, brillo y suavidad para el cabello.','https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=900','Inactivo'),(8,5,'Cafe americano KM2','Cafe pasado al momento, taza caliente y aroma de barra para llevar o disfrutar en tienda.','https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=900','Activo'),(9,5,'Capuccino artesanal','Espresso con leche vaporizada y espuma cremosa, preparado en barra de cafeteria.','https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&q=80&w=900','Activo'),(10,6,'Sandwich mixto caliente','Pan suave con jamon y queso fundido, servido caliente para desayuno o lonche.','https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&q=80&w=900','Activo'),(11,7,'Croissant de mantequilla','Croissant hojaldrado de vitrina, ideal para acompanar cafe o bebida caliente.','https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=900','Activo'),(12,7,'Brownie de chocolate','Brownie humedo con cacao intenso, porcion individual lista para llevar.','https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=900','Activo'),(13,3,'Agua mineral sin gas','Agua mineral fresca de vitrina refrigerada para acompanar compras o snacks.','https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&q=80&w=900','Activo'),(14,3,'Papas nativas crocantes','Snack salado de papas nativas, bolsa lista para lonchera, oficina o camino.','https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&q=80&w=900','Activo'),(15,2,'Arroz extra seleccionado','Arroz de grano largo para despensa diaria del hogar, disponible por bolsa.','https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=900','Activo'),(16,2,'Aceite vegetal premium','Aceite vegetal para cocina diaria, ideal para compras rapidas de minimarket.','https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=900','Activo'),(17,8,'Yogurt bebible fresa','Yogurt refrigerado sabor fresa, listo para desayuno, snack o lonchera.','https://images.unsplash.com/photo-1571212515416-fef01fc43637?auto=format&fit=crop&q=80&w=900','Activo'),(18,8,'Queso fresco artesanal','Queso fresco de vitrina refrigerada para desayuno, sandwich o cocina casera.','https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&q=80&w=900','Activo'),(19,9,'Detergente liquido multiuso','Producto esencial de limpieza para compras de reposicion del hogar.','https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&q=80&w=900','Activo');
+/*!40000 ALTER TABLE `productos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `productos_imagenes`
+--
+
+DROP TABLE IF EXISTS `productos_imagenes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `productos_imagenes` (
   `id_imagen` int unsigned NOT NULL AUTO_INCREMENT,
   `id_producto` int unsigned NOT NULL,
@@ -222,9 +529,26 @@ CREATE TABLE `productos_imagenes` (
   KEY `productos_imagenes_presentacion_idx` (`id_presentacion`),
   CONSTRAINT `productos_imagenes_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE,
   CONSTRAINT `productos_imagenes_presentacion_fk` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS productos_presentaciones;
+--
+-- Dumping data for table `productos_imagenes`
+--
+
+LOCK TABLES `productos_imagenes` WRITE;
+/*!40000 ALTER TABLE `productos_imagenes` DISABLE KEYS */;
+INSERT INTO `productos_imagenes` VALUES (1,1,NULL,'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&q=80&w=900',0),(2,2,NULL,'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&q=80&w=900',0),(3,3,NULL,'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&q=80&w=900',0),(4,4,NULL,'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&q=80&w=900',0),(5,5,NULL,'https://images.unsplash.com/photo-1606914469633-bd39206ea739?auto=format&fit=crop&q=80&w=900',0),(6,6,NULL,'https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&q=80&w=900',0),(7,7,NULL,'https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=900',0),(8,8,NULL,'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=900',0),(9,9,NULL,'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&q=80&w=900',0),(10,10,NULL,'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&q=80&w=900',0),(11,11,NULL,'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=900',0),(12,12,NULL,'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=900',0),(13,13,NULL,'https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&q=80&w=900',0),(14,14,NULL,'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&q=80&w=900',0),(15,15,NULL,'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=900',0),(16,16,NULL,'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=900',0),(17,17,NULL,'https://images.unsplash.com/photo-1571212515416-fef01fc43637?auto=format&fit=crop&q=80&w=900',0),(18,18,NULL,'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&q=80&w=900',0),(74,19,28,'http://127.0.0.1:8000/images/catalogo/presentacion_20260502235006_651816e97aba1033.webp',0),(75,19,NULL,'https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&q=80&w=900',0);
+/*!40000 ALTER TABLE `productos_imagenes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `productos_presentaciones`
+--
+
+DROP TABLE IF EXISTS `productos_presentaciones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `productos_presentaciones` (
   `id_presentacion` int unsigned NOT NULL AUTO_INCREMENT,
   `id_producto` int unsigned NOT NULL,
@@ -233,9 +557,9 @@ CREATE TABLE `productos_presentaciones` (
   `codigo_barras` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `costo_reposicion` decimal(10,2) NOT NULL DEFAULT '0.00',
   `precio` decimal(10,2) NOT NULL,
-  `precio_oferta` decimal(10,2) DEFAULT NULL,
-  `stock` int NOT NULL DEFAULT '0',
-  `stock_minimo` int NOT NULL DEFAULT '5',
+  `precio_referencial` decimal(10,2) DEFAULT NULL,
+  `stock_web` int NOT NULL DEFAULT '0',
+  `stock_web_minimo` int NOT NULL DEFAULT '5',
   `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   PRIMARY KEY (`id_presentacion`),
   UNIQUE KEY `productos_presentaciones_codigo_barras_unique` (`codigo_barras`),
@@ -244,9 +568,113 @@ CREATE TABLE `productos_presentaciones` (
   KEY `idx_barras` (`codigo_barras`),
   CONSTRAINT `productos_presentaciones_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE RESTRICT,
   CONSTRAINT `productos_presentaciones_id_unidad_foreign` FOREIGN KEY (`id_unidad`) REFERENCES `unidades_medida` (`id_unidad`)
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS resenas;
+--
+-- Dumping data for table `productos_presentaciones`
+--
+
+LOCK TABLES `productos_presentaciones` WRITE;
+/*!40000 ALTER TABLE `productos_presentaciones` DISABLE KEYS */;
+INSERT INTO `productos_presentaciones` VALUES (1,1,1,'128GB Negro','KM2-A55-128-BLK',0.00,1299.00,1299.00,8,2,'Inactivo'),(2,1,1,'256GB Azul','KM2-A55-256-BLU',0.00,1599.00,NULL,5,2,'Inactivo'),(3,2,1,'Blanco','KM2-PULSE-WHT',0.00,74.90,74.90,25,2,'Inactivo'),(4,2,1,'Negro','KM2-PULSE-BLK',0.00,89.90,NULL,18,2,'Inactivo'),(5,3,1,'Unidad','KM2-CHG-25W',0.00,49.90,NULL,30,2,'Inactivo'),(6,4,1,'5 litros','KM2-AIRFRY-5L',0.00,299.90,299.90,6,2,'Inactivo'),(7,5,1,'Pack x 6','KM2-ENV-6',0.00,59.90,NULL,15,2,'Inactivo'),(8,5,1,'Pack x 10','KM2-ENV-10',0.00,79.90,79.90,10,2,'Inactivo'),(9,6,1,'Botella 3L','KM2-DETER-3L',0.00,28.90,NULL,20,2,'Inactivo'),(10,7,1,'Frasco 750ml','KM2-SHAM-750',0.00,29.90,29.90,22,2,'Inactivo'),(11,8,1,'Vaso 8 oz','KM2-CAF-AMER-8',0.00,6.50,NULL,40,3,'Activo'),(12,8,1,'Vaso 12 oz','KM2-CAF-AMER-12',0.00,8.50,NULL,32,3,'Activo'),(13,9,1,'Vaso 12 oz','KM2-CAP-12',0.00,9.90,9.90,22,3,'Activo'),(14,10,1,'Unidad','KM2-SAND-MIX',0.00,8.90,NULL,18,3,'Activo'),(15,11,1,'Unidad','KM2-CROIS-UND',0.00,5.90,NULL,24,3,'Activo'),(16,11,1,'Pack x 4','KM2-CROIS-4',0.00,19.90,19.90,8,3,'Activo'),(17,12,1,'Porcion','KM2-BROWNIE-POR',0.00,6.90,NULL,16,3,'Activo'),(18,13,1,'Botella 625 ml','KM2-AGUA-625',0.00,2.50,NULL,59,3,'Activo'),(19,13,1,'Pack x 6','KM2-AGUA-6',0.00,12.90,12.90,20,3,'Activo'),(20,14,1,'Bolsa 120 g','KM2-PAPAS-120',0.00,6.50,NULL,30,3,'Activo'),(21,15,1,'Bolsa 1 kg','KM2-ARROZ-1K',0.00,5.80,NULL,40,3,'Activo'),(22,15,1,'Bolsa 5 kg','KM2-ARROZ-5K',0.00,25.90,25.90,14,3,'Activo'),(23,16,1,'Botella 1 L','KM2-ACEITE-1L',0.00,10.90,NULL,26,3,'Activo'),(24,17,1,'Botella 1 L','KM2-YOG-FRESA-1L',0.00,8.90,NULL,18,3,'Activo'),(25,17,1,'Botella 200 ml','KM2-YOG-FRESA-200',0.00,2.80,NULL,34,3,'Activo'),(26,18,1,'Molde 500 g','KM2-QUESO-500',0.00,13.90,NULL,12,3,'Activo'),(27,19,1,'Botella 3 L','97865658',0.00,28.90,NULL,18,3,'Activo'),(28,19,1,'Botella 1 L','KM2. LIMP-DET1',0.00,9.00,NULL,10,0,'Activo');
+/*!40000 ALTER TABLE `productos_presentaciones` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `promocion_categorias`
+--
+
+DROP TABLE IF EXISTS `promocion_categorias`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `promocion_categorias` (
+  `id_promocion_categoria` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_promocion` int unsigned NOT NULL,
+  `id_categoria` int unsigned NOT NULL,
+  PRIMARY KEY (`id_promocion_categoria`),
+  UNIQUE KEY `promo_categoria_unique` (`id_promocion`,`id_categoria`),
+  KEY `promocion_categorias_id_categoria_foreign` (`id_categoria`),
+  CONSTRAINT `promocion_categorias_id_categoria_foreign` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`) ON DELETE CASCADE,
+  CONSTRAINT `promocion_categorias_id_promocion_foreign` FOREIGN KEY (`id_promocion`) REFERENCES `promociones` (`id_promocion`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `promocion_categorias`
+--
+
+LOCK TABLES `promocion_categorias` WRITE;
+/*!40000 ALTER TABLE `promocion_categorias` DISABLE KEYS */;
+/*!40000 ALTER TABLE `promocion_categorias` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `promocion_productos`
+--
+
+DROP TABLE IF EXISTS `promocion_productos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `promocion_productos` (
+  `id_promocion_producto` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_promocion` int unsigned NOT NULL,
+  `id_producto` int unsigned NOT NULL,
+  PRIMARY KEY (`id_promocion_producto`),
+  UNIQUE KEY `promo_producto_unique` (`id_promocion`,`id_producto`),
+  KEY `promocion_productos_id_producto_foreign` (`id_producto`),
+  CONSTRAINT `promocion_productos_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE,
+  CONSTRAINT `promocion_productos_id_promocion_foreign` FOREIGN KEY (`id_promocion`) REFERENCES `promociones` (`id_promocion`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `promocion_productos`
+--
+
+LOCK TABLES `promocion_productos` WRITE;
+/*!40000 ALTER TABLE `promocion_productos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `promocion_productos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `promociones`
+--
+
+DROP TABLE IF EXISTS `promociones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `promociones` (
+  `id_promocion` int unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `tipo_descuento` enum('Porcentaje','Monto') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Porcentaje',
+  `valor_descuento` decimal(10,2) NOT NULL,
+  `fecha_inicio` date DEFAULT NULL,
+  `fecha_fin` date DEFAULT NULL,
+  `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_promocion`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `promociones`
+--
+
+LOCK TABLES `promociones` WRITE;
+/*!40000 ALTER TABLE `promociones` DISABLE KEYS */;
+/*!40000 ALTER TABLE `promociones` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `resenas`
+--
+
+DROP TABLE IF EXISTS `resenas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `resenas` (
   `id_resena` int unsigned NOT NULL AUTO_INCREMENT,
   `id_producto` int unsigned NOT NULL,
@@ -261,8 +689,25 @@ CREATE TABLE `resenas` (
   CONSTRAINT `resenas_id_cliente_foreign` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE,
   CONSTRAINT `resenas_id_producto_foreign` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS roles;
+--
+-- Dumping data for table `resenas`
+--
+
+LOCK TABLES `resenas` WRITE;
+/*!40000 ALTER TABLE `resenas` DISABLE KEYS */;
+INSERT INTO `resenas` VALUES (1,1,1,5,'Producto llego en buen estado y el precio fue claro.','Aprobado','2026-04-18 05:15:40'),(2,2,2,4,'Buena atencion por WhatsApp y entrega rapida.','Aprobado','2026-04-18 05:15:40'),(3,3,3,5,'La descripcion coincide con lo recibido.','Aprobado','2026-04-18 05:15:40'),(4,4,1,4,'Buen producto para el precio.','Aprobado','2026-04-18 05:15:40'),(5,5,2,5,'Compra sencilla desde el catalogo.','Aprobado','2026-04-18 05:15:40'),(6,8,1,5,'Cafe fresco y productos de vitrina listos para recoger.','Aprobado','2026-04-18 19:59:50'),(7,9,2,4,'La compra por WhatsApp fue rapida y el pedido llego completo.','Aprobado','2026-04-18 19:59:50'),(8,10,3,5,'Buenos precios para abarrotes y snacks del dia.','Aprobado','2026-04-18 19:59:50'),(9,11,1,4,'El sandwich llego caliente y bien empacado.','Aprobado','2026-04-18 19:59:50'),(10,12,2,5,'Catalogo claro para comprar cafe, panaderia y basicos.','Aprobado','2026-04-18 19:59:50');
+/*!40000 ALTER TABLE `resenas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `roles`
+--
+
+DROP TABLE IF EXISTS `roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
   `id_rol` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre_rol` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -270,8 +715,25 @@ CREATE TABLE `roles` (
   `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   PRIMARY KEY (`id_rol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS sessions;
+--
+-- Dumping data for table `roles`
+--
+
+LOCK TABLES `roles` WRITE;
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES (1,'Admin General',1,'Activo'),(2,'Administrador',2,'Activo'),(3,'Atencion WhatsApp',3,'Activo'),(4,'Operador WhatsApp',4,'Activo');
+/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sessions` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
@@ -283,8 +745,63 @@ CREATE TABLE `sessions` (
   KEY `sessions_user_id_index` (`user_id`),
   KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS storefront_settings;
+--
+-- Dumping data for table `sessions`
+--
+
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES ('21EKHzolqV9MBXn6KsC2QlYW1FUcoAzf7GCtUzsq',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo0OntzOjY6Il90b2tlbiI7czo0MDoibUExSEtVRmdQSW56NzdXYnNySTkwV2ZXY0JNVzNQbFZXM1F4NTlPcCI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Jhbm5lcnMiO31zOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozNToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Jhbm5lcnMiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19',1778255378),('FUgryEjQkjgZZJNd63lOFArlmfJkRBp1JT9bDvfU',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT; Windows NT 10.0; es-PE) WindowsPowerShell/5.1.26100.8328','YTozOntzOjY6Il90b2tlbiI7czo0MDoiM2IyR09pZmtQRHByNlVvQ1RFU0pHNmt0dFhhT01DcWo0Y3VEWlphWiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1778214050),('nYNgZtgDtvQGfhc1Wwg7i3ihDbu6rtIWDaTqJyAQ',1,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo1OntzOjY6Il90b2tlbiI7czo0MDoieHQ0NXlkRTRjZ1gwQ1haUWRUWlVhVE9XUDJ4Y1BLc0Z2dW9FYkFlQSI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjQxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4vY29uZmlndXJhY2lvbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==',1778240103),('ptmhSSOByvIg9DrCMXD5KVuXQ253IJUUShmSVr2r',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo0OntzOjY6Il90b2tlbiI7czo0MDoiUWc2WTFBVzBaS2ZmVUVSSkVEd3JmcEk4VUY3amxFc0oyT0NVMEF6ayI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FkbWluL2Jhbm5lcnMiO31zOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czoyNzoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2xvZ2luIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1778255379),('Txqx2t8uI8s3vy7WjSozs0pBt1DX0DECXtvumcIs',1,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo1OntzOjY6Il90b2tlbiI7czo0MDoiajd2Z1NWY2dzRTJoRzd6YnlHaWlBdnBRYnJ0cVVma1Uzemd5MXpTNSI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI3OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=',1778164947),('xubMLIgxSm1X7Vvryh1D4P28UTJhLLTwHDTXF7Gp',1,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36','YTo1OntzOjY6Il90b2tlbiI7czo0MDoiTE5yRGhBRFBEeHMxbWo4WVZNMFRnVzBNeThyaWlDVjlvTGNRWFdlRiI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI3OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=',1778213029);
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stock_web_movimientos`
+--
+
+DROP TABLE IF EXISTS `stock_web_movimientos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stock_web_movimientos` (
+  `id_movimiento` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_presentacion` int unsigned NOT NULL,
+  `id_pedido_whatsapp` int unsigned DEFAULT NULL,
+  `tipo_movimiento` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad` int NOT NULL,
+  `stock_anterior` int NOT NULL,
+  `stock_nuevo` int NOT NULL,
+  `motivo` text COLLATE utf8mb4_unicode_ci,
+  `id_usuario` int unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_movimiento`),
+  KEY `stock_web_movimientos_id_presentacion_foreign` (`id_presentacion`),
+  KEY `stock_web_movimientos_id_pedido_whatsapp_foreign` (`id_pedido_whatsapp`),
+  KEY `stock_web_movimientos_id_usuario_foreign` (`id_usuario`),
+  CONSTRAINT `stock_web_movimientos_id_pedido_whatsapp_foreign` FOREIGN KEY (`id_pedido_whatsapp`) REFERENCES `pedidos_whatsapp` (`id_pedido_whatsapp`) ON DELETE SET NULL,
+  CONSTRAINT `stock_web_movimientos_id_presentacion_foreign` FOREIGN KEY (`id_presentacion`) REFERENCES `productos_presentaciones` (`id_presentacion`) ON DELETE CASCADE,
+  CONSTRAINT `stock_web_movimientos_id_usuario_foreign` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stock_web_movimientos`
+--
+
+LOCK TABLES `stock_web_movimientos` WRITE;
+/*!40000 ALTER TABLE `stock_web_movimientos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `stock_web_movimientos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `storefront_settings`
+--
+
+DROP TABLE IF EXISTS `storefront_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `storefront_settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `store_name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Market KM2',
@@ -302,8 +819,25 @@ CREATE TABLE `storefront_settings` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS unidades_medida;
+--
+-- Dumping data for table `storefront_settings`
+--
+
+LOCK TABLES `storefront_settings` WRITE;
+/*!40000 ALTER TABLE `storefront_settings` DISABLE KEYS */;
+INSERT INTO `storefront_settings` VALUES (1,'Market KM2','Minimarket & Cafe',NULL,'#f9b115','#fb983c','#826955','#000000','dark','rounded',1,NULL,'2026-04-20 13:00:19','2026-05-03 04:48:23');
+/*!40000 ALTER TABLE `storefront_settings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `unidades_medida`
+--
+
+DROP TABLE IF EXISTS `unidades_medida`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `unidades_medida` (
   `id_unidad` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -311,8 +845,25 @@ CREATE TABLE `unidades_medida` (
   `estado` enum('Activo','Inactivo') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Activo',
   PRIMARY KEY (`id_unidad`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS usuarios;
+--
+-- Dumping data for table `unidades_medida`
+--
+
+LOCK TABLES `unidades_medida` WRITE;
+/*!40000 ALTER TABLE `unidades_medida` DISABLE KEYS */;
+INSERT INTO `unidades_medida` VALUES (1,'Unidad','UND','Activo'),(2,'Litro','LT','Activo'),(3,'Kilogramo','KG','Activo'),(4,'Pack','PK','Activo'),(5,'Gramos','GR','Activo');
+/*!40000 ALTER TABLE `unidades_medida` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuarios` (
   `id_usuario` int unsigned NOT NULL AUTO_INCREMENT,
   `id_rol` int unsigned NOT NULL,
@@ -327,8 +878,25 @@ CREATE TABLE `usuarios` (
   KEY `usuarios_id_rol_foreign` (`id_rol`),
   CONSTRAINT `usuarios_id_rol_foreign` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS zonas_delivery;
+--
+-- Dumping data for table `usuarios`
+--
+
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (1,1,'Super Admin','admin@ponteready.com','$2y$10$qfGiJInRCxoxaLOASRwDEuU2EgXGWhQ2m4fWMAJCSY//llaKrUemK','default-user.png','Activo','2026-04-18 05:15:40'),(2,1,'Administrador','admin@km2.com','$2y$12$UvK0WaVmUU5z9phoFoxAG.dw8L7SVz7QaikVgPCxQUEiJpXYvm./2','default-user.png','Activo','2026-04-18 02:50:07'),(3,3,'Vendedora','vendedora@localmarket.com','$2y$12$6TXGdHAvljCs4wkXzBIuDu0TT46n3HwLfbuOjpE3Y4UgLYQDWgUa6','default-user.png','Inactivo','2026-05-01 00:42:29');
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `zonas_delivery`
+--
+
+DROP TABLE IF EXISTS `zonas_delivery`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `zonas_delivery` (
   `id_zona` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -338,5 +906,29 @@ CREATE TABLE `zonas_delivery` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id_zona`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-SET FOREIGN_KEY_CHECKS=1;
+--
+-- Dumping data for table `zonas_delivery`
+--
+
+LOCK TABLES `zonas_delivery` WRITE;
+/*!40000 ALTER TABLE `zonas_delivery` DISABLE KEYS */;
+INSERT INTO `zonas_delivery` VALUES (1,'Recojo en tienda',0.00,'Activo','2026-04-18 05:15:40','2026-04-18 05:15:40'),(2,'Fonavi',3.00,'Activo','2026-04-18 05:15:40','2026-04-20 05:09:43'),(3,'Las mercedes',3.00,'Activo','2026-04-18 05:15:40','2026-04-20 05:09:30'),(4,'Tablazo',5.00,'Activo','2026-04-18 05:15:40','2026-04-20 05:09:23'),(5,'Marco jara',5.00,'Activo','2026-04-18 05:15:40','2026-04-20 05:09:16');
+/*!40000 ALTER TABLE `zonas_delivery` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'km2_db'
+--
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-05-08 17:20:04

@@ -1,92 +1,109 @@
-# Requerimientos detallados - Market KM2
+# Requerimientos Detallados - Market KM2
 
 ## Alcance Vigente
 
-Market KM2 es un sistema web para tienda virtual con gestion de pedidos por WhatsApp. El sistema permite publicar productos, recibir pedidos desde checkout web, redirigir al cliente a WhatsApp y administrar el estado de cada pedido desde un panel interno.
+Market KM2 es un sistema web para tienda virtual con pedidos por WhatsApp. El sistema publica productos, permite registro e inicio de sesion de clientes, recibe pedidos desde checkout web, reserva stock web, redirige a WhatsApp y permite que el operador atienda el pedido desde una bandeja tipo tabla.
 
-Quedan fuera del alcance vigente: POS, caja, reservas, almacenes, compras, proveedores, lotes, kardex y hardware de impresion.
+Quedan fuera del alcance vigente: POS, caja, SUNAT, facturacion, reservas, almacenes, compras, proveedores, lotes, kardex y hardware de impresion. PECAN permanece como sistema externo oficial para venta, comprobante y stock real.
 
 ## Requerimientos Generales
 
-### RG01. Tienda virtual operativa
+### RG01. Tienda Virtual Operativa
 
-El sistema debe mostrar una vitrina publica con productos activos, categorias, banners, precios, stock disponible y detalle de presentaciones.
+El sistema debe mostrar una vitrina publica con productos activos, categorias, banners, precios, precio referencial, promociones vigentes, stock web y detalle de presentaciones.
 
-### RG02. Pedidos por WhatsApp
+### RG02. Cuenta De Cliente
 
-El sistema debe convertir el carrito en un pedido WhatsApp, guardar cabecera y detalle, calcular delivery y total, y generar un enlace `wa.me` con el resumen para el cliente.
+El cliente debe registrarse o iniciar sesion antes de completar el pedido. El checkout debe precargar nombre, WhatsApp y direccion cuando el cliente ya existe.
 
-### RG03. Administracion interna
+### RG03. Pedidos Por WhatsApp
 
-El sistema debe ofrecer un panel administrativo para gestionar productos, categorias, banners, zonas de delivery, pedidos, usuarios, roles, permisos, reportes y configuracion comercial.
+El sistema debe convertir el carrito en un pedido WhatsApp, guardar cabecera y detalle, calcular delivery y total referencial, y generar un enlace `wa.me` con el resumen para continuar la atencion fuera del sistema.
 
-### RG04. Stock directo
+### RG04. Stock Web
 
-El stock se controla directamente en `productos_presentaciones.stock`. No hay distribucion por almacenes ni kardex.
+El sistema controla `productos_presentaciones.stock_web` como stock disponible para la tienda virtual. No reemplaza el stock real de PECAN. Al crear un pedido se descuenta stock web; al cancelar se devuelve; al ajustar cantidades se descuenta o devuelve la diferencia.
 
-### RG05. Seguridad
+### RG05. Administracion Interna
 
-Las rutas administrativas requieren autenticacion. Los roles y permisos limitan acceso por modulo y accion.
+El panel administrativo debe gestionar productos, categorias, promociones, banners, zonas de delivery, pedidos, usuarios, roles, permisos, reportes, auditoria y configuracion comercial.
 
-### RG06. Reportes
+### RG06. Seguridad Y Auditoria
 
-Los reportes y el dashboard ejecutivo deben usar pedidos WhatsApp como fuente de ingresos, estados, zonas y productos vendidos.
+Las acciones relevantes deben registrar usuario, rol, accion, entidad, descripcion legible, valores antes/despues, IP, dispositivo y fecha. El administrador debe poder revisar la auditoria desde el panel.
 
 ## Requerimientos Funcionales
 
-### RF01. Usuarios, roles y permisos
+### RF01. Usuarios, Roles Y Permisos
 
 - Permitir inicio y cierre de sesion administrativo.
 - Crear, editar, activar, inactivar y eliminar usuarios internos.
-- Registrar nombres, correo, clave, rol, fotografia y estado.
-- Administrar roles como `Admin General`, `Administrador`, `Atencion WhatsApp` y `Operador WhatsApp`.
+- Administrar roles: `Admin General`, `Administrador`, `Atencion WhatsApp` y `Operador WhatsApp`.
 - Administrar permisos por modulo: `Pedidos`, `Catalogo`, `Tienda Virtual`, `Reportes`, `Configuracion` y `Usuarios`.
 - Evitar que el sistema quede sin usuarios administrativos validos.
 
-### RF02. Configuracion del negocio
+### RF02. Clientes
 
-- Registrar RUC, razon social, nombre comercial, direccion, telefono, correo, ubigeo, moneda e IGV.
-- Configurar datos visibles de la tienda virtual.
-- Mantener una configuracion activa para reportes y storefront.
+- Registrar cliente con nombre, correo, WhatsApp, direccion y contrasena.
+- Permitir inicio y cierre de sesion de cliente.
+- Precargar datos del cliente en checkout.
+- Asociar carrito y trazabilidad de pedidos por datos del cliente.
 
-### RF03. Catalogo tecnico
+### RF03. Catalogo Tecnico
 
 - Crear y editar productos.
-- Crear presentaciones con codigo de barras, unidad, costo, precio, oferta, stock y stock minimo.
+- Crear presentaciones con codigo de barras, unidad, costo, precio, precio referencial, stock web y stock web minimo.
 - Cargar imagenes de productos y presentaciones.
 - Administrar categorias y subcategorias.
-- Evitar eliminaciones que rompan relaciones con productos o pedidos.
+- Evitar eliminaciones que rompan relaciones con pedidos.
 
-### RF04. Tienda publica
+### RF04. Promociones
+
+- Crear promociones por porcentaje o monto.
+- Aplicar promociones a productos especificos.
+- Aplicar promociones a categorias completas.
+- Mantener fechas de vigencia y estado.
+- Calcular el mejor precio promocional sin modificar el precio base del producto.
+
+### RF05. Tienda Publica
 
 - Mostrar productos activos con presentaciones activas.
 - Permitir busqueda por texto y filtrado por categoria.
-- Mostrar banners activos.
-- Mostrar detalle de producto, variantes, stock y productos relacionados.
-- Exponer APIs para catalogo, categorias, banners y detalle.
+- Mostrar banners activos y promociones vigentes.
+- Mostrar detalle de producto, variantes, stock web y productos relacionados.
+- Bloquear productos sin stock web.
 
-### RF05. Carrito y checkout
+### RF06. Carrito Y Checkout
 
 - Agregar, actualizar y retirar productos del carrito.
-- Recalcular precios y stock en servidor durante checkout.
-- Validar nombre, telefono, direccion y zona de delivery.
+- Recalcular precios, promociones y stock web en servidor durante checkout.
+- Validar sesion de cliente, direccion y zona de delivery.
 - Crear `pedidos_whatsapp` y `pedidos_whatsapp_detalles`.
+- Guardar `cantidad_solicitada`, `cantidad_confirmada`, `motivo_ajuste` y `estado_item`.
 - Redirigir al cliente a WhatsApp con el resumen.
 
-### RF06. Bandeja de pedidos
+### RF07. Bandeja De Pedidos
 
-- Mostrar pedidos por estado operativo.
-- Estados vigentes: `Pendiente`, `Confirmado`, `En Preparacion`, `En Reparto`, `Entregado`, `Cancelado`.
+- Mostrar pedidos en tabla operativa.
+- Estados vigentes: `Pendiente`, `Observado`, `Ajustado`, `Confirmado`, `En Preparacion`, `En Delivery`, `Entregado`, `Cancelado`.
 - Actualizar estado desde el panel.
+- Ajustar cantidades confirmadas por item cuando el stock real de PECAN no coincida con el stock web.
+- Devolver stock web al cancelar un pedido.
 - Ver detalle y ticket operativo del pedido.
 
-### RF07. Zonas de delivery
+### RF08. Zonas De Delivery
 
 - Crear y editar zonas con tarifa, cobertura y estado.
-- Usar la tarifa de la zona en el total del pedido.
-- Impedir pedidos si no hay zonas disponibles cuando el flujo requiere delivery.
+- Usar la tarifa de la zona en el total referencial del pedido.
+- Permitir recojo en tienda como zona con tarifa cero.
 
-### RF08. Reportes y analitica
+### RF09. Auditoria
+
+- Registrar acciones de pedidos, ajustes, productos, promociones y movimientos de stock web.
+- Mostrar auditoria en una vista administrativa.
+- Mostrar movimientos de stock web con stock anterior y nuevo.
+
+### RF10. Reportes Y Analitica
 
 - Consultar pedidos por rango de fechas.
 - Calcular ingresos estimados, pedidos pendientes, productos vendidos y zonas con demanda.
@@ -97,14 +114,20 @@ Los reportes y el dashboard ejecutivo deben usar pedidos WhatsApp como fuente de
 
 Tablas principales:
 
-- `pedidos_whatsapp`
-- `pedidos_whatsapp_detalles`
 - `clientes`
 - `carritos_web`
 - `productos`
 - `productos_presentaciones`
 - `productos_imagenes`
 - `categorias`
+- `unidades_medida`
+- `promociones`
+- `promocion_productos`
+- `promocion_categorias`
+- `pedidos_whatsapp`
+- `pedidos_whatsapp_detalles`
+- `stock_web_movimientos`
+- `auditoria_operativa`
 - `banners_web`
 - `zonas_delivery`
 - `storefront_settings`
@@ -119,10 +142,19 @@ Tablas principales:
 - `sessions`
 - `cache`
 - `cache_locks`
+- `migrations`
+
+Campos clave del pedido:
+
+- `pedidos_whatsapp.referencia_atencion` guarda una referencia interna de pago o atencion por WhatsApp. No representa boleta, factura ni comprobante SUNAT.
+- `pedidos_whatsapp_detalles.cantidad_solicitada` conserva lo pedido por el cliente.
+- `pedidos_whatsapp_detalles.cantidad_confirmada` conserva lo validado por el operador contra PECAN/tienda.
+- `pedidos_whatsapp_detalles.motivo_ajuste` explica cualquier cambio de cantidad.
 
 ## Criterios De Aceptacion
 
 - Una instalacion nueva no crea tablas legacy de POS, caja, reservas, almacenes, compras, proveedores, lotes ni kardex.
 - `php artisan migrate` debe limpiar una base existente con tablas legacy.
+- La base de datos debe coincidir con los requerimientos vigentes; no debe contener tablas sin uso funcional.
 - `php artisan test` debe pasar.
 - `php artisan route:list` no debe exponer rutas POS, reservas, almacenes, compras o caja.

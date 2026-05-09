@@ -5,9 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Migración para la tabla 'productos_presentaciones'.
- * Es la entidad central del inventario: cada variante de un producto
- * (tamaño, sabor, pack) tiene su propio precio, stock y código de barras.
+ * Migracion para la tabla 'productos_presentaciones'.
+ * Es la entidad central del inventario web: cada variante de un producto
+ * tiene precio, precio referencial, stock web y codigo de barras.
  */
 return new class extends Migration
 {
@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('codigo_barras', 100)->unique()->nullable();
             $table->decimal('costo_reposicion', 10, 2)->default(0);
             $table->decimal('precio', 10, 2);
-            $table->decimal('precio_oferta', 10, 2)->nullable();
-            $table->integer('stock')->default(0);
-            $table->integer('stock_minimo')->default(5);
+            $table->decimal('precio_referencial', 10, 2)->nullable();
+            $table->integer('stock_web')->default(0);
+            $table->integer('stock_web_minimo')->default(5);
             $table->enum('estado', ['Activo', 'Inactivo'])->default('Activo');
 
             $table->foreign('id_producto')

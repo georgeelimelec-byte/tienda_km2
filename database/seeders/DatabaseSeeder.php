@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
     {
         foreach ([
             ['id_modulo' => 1, 'nombre' => 'Pedidos', 'descripcion' => 'Bandeja de pedidos WhatsApp y cambios de estado', 'estado' => 'Activo'],
-            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock directo', 'estado' => 'Activo'],
+            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock web', 'estado' => 'Activo'],
             ['id_modulo' => 3, 'nombre' => 'Tienda Virtual', 'descripcion' => 'Banners, zonas de delivery, promociones y vitrina web', 'estado' => 'Activo'],
             ['id_modulo' => 4, 'nombre' => 'Reportes', 'descripcion' => 'Metricas y exportaciones de pedidos WhatsApp', 'estado' => 'Activo'],
             ['id_modulo' => 5, 'nombre' => 'Configuracion', 'descripcion' => 'Datos comerciales, apariencia y ajustes del sistema', 'estado' => 'Activo'],

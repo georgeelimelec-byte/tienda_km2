@@ -40,14 +40,14 @@
                     <div class="space-y-5 relative z-10">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Nombre Completo <span class="text-brand">*</span></label>
-                            <input type="text" name="nombre" required class="w-full border-gray-200 rounded-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="Tu nombre completo">
+                            <input type="text" name="nombre" value="{{ old('nombre', $cliente->nombre_o_razon_social ?? '') }}" required class="w-full border-gray-200 rounded-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="Tu nombre completo">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Número de WhatsApp <span class="text-brand">*</span></label>
                             <div class="flex">
                                 <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500 font-medium">+51</span>
-                                <input type="tel" name="whatsapp" required class="flex-1 w-full border-gray-200 rounded-r-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="999 888 777">
+                                <input type="tel" name="whatsapp" value="{{ old('whatsapp', $cliente->celular ?? '') }}" required class="flex-1 w-full border-gray-200 rounded-r-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="999 888 777">
                             </div>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                         
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Dirección Exacta <span class="text-brand">*</span></label>
-                            <input type="text" name="direccion" required class="w-full border-gray-200 rounded-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="Ej. Calle Los Pinos 123, Dpto 4">
+                            <input type="text" name="direccion" value="{{ old('direccion', $cliente->direccion ?? '') }}" required class="w-full border-gray-200 rounded-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="Ej. Calle Los Pinos 123, Dpto 4">
                         </div>
                         
                         <div>

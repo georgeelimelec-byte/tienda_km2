@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Modules\Inventory\Models\Producto;
 use Modules\Storefront\Models\BannerWeb;
 use Modules\Storefront\Models\Cliente;
+use Modules\Storefront\Models\Promocion;
 use Modules\Storefront\Models\Resena;
 use Modules\Storefront\Models\ZonaDelivery;
 
@@ -21,6 +22,7 @@ class StorefrontDatabaseSeeder extends Seeder
         $this->seedCompany();
         $this->seedDeliveryZones();
         $this->seedBanners();
+        $this->seedPromotions();
         $this->seedReviews();
     }
 
@@ -95,6 +97,23 @@ class StorefrontDatabaseSeeder extends Seeder
                 ]
             );
         }
+    }
+
+    private function seedPromotions(): void
+    {
+        $promo = Promocion::updateOrCreate(
+            ['nombre' => 'Promocion cafeteria KM2'],
+            [
+                'descripcion' => 'Descuento piloto para productos de cafeteria publicados en la tienda virtual.',
+                'tipo_descuento' => 'Porcentaje',
+                'valor_descuento' => 10,
+                'fecha_inicio' => now()->subDay()->toDateString(),
+                'fecha_fin' => now()->addWeeks(4)->toDateString(),
+                'estado' => 'Activo',
+            ]
+        );
+
+        $promo->categorias()->sync([5, 6, 7]);
     }
 
     private function seedReviews(): void

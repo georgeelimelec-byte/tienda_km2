@@ -5,14 +5,21 @@ namespace Modules\Storefront\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\EmpresaConfiguracion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Modules\Inventory\Models\Categoria;
 use Modules\Inventory\Models\Producto;
 use Modules\Inventory\Models\ProductoPresentacion;
 use Modules\Storefront\Models\BannerWeb;
+use Modules\Storefront\Models\Cliente;
 use Modules\Storefront\Models\PedidoWhatsapp;
 use Modules\Storefront\Models\PedidoWhatsappDetalle;
+use Modules\Storefront\Models\Promocion;
 use Modules\Storefront\Models\ZonaDelivery;
+use Modules\Storefront\Services\OperationalAudit;
+use Modules\Storefront\Services\StockWebService;
+use RuntimeException;
 
 class StorefrontController extends Controller
 {
@@ -43,18 +50,12 @@ class StorefrontController extends Controller
             ->whereIn('posicion', ['Lateral', 'Pop_up'])
             ->orderBy('id_banner')
             ->get();
-        $promociones = ProductoPresentacion::with([
-                'producto.categoria.padre',
-                'producto.imagenes',
-                'imagenes',
-            ])
-            ->where('estado', 'Activo')
-            ->whereNotNull('precio_oferta')
-            ->whereColumn('precio_oferta', '<', 'precio')
-            ->whereHas('producto', fn ($q) => $q->where('estado', 'Activo'))
-            ->orderByRaw('(precio - precio_oferta) DESC')
-            ->take(4)
+        $promociones = Promocion::activas()
+            ->with(['productos.imagenes', 'categorias'])
+            ->orderByDesc('id_promocion')
+            ->take(6)
             ->get();
+        $promotedProductIds = $this->promotedProductIds($promociones);
 
         $productos = Producto::query()
             ->where('estado', 'Activo')
@@ -70,12 +71,12 @@ class StorefrontController extends Controller
                 });
             })
             ->when(!empty($categoryIds), fn ($q) => $q->whereIn('id_categoria', $categoryIds))
-            ->when($filtro === 'promociones', function ($q) {
-                return $q->whereHas('presentaciones', function ($presentationQuery) {
-                    $presentationQuery->where('estado', 'Activo')
-                        ->whereNotNull('precio_oferta')
-                        ->whereColumn('precio_oferta', '<', 'precio');
-                });
+            ->when($filtro === 'promociones', function ($q) use ($promotedProductIds) {
+                if (empty($promotedProductIds)) {
+                    return $q->whereRaw('1 = 0');
+                }
+
+                return $q->whereIn('id_producto', $promotedProductIds);
             })
             ->when($filtro === 'combos', function ($q) {
                 return $q->where(function ($subQuery) {
@@ -142,17 +143,31 @@ class StorefrontController extends Controller
 
     public function checkout()
     {
+        $cliente = $this->sessionCliente(request());
+        if (! $cliente) {
+            return redirect()
+                ->route('storefront.cliente.login')
+                ->with('error', 'Inicia sesion o registrate para completar el pedido.');
+        }
+
         $zonas = ZonaDelivery::where('estado', 'Activo')
             ->orderBy('tarifa')
             ->orderBy('nombre')
             ->get();
         $igv = $this->igvPercent();
 
-        return view('storefront::checkout', compact('zonas', 'igv'));
+        return view('storefront::checkout', compact('zonas', 'igv', 'cliente'));
     }
 
-    public function storePedido(Request $request)
+    public function storePedido(Request $request, StockWebService $stockWeb, OperationalAudit $audit)
     {
+        $cliente = $this->sessionCliente($request);
+        if (! $cliente) {
+            return redirect()
+                ->route('storefront.cliente.login')
+                ->with('error', 'Inicia sesion o registrate para completar el pedido.');
+        }
+
         $data = $request->validate([
             'nombre' => 'required|string|max:100',
             'whatsapp' => 'required|string|max:20',
@@ -173,14 +188,20 @@ class StorefrontController extends Controller
         }
 
         foreach ($items as $item) {
-            if ($item['quantity'] > $item['presentation']->stock) {
-                return back()->with('error', "Stock insuficiente para {$item['name']}");
+            if ($item['quantity'] > (int) $item['presentation']->stock_web) {
+                return back()->with('error', "Stock web insuficiente para {$item['name']}. Disponible: {$item['presentation']->stock_web}");
             }
         }
 
         $zona = ZonaDelivery::where('estado', 'Activo')->findOrFail($data['id_zona']);
         $costoDelivery = (float) $zona->tarifa;
         $totalProductos = collect($items)->sum(fn ($item) => $item['subtotal']);
+
+        $cliente->update([
+            'nombre_o_razon_social' => $data['nombre'],
+            'celular' => $data['whatsapp'],
+            'direccion' => $data['direccion'],
+        ]);
 
         do {
             $codigo = '#WA-' . now()->format('ymd') . '-' . str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
@@ -195,7 +216,7 @@ class StorefrontController extends Controller
 
         $mensaje .= "\nTotal productos: S/ " . number_format($totalProductos, 2) . "\n";
         $mensaje .= "Delivery {$zona->nombre}: S/ " . number_format($costoDelivery, 2) . "\n";
-        $mensaje .= "Total a pagar: S/ " . number_format($totalProductos + $costoDelivery, 2) . "\n\n";
+        $mensaje .= "Total referencial del pedido: S/ " . number_format($totalProductos + $costoDelivery, 2) . "\n\n";
         $mensaje .= "Mi direccion es: {$data['direccion']}";
 
         if (!empty($data['referencia'])) {
@@ -204,35 +225,120 @@ class StorefrontController extends Controller
 
         $whatsappUrl = "https://wa.me/{$numeroEmpresa}?text=" . urlencode($mensaje);
 
-        DB::transaction(function () use ($codigo, $data, $zona, $totalProductos, $costoDelivery, $items, $whatsappUrl) {
-            $pedido = PedidoWhatsapp::create([
-                'codigo_pedido' => $codigo,
-                'cliente_nombre' => $data['nombre'],
-                'cliente_whatsapp' => $data['whatsapp'],
-                'cliente_direccion' => $data['direccion'],
-                'cliente_referencia' => $data['referencia'] ?? '',
-                'id_zona_delivery' => $zona->id_zona,
-                'total_productos' => $totalProductos,
-                'costo_delivery' => $costoDelivery,
-                'total_pedido' => $totalProductos + $costoDelivery,
-                'estado' => 'Pendiente',
-                'whatsapp_url' => $whatsappUrl,
-            ]);
-
-            foreach ($items as $item) {
-                PedidoWhatsappDetalle::create([
-                    'id_pedido_whatsapp' => $pedido->id_pedido_whatsapp,
-                    'id_producto' => $item['presentation']->id_producto,
-                    'id_presentacion' => $item['presentation']->id_presentacion,
-                    'nombre_producto' => $item['name'],
-                    'precio_unitario' => $item['price'],
-                    'cantidad' => $item['quantity'],
-                    'subtotal' => $item['subtotal'],
+        try {
+            DB::transaction(function () use ($codigo, $data, $zona, $totalProductos, $costoDelivery, $items, $whatsappUrl, $stockWeb, $audit, $request) {
+                $pedido = PedidoWhatsapp::create([
+                    'codigo_pedido' => $codigo,
+                    'cliente_nombre' => $data['nombre'],
+                    'cliente_whatsapp' => $data['whatsapp'],
+                    'cliente_direccion' => $data['direccion'],
+                    'cliente_referencia' => $data['referencia'] ?? '',
+                    'id_zona_delivery' => $zona->id_zona,
+                    'total_productos' => $totalProductos,
+                    'costo_delivery' => $costoDelivery,
+                    'total_pedido' => $totalProductos + $costoDelivery,
+                    'estado' => 'Pendiente',
+                    'whatsapp_url' => $whatsappUrl,
                 ]);
-            }
-        });
+
+                foreach ($items as $item) {
+                    if (! $stockWeb->reserve($item['presentation'], $item['quantity'], $pedido->id_pedido_whatsapp, 'Reserva automatica al crear pedido web')) {
+                        throw new RuntimeException("Stock web insuficiente para {$item['name']}. El pedido no fue registrado.");
+                    }
+
+                    PedidoWhatsappDetalle::create([
+                        'id_pedido_whatsapp' => $pedido->id_pedido_whatsapp,
+                        'id_producto' => $item['presentation']->id_producto,
+                        'id_presentacion' => $item['presentation']->id_presentacion,
+                        'nombre_producto' => $item['name'],
+                        'precio_unitario' => $item['price'],
+                        'cantidad_solicitada' => $item['quantity'],
+                        'cantidad_confirmada' => $item['quantity'],
+                        'subtotal' => $item['subtotal'],
+                        'estado_item' => 'Solicitado',
+                    ]);
+                }
+
+                $audit->log(
+                    'crear_pedido_web',
+                    'pedidos_whatsapp',
+                    $pedido->id_pedido_whatsapp,
+                    "Cliente {$pedido->cliente_nombre} creo el pedido {$pedido->codigo_pedido} desde la tienda virtual",
+                    null,
+                    [
+                        'codigo' => $pedido->codigo_pedido,
+                        'total' => $pedido->total_pedido,
+                        'items' => collect($items)->map(fn ($item) => [
+                            'producto' => $item['name'],
+                            'cantidad_solicitada' => $item['quantity'],
+                            'cantidad_confirmada' => $item['quantity'],
+                        ])->values()->all(),
+                    ],
+                    $request
+                );
+            });
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
 
         return redirect()->away($whatsappUrl);
+    }
+
+    public function loginForm()
+    {
+        return view('storefront::cliente-login');
+    }
+
+    public function registerForm()
+    {
+        return view('storefront::cliente-register');
+    }
+
+    public function loginCliente(Request $request)
+    {
+        $data = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $cliente = Cliente::where('email', $data['email'])->first();
+        if (! $cliente || ! Hash::check($data['password'], (string) $cliente->password)) {
+            return back()->withErrors(['email' => 'Credenciales incorrectas.'])->withInput();
+        }
+
+        $request->session()->put('cliente_id', $cliente->id_cliente);
+
+        return redirect()->route('storefront.checkout');
+    }
+
+    public function registerCliente(Request $request)
+    {
+        $data = $request->validate([
+            'nombre' => 'required|string|max:150',
+            'email' => 'required|email|unique:clientes,email',
+            'whatsapp' => 'required|string|max:20',
+            'direccion' => 'nullable|string|max:500',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $cliente = Cliente::create([
+            'nombre_o_razon_social' => $data['nombre'],
+            'email' => $data['email'],
+            'celular' => $data['whatsapp'],
+            'direccion' => $data['direccion'] ?? null,
+            'password' => Hash::make($data['password']),
+        ]);
+
+        $request->session()->put('cliente_id', $cliente->id_cliente);
+
+        return redirect()->route('storefront.checkout');
+    }
+
+    public function logoutCliente(Request $request)
+    {
+        $request->session()->forget('cliente_id');
+
+        return redirect()->route('storefront.index');
     }
 
     private function catalogRelations(): array
@@ -242,8 +348,8 @@ class StorefrontController extends Controller
             'imagenes',
             'presentaciones' => function ($q) {
                 $q->where('estado', 'Activo')
-                    ->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END')
-                    ->orderByRaw('COALESCE(precio_oferta, precio)')
+                    ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
+                    ->orderBy('precio')
                     ->orderBy('id_presentacion');
             },
             'presentaciones.unidadMedida',
@@ -271,11 +377,49 @@ class StorefrontController extends Controller
         return $ids;
     }
 
+    private function promotedProductIds(Collection $promociones): array
+    {
+        if ($promociones->isEmpty()) {
+            return [];
+        }
+
+        $directProductIds = $promociones
+            ->flatMap(fn (Promocion $promocion) => $promocion->productos->pluck('id_producto'))
+            ->filter()
+            ->values()
+            ->all();
+
+        $categoryIds = $promociones
+            ->flatMap(fn (Promocion $promocion) => $promocion->categorias->pluck('id_categoria'))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $expandedCategoryIds = [];
+        foreach ($categoryIds as $categoryId) {
+            $expandedCategoryIds = array_merge($expandedCategoryIds, $this->categoryAndChildrenIds((int) $categoryId));
+        }
+
+        $categoryProductIds = empty($expandedCategoryIds)
+            ? []
+            : Producto::whereIn('id_categoria', array_unique($expandedCategoryIds))->pluck('id_producto')->all();
+
+        return array_values(array_unique(array_merge($directProductIds, $categoryProductIds)));
+    }
+
     private function igvPercent(): float
     {
         return (float) optional(
             EmpresaConfiguracion::where('estado', 'Activo')->first()
         )->porcentaje_igv ?: 18.0;
+    }
+
+    private function sessionCliente(Request $request): ?Cliente
+    {
+        $clienteId = $request->session()->get('cliente_id');
+
+        return $clienteId ? Cliente::find($clienteId) : null;
     }
 
     private function normalizeCartItems(array $cart): array
@@ -299,8 +443,8 @@ class StorefrontController extends Controller
                 $presentation = ProductoPresentacion::with('producto')
                     ->where('estado', 'Activo')
                     ->where('id_producto', $productId)
-                    ->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END')
-                    ->orderByRaw('COALESCE(precio_oferta, precio)')
+                    ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
+                    ->orderBy('precio')
                     ->first();
             }
 
@@ -308,8 +452,8 @@ class StorefrontController extends Controller
                 $presentation = ProductoPresentacion::with('producto')
                     ->where('estado', 'Activo')
                     ->where('id_producto', $rawItem['id'])
-                    ->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END')
-                    ->orderByRaw('COALESCE(precio_oferta, precio)')
+                    ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
+                    ->orderBy('precio')
                     ->first();
             }
 

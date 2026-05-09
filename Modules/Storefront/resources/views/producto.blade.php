@@ -19,16 +19,24 @@
             ->values();
         $images = $variantImages->isNotEmpty() ? $variantImages : $baseImages;
 
+        $price = (float) $presentacion->precio_efectivo;
+        $basePrice = (float) $presentacion->precio;
+        $referencePrice = $presentacion->precio_referencial !== null ? (float) $presentacion->precio_referencial : null;
+        $displayReference = $referencePrice && $referencePrice > $price
+            ? $referencePrice
+            : (($presentacion->tiene_promocion && $basePrice > $price) ? $basePrice : null);
+
         return [
             'id' => $presentacion->id_presentacion,
             'presentation_id' => $presentacion->id_presentacion,
             'product_id' => $producto->id_producto,
             'name' => $producto->nombre_base,
             'variant' => $presentacion->nombre_variante,
-            'price' => (float) $presentacion->precio_efectivo,
-            'regular_price' => (float) $presentacion->precio,
-            'has_offer' => (bool) $presentacion->tiene_oferta,
-            'stock' => (int) $presentacion->stock,
+            'price' => $price,
+            'regular_price' => $displayReference,
+            'has_offer' => $displayReference !== null,
+            'has_promotion' => (bool) $presentacion->tiene_promocion,
+            'stock' => (int) $presentacion->stock_web,
             'image' => $images->first(),
             'images' => $images->values(),
         ];

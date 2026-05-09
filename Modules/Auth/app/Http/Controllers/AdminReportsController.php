@@ -22,7 +22,7 @@ class AdminReportsController extends Controller
         $itemsSold = PedidoWhatsappDetalle::query()
             ->join('pedidos_whatsapp', 'pedidos_whatsapp.id_pedido_whatsapp', '=', 'pedidos_whatsapp_detalles.id_pedido_whatsapp')
             ->whereBetween('pedidos_whatsapp.created_at', [$from, $to])
-            ->sum('pedidos_whatsapp_detalles.cantidad');
+            ->sum('pedidos_whatsapp_detalles.cantidad_confirmada');
 
         $statusSummary = (clone $pedidosBase)
             ->select('estado')
@@ -45,7 +45,7 @@ class AdminReportsController extends Controller
             ->join('pedidos_whatsapp', 'pedidos_whatsapp.id_pedido_whatsapp', '=', 'pedidos_whatsapp_detalles.id_pedido_whatsapp')
             ->whereBetween('pedidos_whatsapp.created_at', [$from, $to])
             ->select('pedidos_whatsapp_detalles.nombre_producto')
-            ->selectRaw('SUM(pedidos_whatsapp_detalles.cantidad) as unidades')
+            ->selectRaw('SUM(pedidos_whatsapp_detalles.cantidad_confirmada) as unidades')
             ->selectRaw('SUM(pedidos_whatsapp_detalles.subtotal) as total')
             ->groupBy('pedidos_whatsapp_detalles.nombre_producto')
             ->orderByDesc('unidades')
@@ -60,8 +60,8 @@ class AdminReportsController extends Controller
 
         $lowStock = ProductoPresentacion::with('producto')
             ->where('estado', 'Activo')
-            ->whereColumn('stock', '<=', 'stock_minimo')
-            ->orderBy('stock')
+            ->whereColumn('stock_web', '<=', 'stock_web_minimo')
+            ->orderBy('stock_web')
             ->limit(8)
             ->get();
 

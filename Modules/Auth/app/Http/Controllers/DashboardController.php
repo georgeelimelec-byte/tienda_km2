@@ -12,7 +12,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Redirige al nuevo dashboard "hub" que creamos para el Storefront y Kanban
+        // Redirige al dashboard hub de tienda virtual y pedidos WhatsApp.
         return view('storefront::admin.dashboard');
     }
 }

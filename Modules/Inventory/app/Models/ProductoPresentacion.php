@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Modelo Eloquent para la tabla 'productos_presentaciones'.
- * Entidad central del inventario: cada variante tiene su propio stock, precio y barcode.
+ * Entidad central del inventario web: cada variante tiene su propio stock web, precio y barcode.
  *
  * @property int $id_presentacion
  * @property int $id_producto
@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $codigo_barras
  * @property float $costo_reposicion
  * @property float $precio
- * @property float|null $precio_oferta
- * @property int $stock
- * @property int $stock_minimo
+ * @property float|null $precio_referencial
+ * @property int $stock_web
+ * @property int $stock_web_minimo
  * @property string $estado
  */
 class ProductoPresentacion extends Model
@@ -28,12 +28,12 @@ class ProductoPresentacion extends Model
 
     protected $fillable = [
         'id_producto', 'id_unidad', 'nombre_variante', 'codigo_barras',
-        'costo_reposicion', 'precio', 'precio_oferta', 'stock', 'stock_minimo', 'estado',
+        'costo_reposicion', 'precio', 'precio_referencial', 'stock_web', 'stock_web_minimo', 'estado',
     ];
 
     protected $casts = [
         'precio' => 'decimal:2',
-        'precio_oferta' => 'decimal:2',
+        'precio_referencial' => 'decimal:2',
         'costo_reposicion' => 'decimal:2',
     ];
 
@@ -58,20 +58,35 @@ class ProductoPresentacion extends Model
      */
     public function isLowStock(): bool
     {
-        return $this->stock <= $this->stock_minimo;
+        return $this->stock_web <= $this->stock_web_minimo;
     }
 
     /**
-     * Retorna el precio efectivo (oferta si existe, sino el normal).
+     * Retorna el precio efectivo, aplicando promociones activas si corresponde.
      */
     public function getPrecioEfectivoAttribute(): float
     {
-        return (float) ($this->precio_oferta ?? $this->precio);
+        return app(\Modules\Storefront\Services\PromotionPricingService::class)
+            ->priceFor($this)['final_price'];
     }
 
     public function getTieneOfertaAttribute(): bool
     {
-        return $this->precio_oferta !== null && (float) $this->precio_oferta < (float) $this->precio;
+        return $this->tiene_promocion || (
+            $this->precio_referencial !== null && (float) $this->precio_referencial > (float) $this->precio
+        );
+    }
+
+    public function getTienePromocionAttribute(): bool
+    {
+        return app(\Modules\Storefront\Services\PromotionPricingService::class)
+            ->priceFor($this)['has_promotion'];
+    }
+
+    public function getPromocionActivaAttribute()
+    {
+        return app(\Modules\Storefront\Services\PromotionPricingService::class)
+            ->priceFor($this)['promotion'];
     }
 
     public function getImagenPrincipalUrlAttribute(): string

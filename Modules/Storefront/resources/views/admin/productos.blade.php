@@ -24,8 +24,8 @@
                     descripcion: '',
                     id_categoria: '',
                     precio_venta: '',
-                    precio_oferta: '',
-                    stock: 0,
+                    precio_referencial: '',
+                    stock_web: 0,
                     galeria_urls: '',
                     nombre_variante: 'Unidad',
                     codigo_barras: '',
@@ -136,9 +136,9 @@
                             $presentacion = $item->presentaciones->first();
                             $imgPrincipal = $item->imagen_principal_url;
                             $precioRegular = $presentacion ? (float) $presentacion->precio : 0;
-                            $precioOferta = $presentacion && $presentacion->precio_oferta !== null ? (float) $presentacion->precio_oferta : null;
+                            $precioReferencial = $presentacion && $presentacion->precio_referencial !== null ? (float) $presentacion->precio_referencial : null;
                             $precio = $presentacion ? (float) $presentacion->precio_efectivo : 0;
-                            $stock = $presentacion ? (int) $presentacion->stock : 0;
+                            $stock = $presentacion ? (int) $presentacion->stock_web : 0;
                             $galleryUrls = $item->imagenes->pluck('imagen_url')->implode("\n");
                         @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
@@ -156,8 +156,8 @@
                                 <div class="font-bold text-gray-900 line-clamp-1" title="{{ $item->nombre_base }}">{{ $item->nombre_base }}</div>
                                 <div class="text-xs text-gray-500">{{ $item->categoria->nombre ?? 'Sin categoria' }}</div>
                                 <div class="text-sm font-bold text-brand mt-1">S/ {{ number_format($precio, 2) }}</div>
-                                @if($precioOferta !== null && $precioOferta < $precioRegular)
-                                    <div class="text-xs text-gray-400 line-through">Regular S/ {{ number_format($precioRegular, 2) }}</div>
+                                @if($precioReferencial !== null && $precioReferencial > $precio)
+                                    <div class="text-xs text-gray-400 line-through">Ref. S/ {{ number_format($precioReferencial, 2) }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -175,8 +175,8 @@
                                     "descripcion" => $item->descripcion,
                                     "id_categoria" => $item->id_categoria,
                                     "precio_venta" => $precioRegular,
-                                    "precio_oferta" => $precioOferta,
-                                    "stock" => $stock,
+                                    "precio_referencial" => $precioReferencial,
+                                    "stock_web" => $stock,
                                     "estado" => $item->estado,
                                     "galeria_urls" => $galleryUrls,
                                     "nombre_variante" => $presentacion->nombre_variante ?? 'Unidad',
@@ -255,9 +255,9 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Precio oferta S/</label>
-                                    <input type="number" step="0.01" name="precio_oferta" x-model="currentItem.precio_oferta" class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all" placeholder="Opcional">
-                                    <p class="text-xs text-gray-500 mt-1">Debe ser menor que el precio regular para mostrarse como promocion.</p>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Precio referencial S/</label>
+                                    <input type="number" step="0.01" name="precio_referencial" x-model="currentItem.precio_referencial" class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all" placeholder="Opcional">
+                                    <p class="text-xs text-gray-500 mt-1">Solo es un ancla visual. Las promociones se configuran aparte.</p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-1">Presentacion</label>
@@ -271,8 +271,8 @@
                                     <input type="text" name="codigo_barras" x-model="currentItem.codigo_barras" class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all" placeholder="Opcional">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Stock Disponible <span class="text-red-500">*</span></label>
-                                    <input type="number" name="stock" x-model="currentItem.stock" required class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Stock web <span class="text-red-500">*</span></label>
+                                    <input type="number" name="stock_web" x-model="currentItem.stock_web" required class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all">
                                 </div>
                             </div>
 

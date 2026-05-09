@@ -50,8 +50,8 @@
         .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: #ffffff; transition: all 0.2s; }
         .form-control:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(229,140,58,0.1); }
         
-        .variant-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 40px; gap: 10px; align-items: end; margin-bottom: 12px; background: #ffffff; padding: 12px; border: 1px solid var(--border); border-radius: 12px; }
-        .variant-row-header { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 40px; gap: 10px; padding: 0 12px; margin-bottom: 8px; }
+        .variant-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 1fr 40px; gap: 10px; align-items: end; margin-bottom: 12px; background: #ffffff; padding: 12px; border: 1px solid var(--border); border-radius: 12px; }
+        .variant-row-header { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 1fr 40px; gap: 10px; padding: 0 12px; margin-bottom: 8px; }
         .variant-col-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .variant-image-tools { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr); gap: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
         .variant-image-note { font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
@@ -145,6 +145,7 @@
                             <th>Unidad</th>
                             <th>Costo S/</th>
                             <th>Precio S/</th>
+                            <th>Ref. S/</th>
                             <th>Stock</th>
                             <th>Fotos</th>
                         </tr>
@@ -160,11 +161,12 @@
                                 <td>{{ $pres->unidadMedida->nombre ?? 'Otr' }}</td>
                                 <td>{{ number_format($pres->costo_reposicion, 2) }}</td>
                                 <td style="font-weight: 700; color: var(--primary);">{{ number_format($pres->precio, 2) }}</td>
+                                <td>{{ $pres->precio_referencial ? number_format($pres->precio_referencial, 2) : '---' }}</td>
                                 <td>
-                                    @if ($pres->stock <= $pres->stock_minimo)
-                                        <span class="badge-stock low">{{ $pres->stock }} <i class="fas fa-arrow-down" style="font-size:10px;"></i></span>
+                                    @if ($pres->stock_web <= $pres->stock_web_minimo)
+                                        <span class="badge-stock low">{{ $pres->stock_web }} <i class="fas fa-arrow-down" style="font-size:10px;"></i></span>
                                     @else
-                                        <span class="badge-stock">{{ $pres->stock }}</span>
+                                        <span class="badge-stock">{{ $pres->stock_web }}</span>
                                     @endif
                                 </td>
                                 <td>
@@ -264,7 +266,8 @@
                                 <div class="variant-col-label">Unid.</div>
                                 <div class="variant-col-label">Costo S/</div>
                                 <div class="variant-col-label">Precio S/</div>
-                                <div class="variant-col-label">Stock Total</div>
+                                <div class="variant-col-label">Ref. S/</div>
+                                <div class="variant-col-label">Stock web</div>
                                 <div></div>
                             </div>
                         @endif
@@ -293,8 +296,12 @@
                                     @error('presentaciones.'.$index.'.precio') <span class="form-error">Req</span> @enderror
                                 </div>
                                 <div>
-                                    <input type="number" class="form-control" wire:model="presentaciones.{{ $index }}.stock" min="0" placeholder="0">
-                                    @error('presentaciones.'.$index.'.stock') <span class="form-error">Req</span> @enderror
+                                    <input type="number" step="0.01" class="form-control" wire:model="presentaciones.{{ $index }}.precio_referencial" placeholder="Opcional">
+                                    @error('presentaciones.'.$index.'.precio_referencial') <span class="form-error">Inv</span> @enderror
+                                </div>
+                                <div>
+                                    <input type="number" class="form-control" wire:model="presentaciones.{{ $index }}.stock_web" min="0" placeholder="0">
+                                    @error('presentaciones.'.$index.'.stock_web') <span class="form-error">Req</span> @enderror
                                 </div>
                                 <button type="button" wire:click="removePresentacion({{ $index }})" class="btn-remove" title="Quitar variante">
                                     <i class="fas fa-trash"></i>

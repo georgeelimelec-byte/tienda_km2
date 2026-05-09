@@ -25,7 +25,7 @@ class InventoryService
 
         DB::transaction(function () use ($presentacionId, $cantidad) {
             $presentation = $this->findLockedPresentation($presentacionId);
-            $currentStock = (int) $presentation->stock;
+            $currentStock = (int) $presentation->stock_web;
 
             if ($currentStock < $cantidad) {
                 throw new \RuntimeException(
@@ -33,7 +33,7 @@ class InventoryService
                 );
             }
 
-            $presentation->update(['stock' => $currentStock - $cantidad]);
+            $presentation->update(['stock_web' => $currentStock - $cantidad]);
         });
     }
 
@@ -55,7 +55,7 @@ class InventoryService
 
         DB::transaction(function () use ($presentacionId, $quantity) {
             $presentation = $this->findLockedPresentation($presentacionId);
-            $presentation->update(['stock' => (int) $presentation->stock + $quantity]);
+            $presentation->update(['stock_web' => (int) $presentation->stock_web + $quantity]);
         });
     }
 

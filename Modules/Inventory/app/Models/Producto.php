@@ -38,8 +38,8 @@ class Producto extends Model
     {
         return $this->hasOne(ProductoPresentacion::class, 'id_producto', 'id_producto')
             ->where('estado', 'Activo')
-            ->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END')
-            ->orderByRaw('COALESCE(precio_oferta, precio)')
+            ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
+            ->orderBy('precio')
             ->orderBy('id_presentacion');
     }
 
@@ -99,12 +99,12 @@ class Producto extends Model
         if ($this->relationLoaded('presentaciones')) {
             return (int) $this->presentaciones
                 ->where('estado', 'Activo')
-                ->sum('stock');
+                ->sum('stock_web');
         }
 
         return (int) $this->presentaciones()
             ->where('estado', 'Activo')
-            ->sum('stock');
+            ->sum('stock_web');
     }
 
     public function getPrecioDesdeAttribute(): ?float
@@ -121,7 +121,7 @@ class Producto extends Model
 
         $presentacion = $this->presentaciones()
             ->where('estado', 'Activo')
-            ->orderByRaw('COALESCE(precio_oferta, precio)')
+            ->orderBy('precio')
             ->first();
 
         return $presentacion ? (float) $presentacion->precio_efectivo : null;

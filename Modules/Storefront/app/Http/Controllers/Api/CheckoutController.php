@@ -10,10 +10,13 @@ use Modules\Inventory\Models\ProductoPresentacion;
 use Modules\Storefront\Models\PedidoWhatsapp;
 use Modules\Storefront\Models\PedidoWhatsappDetalle;
 use Modules\Storefront\Models\ZonaDelivery;
+use Modules\Storefront\Services\OperationalAudit;
+use Modules\Storefront\Services\StockWebService;
+use RuntimeException;
 
 class CheckoutController extends Controller
 {
-    public function process(Request $request): JsonResponse
+    public function process(Request $request, StockWebService $stockWeb, OperationalAudit $audit): JsonResponse
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:100',
@@ -34,7 +37,7 @@ class CheckoutController extends Controller
                 ->where('estado', 'Activo')
                 ->findOrFail($item['id_presentacion']);
 
-            if ($item['cantidad'] > $presentation->stock) {
+            if ($item['cantidad'] > $presentation->stock_web) {
                 return response()->json([
                     'message' => "Stock insuficiente para {$presentation->producto->nombre_base}.",
                 ], 422);
@@ -47,13 +50,30 @@ class CheckoutController extends Controller
             }
 
             $price = (float) $presentation->precio_efectivo;
-            $lines[] = [
+            $key = $presentation->id_presentacion;
+            if (isset($lines[$key])) {
+                $lines[$key]['quantity'] += (int) $item['cantidad'];
+                $lines[$key]['subtotal'] = $lines[$key]['quantity'] * $price;
+                continue;
+            }
+
+            $lines[$key] = [
                 'presentation' => $presentation,
                 'name' => $name,
                 'quantity' => (int) $item['cantidad'],
                 'price' => $price,
                 'subtotal' => $price * (int) $item['cantidad'],
             ];
+        }
+
+        $lines = array_values($lines);
+
+        foreach ($lines as $line) {
+            if ($line['quantity'] > $line['presentation']->stock_web) {
+                return response()->json([
+                    'message' => "Stock insuficiente para {$line['name']}.",
+                ], 422);
+            }
         }
 
         do {
@@ -67,39 +87,59 @@ class CheckoutController extends Controller
         }
         $message .= "\nTotal productos: S/ " . number_format(collect($lines)->sum('subtotal'), 2);
         $message .= "\nDelivery {$zona->nombre}: S/ " . number_format((float) $zona->tarifa, 2);
-        $message .= "\nTotal a pagar: S/ " . number_format(collect($lines)->sum('subtotal') + (float) $zona->tarifa, 2);
+        $message .= "\nTotal referencial del pedido: S/ " . number_format(collect($lines)->sum('subtotal') + (float) $zona->tarifa, 2);
         $whatsappUrl = "https://wa.me/{$numeroEmpresa}?text=" . urlencode($message);
 
-        $pedido = DB::transaction(function () use ($codigo, $data, $zona, $lines, $whatsappUrl) {
-            $totalProductos = collect($lines)->sum('subtotal');
-            $pedido = PedidoWhatsapp::create([
-                'codigo_pedido' => $codigo,
-                'cliente_nombre' => $data['nombre'],
-                'cliente_whatsapp' => $data['whatsapp'],
-                'cliente_direccion' => $data['direccion'],
-                'cliente_referencia' => $data['referencia'] ?? '',
-                'id_zona_delivery' => $zona->id_zona,
-                'total_productos' => $totalProductos,
-                'costo_delivery' => (float) $zona->tarifa,
-                'total_pedido' => $totalProductos + (float) $zona->tarifa,
-                'estado' => 'Pendiente',
-                'whatsapp_url' => $whatsappUrl,
-            ]);
-
-            foreach ($lines as $line) {
-                PedidoWhatsappDetalle::create([
-                    'id_pedido_whatsapp' => $pedido->id_pedido_whatsapp,
-                    'id_producto' => $line['presentation']->id_producto,
-                    'id_presentacion' => $line['presentation']->id_presentacion,
-                    'nombre_producto' => $line['name'],
-                    'precio_unitario' => $line['price'],
-                    'cantidad' => $line['quantity'],
-                    'subtotal' => $line['subtotal'],
+        try {
+            $pedido = DB::transaction(function () use ($codigo, $data, $zona, $lines, $whatsappUrl, $stockWeb, $audit, $request) {
+                $totalProductos = collect($lines)->sum('subtotal');
+                $pedido = PedidoWhatsapp::create([
+                    'codigo_pedido' => $codigo,
+                    'cliente_nombre' => $data['nombre'],
+                    'cliente_whatsapp' => $data['whatsapp'],
+                    'cliente_direccion' => $data['direccion'],
+                    'cliente_referencia' => $data['referencia'] ?? '',
+                    'id_zona_delivery' => $zona->id_zona,
+                    'total_productos' => $totalProductos,
+                    'costo_delivery' => (float) $zona->tarifa,
+                    'total_pedido' => $totalProductos + (float) $zona->tarifa,
+                    'estado' => 'Pendiente',
+                    'whatsapp_url' => $whatsappUrl,
                 ]);
-            }
 
-            return $pedido->load('detalles', 'zonaDelivery');
-        });
+                foreach ($lines as $line) {
+                    if (! $stockWeb->reserve($line['presentation'], $line['quantity'], $pedido->id_pedido_whatsapp, 'Reserva automatica al crear pedido API')) {
+                        throw new RuntimeException("Stock insuficiente para {$line['name']}.");
+                    }
+
+                    PedidoWhatsappDetalle::create([
+                        'id_pedido_whatsapp' => $pedido->id_pedido_whatsapp,
+                        'id_producto' => $line['presentation']->id_producto,
+                        'id_presentacion' => $line['presentation']->id_presentacion,
+                        'nombre_producto' => $line['name'],
+                        'precio_unitario' => $line['price'],
+                        'cantidad_solicitada' => $line['quantity'],
+                        'cantidad_confirmada' => $line['quantity'],
+                        'subtotal' => $line['subtotal'],
+                        'estado_item' => 'Solicitado',
+                    ]);
+                }
+
+                $audit->log(
+                    'crear_pedido_api',
+                    'pedidos_whatsapp',
+                    $pedido->id_pedido_whatsapp,
+                    "Pedido {$pedido->codigo_pedido} creado desde API de tienda virtual",
+                    null,
+                    ['total' => $pedido->total_pedido, 'items' => count($lines)],
+                    $request
+                );
+
+                return $pedido->load('detalles', 'zonaDelivery');
+            });
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         return response()->json($pedido, 201);
     }

@@ -264,22 +264,26 @@
 
                 @foreach(($promociones ?? collect())->take(3) as $promo)
                     @php
-                        $promoImage = optional($promo->imagenes->first())->url ?: optional($promo->producto->imagenes->first())->url;
-                        $promoName = trim($promo->producto->nombre_base . ' ' . $promo->nombre_variante);
+                        $promoProduct = $promo->productos->first();
+                        $promoImage = optional($promoProduct?->imagenes->first())->url ?: optional($promoProduct)->imagen_principal_url;
+                        $promoScope = $promo->productos->isNotEmpty()
+                            ? $promo->productos->count() . ' producto(s)'
+                            : $promo->categorias->pluck('nombre')->implode(', ');
+                        $discountLabel = $promo->tipo_descuento === 'Monto'
+                            ? 'S/ ' . number_format((float) $promo->valor_descuento, 2)
+                            : number_format((float) $promo->valor_descuento, 0) . '%';
                     @endphp
-                    <a href="{{ route('storefront.producto', $promo->id_producto) }}" class="group flex min-h-[180px] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-lg lg:min-h-[220px]">
+                    <a href="{{ route('storefront.index', ['filtro' => 'promociones']) }}" class="group flex min-h-[180px] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-lg lg:min-h-[220px]">
                         <div class="w-2/5 bg-gray-100">
                             @if($promoImage)
-                                <img src="{{ $promoImage }}" alt="{{ $promoName }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                <img src="{{ $promoImage }}" alt="{{ $promo->nombre }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                             @endif
                         </div>
                         <div class="flex flex-1 flex-col justify-center p-4">
-                            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-brand">Oferta</p>
-                            <h3 class="text-base font-extrabold leading-tight text-gray-900">{{ $promoName }}</h3>
-                            <div class="mt-3 flex items-end gap-2">
-                                <span class="text-xl font-black text-brand">S/ {{ number_format((float) $promo->precio_oferta, 2) }}</span>
-                                <span class="text-sm font-semibold text-gray-400 line-through">S/ {{ number_format((float) $promo->precio, 2) }}</span>
-                            </div>
+                            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-brand">Promocion</p>
+                            <h3 class="text-base font-extrabold leading-tight text-gray-900">{{ $promo->nombre }}</h3>
+                            <p class="mt-2 text-sm text-gray-500">{{ $promoScope ?: 'Productos seleccionados' }}</p>
+                            <div class="mt-3 text-xl font-black text-brand">-{{ $discountLabel }}</div>
                         </div>
                     </a>
                 @endforeach
@@ -365,7 +369,12 @@
 
                 $img = optional($presentacion->imagenes->first())->url ?: $producto->imagen_principal_url;
                 $price = (float) $presentacion->precio_efectivo;
-                $regularPrice = (float) $presentacion->precio;
+                $basePrice = (float) $presentacion->precio;
+                $referencePrice = $presentacion->precio_referencial !== null ? (float) $presentacion->precio_referencial : null;
+                $regularPrice = $referencePrice && $referencePrice > $price
+                    ? $referencePrice
+                    : (($presentacion->tiene_promocion && $basePrice > $price) ? $basePrice : null);
+                $stockWeb = (int) $presentacion->stock_web;
                 $igvAmount = $igv > 0 ? $price * ($igv / (100 + $igv)) : 0;
                 $rating = $producto->valoracion_promedio ? round($producto->valoracion_promedio, 1) : null;
                 $category = $producto->categoria;
@@ -381,7 +390,7 @@
                     'variant' => $presentacion->nombre_variante,
                     'price' => $price,
                     'image' => $img,
-                    'max_stock' => (int) $presentacion->stock,
+                    'max_stock' => $stockWeb,
                 ];
             @endphp
 
@@ -391,12 +400,16 @@
                     <div class="absolute inset-0 bg-gradient-to-t from-gray-950/45 via-transparent to-transparent z-10 pointer-events-none"></div>
                     <span class="absolute top-4 left-4 z-20 px-3 py-1 rounded-md text-xs font-bold border {{ $isCafe ? 'bg-orange-50/95 text-coffee border-orange-100' : 'bg-white/95 text-gray-700 border-gray-200' }}">{{ $isCafe ? 'Cafe' : 'Minimarket' }}</span>
 
-                    @if($presentacion->stock > 0)
+                    @if($stockWeb > 0)
                         <button @click="addToCart(@js($cartPayload))" class="absolute bottom-4 right-4 z-20 bg-white text-gray-900 hover:bg-ink hover:text-white rounded-lg p-3 shadow-lg transform translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 border border-white/80" title="Anadir">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                         </button>
                     @else
                         <span class="absolute bottom-4 right-4 z-20 bg-red-50 text-red-700 rounded-md px-3 py-2 text-xs font-bold border border-red-100">Agotado</span>
+                    @endif
+
+                    @if($presentacion->tiene_promocion)
+                        <span class="absolute top-4 right-4 z-20 rounded-md bg-brand px-3 py-1 text-xs font-black text-white">Promo</span>
                     @endif
                 </div>
 
@@ -410,13 +423,13 @@
 
                     <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
                         <span>{{ $presentacion->nombre_variante }}</span>
-                        <span>{{ $presentacion->stock }} disp.</span>
+                        <span>{{ $stockWeb }} disp.</span>
                     </div>
 
                     <div class="mt-auto">
                         <div class="flex items-center justify-between mb-2">
                             <div>
-                                @if($presentacion->tiene_oferta)
+                                @if($regularPrice)
                                     <p class="text-xs text-gray-400 font-medium line-through">S/ {{ number_format($regularPrice, 2) }}</p>
                                 @endif
                                 <p class="text-brand font-black text-xl">S/ {{ number_format($price, 2) }}</p>

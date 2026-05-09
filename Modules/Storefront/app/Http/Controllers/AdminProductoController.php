@@ -10,6 +10,8 @@ use Modules\Inventory\Models\Categoria;
 use Modules\Inventory\Models\Producto;
 use Modules\Inventory\Models\ProductoImagen;
 use Modules\Inventory\Models\ProductoPresentacion;
+use Modules\Storefront\Services\OperationalAudit;
+use Modules\Storefront\Services\StockWebService;
 
 class AdminProductoController extends Controller
 {
@@ -23,15 +25,15 @@ class AdminProductoController extends Controller
         return view('storefront::admin.productos', compact('productos', 'categorias'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, StockWebService $stockWeb, OperationalAudit $audit)
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string',
             'id_categoria' => 'required|exists:categorias,id_categoria',
             'precio_venta' => 'required|numeric|min:0',
-            'precio_oferta' => 'nullable|numeric|min:0|lt:precio_venta',
-            'stock' => 'required|integer|min:0',
+            'precio_referencial' => 'nullable|numeric|min:0|gt:precio_venta',
+            'stock_web' => 'required|integer|min:0',
             'foto_archivo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'galeria_urls' => 'nullable|string',
             'nombre_variante' => 'nullable|string|max:100',
@@ -42,7 +44,7 @@ class AdminProductoController extends Controller
         $imageUrl = $this->resolveImageUrl($request);
         $imageUrls = $this->imageUrls($imageUrl, $data['galeria_urls'] ?? null);
 
-        DB::transaction(function () use ($data, $imageUrl, $imageUrls) {
+        DB::transaction(function () use ($data, $imageUrl, $imageUrls, $stockWeb, $audit, $request) {
             $producto = Producto::create([
                 'nombre_base' => $data['nombre'],
                 'descripcion' => $data['descripcion'] ?? null,
@@ -51,33 +53,47 @@ class AdminProductoController extends Controller
                 'estado' => $data['estado'] ?? 'Activo',
             ]);
 
-            ProductoPresentacion::create([
+            $presentacion = ProductoPresentacion::create([
                 'id_producto' => $producto->id_producto,
                 'id_unidad' => 1,
                 'nombre_variante' => ($data['nombre_variante'] ?? '') ?: 'Unidad',
                 'codigo_barras' => $data['codigo_barras'] ?? null,
                 'precio' => $data['precio_venta'],
-                'precio_oferta' => $data['precio_oferta'] ?? null,
-                'stock' => $data['stock'],
-                'stock_minimo' => 1,
+                'precio_referencial' => $data['precio_referencial'] ?? null,
+                'stock_web' => 0,
+                'stock_web_minimo' => 1,
                 'estado' => $data['estado'] ?? 'Activo',
             ]);
 
+            $stockWeb->adjustManual($presentacion, (int) $data['stock_web'], 'Carga inicial de stock web desde productos');
             $this->syncImages($producto, $imageUrls);
+            $audit->log(
+                'crear_producto',
+                'productos',
+                $producto->id_producto,
+                "Producto {$producto->nombre_base} creado para la tienda virtual",
+                null,
+                [
+                    'precio' => $presentacion->precio,
+                    'precio_referencial' => $presentacion->precio_referencial,
+                    'stock_web' => $data['stock_web'],
+                ],
+                $request
+            );
         });
 
         return back()->with('success', 'Producto creado exitosamente');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, StockWebService $stockWeb, OperationalAudit $audit)
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string',
             'id_categoria' => 'required|exists:categorias,id_categoria',
             'precio_venta' => 'required|numeric|min:0',
-            'precio_oferta' => 'nullable|numeric|min:0|lt:precio_venta',
-            'stock' => 'required|integer|min:0',
+            'precio_referencial' => 'nullable|numeric|min:0|gt:precio_venta',
+            'stock_web' => 'required|integer|min:0',
             'estado' => 'required|in:Activo,Inactivo',
             'foto_archivo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'galeria_urls' => 'nullable|string',
@@ -88,8 +104,9 @@ class AdminProductoController extends Controller
         $imageUrl = $this->resolveImageUrl($request);
         $imageUrls = $this->imageUrls($imageUrl, $data['galeria_urls'] ?? null);
 
-        DB::transaction(function () use ($data, $id, $imageUrl, $imageUrls) {
+        DB::transaction(function () use ($data, $id, $imageUrl, $imageUrls, $stockWeb, $audit, $request) {
             $producto = Producto::with(['presentaciones.imagenes', 'imagenes'])->findOrFail($id);
+            $oldProduct = $producto->only(['nombre_base', 'descripcion', 'id_categoria', 'estado']);
             $producto->update([
                 'nombre_base' => $data['nombre'],
                 'descripcion' => $data['descripcion'] ?? null,
@@ -100,39 +117,69 @@ class AdminProductoController extends Controller
 
             $presentacion = $producto->presentaciones->first();
             if ($presentacion) {
+                $oldPresentation = $presentacion->only(['nombre_variante', 'codigo_barras', 'precio', 'precio_referencial', 'stock_web', 'estado']);
                 $presentacion->update([
                     'nombre_variante' => ($data['nombre_variante'] ?? '') ?: 'Unidad',
                     'codigo_barras' => $data['codigo_barras'] ?? null,
                     'precio' => $data['precio_venta'],
-                    'precio_oferta' => $data['precio_oferta'] ?? null,
-                    'stock' => $data['stock'],
+                    'precio_referencial' => $data['precio_referencial'] ?? null,
                     'estado' => $data['estado'],
                 ]);
+
+                if ((int) $oldPresentation['stock_web'] !== (int) $data['stock_web']) {
+                    $stockWeb->adjustManual($presentacion, (int) $data['stock_web'], 'Ajuste manual de stock web desde productos');
+                }
             } else {
-                ProductoPresentacion::create([
+                $oldPresentation = null;
+                $presentacion = ProductoPresentacion::create([
                     'id_producto' => $producto->id_producto,
                     'id_unidad' => 1,
                     'nombre_variante' => ($data['nombre_variante'] ?? '') ?: 'Unidad',
                     'codigo_barras' => $data['codigo_barras'] ?? null,
                     'precio' => $data['precio_venta'],
-                    'precio_oferta' => $data['precio_oferta'] ?? null,
-                    'stock' => $data['stock'],
-                    'stock_minimo' => 1,
+                    'precio_referencial' => $data['precio_referencial'] ?? null,
+                    'stock_web' => 0,
+                    'stock_web_minimo' => 1,
                     'estado' => $data['estado'],
                 ]);
+                $stockWeb->adjustManual($presentacion, (int) $data['stock_web'], 'Carga inicial de stock web desde productos');
             }
 
             $this->syncImages($producto, $imageUrls);
+            $audit->log(
+                'actualizar_producto',
+                'productos',
+                $producto->id_producto,
+                "Producto {$producto->nombre_base} actualizado para la tienda virtual",
+                [
+                    'producto' => $oldProduct,
+                    'presentacion' => $oldPresentation,
+                ],
+                [
+                    'producto' => $producto->fresh()->only(['nombre_base', 'descripcion', 'id_categoria', 'estado']),
+                    'presentacion' => $presentacion->fresh()->only(['nombre_variante', 'codigo_barras', 'precio', 'precio_referencial', 'stock_web', 'estado']),
+                ],
+                $request
+            );
         });
 
         return back()->with('success', 'Producto actualizado exitosamente');
     }
 
-    public function destroy($id)
+    public function destroy($id, OperationalAudit $audit, Request $request)
     {
         try {
-            DB::transaction(function () use ($id) {
+            DB::transaction(function () use ($id, $audit, $request) {
                 $producto = Producto::findOrFail($id);
+                $audit->log(
+                    'eliminar_producto',
+                    'productos',
+                    $producto->id_producto,
+                    "Producto {$producto->nombre_base} eliminado de la tienda virtual",
+                    $producto->only(['nombre_base', 'id_categoria', 'estado']),
+                    null,
+                    $request
+                );
                 ProductoPresentacion::where('id_producto', $producto->id_producto)->delete();
                 $producto->delete();
             });

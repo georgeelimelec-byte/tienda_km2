@@ -32,7 +32,10 @@ class StorefrontCatalogTest extends TestCase
             ->assertSee('Cafe americano KM2')
             ->assertSee('Presentacion');
 
-        $this->get(route('storefront.checkout'))
+        $cliente = Cliente::where('email', 'maria@example.test')->firstOrFail();
+
+        $this->withSession(['cliente_id' => $cliente->id_cliente])
+            ->get(route('storefront.checkout'))
             ->assertOk()
             ->assertSee('IGV incluido');
 
@@ -47,7 +50,10 @@ class StorefrontCatalogTest extends TestCase
 
         $presentation = ProductoPresentacion::where('codigo_barras', 'KM2-CAF-AMER-8')->firstOrFail();
 
-        $response = $this->post(route('storefront.store_pedido'), [
+        $cliente = Cliente::where('email', 'maria@example.test')->firstOrFail();
+
+        $response = $this->withSession(['cliente_id' => $cliente->id_cliente])
+            ->post(route('storefront.store_pedido'), [
             'nombre' => 'Cliente Demo',
             'whatsapp' => '51988887777',
             'direccion' => 'Av. Demo 123',
@@ -68,7 +74,13 @@ class StorefrontCatalogTest extends TestCase
 
         $this->assertDatabaseHas('pedidos_whatsapp_detalles', [
             'id_presentacion' => $presentation->id_presentacion,
-            'cantidad' => 2,
+            'cantidad_solicitada' => 2,
+            'cantidad_confirmada' => 2,
+        ]);
+
+        $this->assertDatabaseHas('productos_presentaciones', [
+            'id_presentacion' => $presentation->id_presentacion,
+            'stock_web' => 38,
         ]);
     }
 
@@ -220,9 +232,9 @@ class StorefrontCatalogTest extends TestCase
                 'nombre' => $product->nombre_base,
                 'descripcion' => $product->descripcion,
                 'id_categoria' => $product->id_categoria,
-                'precio_venta' => 6.50,
-                'precio_oferta' => 5.50,
-                'stock' => 30,
+                'precio_venta' => 5.50,
+                'precio_referencial' => 6.50,
+                'stock_web' => 30,
                 'estado' => 'Activo',
                 'foto_url' => 'https://example.com/cafe-americano.jpg',
                 'galeria_urls' => "https://example.com/cafe-americano.jpg\nhttps://example.com/cafe-barra.jpg",
@@ -233,8 +245,9 @@ class StorefrontCatalogTest extends TestCase
 
         $this->assertDatabaseHas('productos_presentaciones', [
             'id_presentacion' => $presentation->id_presentacion,
-            'precio_oferta' => 5.50,
-            'stock' => 30,
+            'precio' => 5.50,
+            'precio_referencial' => 6.50,
+            'stock_web' => 30,
         ]);
 
         $this->assertDatabaseHas('productos_imagenes', [

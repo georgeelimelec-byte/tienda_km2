@@ -37,7 +37,7 @@ class CartController extends Controller
         ]);
 
         $presentacion = ProductoPresentacion::where('estado', 'Activo')->findOrFail($data['id_presentacion']);
-        if ($data['cantidad'] > $presentacion->stock) {
+        if ($data['cantidad'] > $presentacion->stock_web) {
             return response()->json(['message' => 'Stock insuficiente.'], 422);
         }
 
@@ -58,6 +58,11 @@ class CartController extends Controller
 
         $data = $request->validate(['cantidad' => 'required|integer|min:1']);
         $item = CarritoWeb::where('id_cliente', $clienteId)->findOrFail($id);
+        $presentacion = ProductoPresentacion::where('estado', 'Activo')->findOrFail($item->id_presentacion);
+        if ($data['cantidad'] > $presentacion->stock_web) {
+            return response()->json(['message' => 'Stock insuficiente.'], 422);
+        }
+
         $item->update(['cantidad' => $data['cantidad']]);
 
         return response()->json($item->fresh('presentacion.imagenes', 'presentacion.producto.imagenes'));

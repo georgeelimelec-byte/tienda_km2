@@ -11,6 +11,7 @@ use Modules\Inventory\Models\ProductoPresentacion;
 use Modules\Storefront\Models\BannerWeb;
 use Modules\Storefront\Models\PedidoWhatsapp;
 use Modules\Storefront\Models\PedidoWhatsappDetalle;
+use Modules\Storefront\Models\Promocion;
 
 class AdminBusinessController extends Controller
 {
@@ -22,7 +23,7 @@ class AdminBusinessController extends Controller
         $estimatedRevenue = (float) ((clone $pedidosBase)->sum('total_pedido') ?: 0);
         $avgTicket = $ordersCount > 0 ? $estimatedRevenue / $ordersCount : 0;
         $pendingCount = (clone $pedidosBase)->where('estado', 'Pendiente')->count();
-        $fulfilledCount = (clone $pedidosBase)->whereIn('estado', ['En Reparto', 'Entregado'])->count();
+        $fulfilledCount = (clone $pedidosBase)->whereIn('estado', ['En Delivery', 'Entregado'])->count();
         $paidCount = (clone $pedidosBase)->where('estado', 'Confirmado')->count();
 
         $dailyTrend = PedidoWhatsapp::query()
@@ -42,7 +43,7 @@ class AdminBusinessController extends Controller
             ->join('categorias', 'categorias.id_categoria', '=', 'productos.id_categoria')
             ->whereBetween('pedidos_whatsapp.created_at', [$from, $to])
             ->select('categorias.nombre')
-            ->selectRaw('SUM(pedidos_whatsapp_detalles.cantidad) as unidades')
+            ->selectRaw('SUM(pedidos_whatsapp_detalles.cantidad_confirmada) as unidades')
             ->selectRaw('SUM(pedidos_whatsapp_detalles.subtotal) as total')
             ->groupBy('categorias.nombre')
             ->orderByDesc('total')
@@ -53,7 +54,7 @@ class AdminBusinessController extends Controller
             ->join('pedidos_whatsapp', 'pedidos_whatsapp.id_pedido_whatsapp', '=', 'pedidos_whatsapp_detalles.id_pedido_whatsapp')
             ->whereBetween('pedidos_whatsapp.created_at', [$from, $to])
             ->select('pedidos_whatsapp_detalles.nombre_producto')
-            ->selectRaw('SUM(pedidos_whatsapp_detalles.cantidad) as unidades')
+            ->selectRaw('SUM(pedidos_whatsapp_detalles.cantidad_confirmada) as unidades')
             ->selectRaw('SUM(pedidos_whatsapp_detalles.subtotal) as total')
             ->groupBy('pedidos_whatsapp_detalles.nombre_producto')
             ->orderByDesc('total')
@@ -68,14 +69,11 @@ class AdminBusinessController extends Controller
             ->get();
 
         $lowStockCount = ProductoPresentacion::where('estado', 'Activo')
-            ->whereColumn('stock', '<=', 'stock_minimo')
+            ->whereColumn('stock_web', '<=', 'stock_web_minimo')
             ->count();
 
         $activeProducts = Producto::where('estado', 'Activo')->count();
-        $activePromotions = ProductoPresentacion::where('estado', 'Activo')
-            ->whereNotNull('precio_oferta')
-            ->whereColumn('precio_oferta', '<', 'precio')
-            ->count();
+        $activePromotions = Promocion::activas()->count();
 
         $activeBanners = BannerWeb::where('estado', 'Activo')->count();
         $usersCount = Usuario::count();

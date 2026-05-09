@@ -900,6 +900,11 @@
                     <i class="fas fa-image"></i> Banners
                 </span>
                 @endif
+                @if(\Illuminate\Support\Facades\Route::has('admin.promociones.index'))
+                    <a href="{{ route('admin.promociones.index') }}" class="nav-link {{ request()->routeIs('admin.promociones.*') ? 'active' : '' }}">
+                        <i class="fas fa-percent"></i> Promociones
+                    </a>
+                @endif
             </div>
 
             <div class="nav-section">
@@ -912,6 +917,11 @@
                 @if(\Illuminate\Support\Facades\Route::has('admin.business.index'))
                     <a href="{{ route('admin.business.index') }}" class="nav-link {{ request()->routeIs('admin.business.*') ? 'active' : '' }}">
                         <i class="fas fa-chart-line"></i> Business & data
+                    </a>
+                @endif
+                @if(\Illuminate\Support\Facades\Route::has('admin.auditoria.index'))
+                    <a href="{{ route('admin.auditoria.index') }}" class="nav-link {{ request()->routeIs('admin.auditoria.*') ? 'active' : '' }}">
+                        <i class="fas fa-shield-halved"></i> Auditoria
                     </a>
                 @endif
                 @if(\Illuminate\Support\Facades\Route::has('admin.configuracion.index'))
