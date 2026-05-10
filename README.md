@@ -35,7 +35,6 @@ Tablas principales del alcance actual:
 - `auditoria_operativa`, `stock_web_movimientos`
 - `banners_web`, `zonas_delivery`, `storefront_settings`
 - `usuarios`, `roles`, `modulos`, `permisos_rol`, `permisos_usuario`
-- `empresa_configuracion`
 - `personal_access_tokens`, `sessions`, `cache`, `cache_locks`, `migrations`
 
 Las migraciones `2026_05_06_*` y `2026_05_07_*` limpian columnas y tablas legacy o sin flujo real en instalaciones existentes.
@@ -52,11 +51,7 @@ npm run build
 php artisan serve
 ```
 
-Configura el numero de la empresa para WhatsApp:
-
-```env
-WHATSAPP_EMPRESA=51999999999
-```
+El numero de WhatsApp, horario, moneda e impuesto incluido se configuran desde `/admin/configuracion` y se guardan en `storefront_settings`.
 
 ## Validacion
 

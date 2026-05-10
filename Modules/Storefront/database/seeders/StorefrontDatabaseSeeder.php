@@ -3,9 +3,9 @@
 namespace Modules\Storefront\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Modules\Storefront\Models\BannerWeb;
 use Modules\Storefront\Models\Promocion;
+use Modules\Storefront\Models\StorefrontSetting;
 use Modules\Storefront\Models\ZonaDelivery;
 
 class StorefrontDatabaseSeeder extends Seeder
@@ -15,28 +15,24 @@ class StorefrontDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->seedCompany();
+        $this->seedStorefrontSettings();
         $this->seedDeliveryZones();
         $this->seedBanners();
         $this->seedPromotions();
     }
 
-    private function seedCompany(): void
+    private function seedStorefrontSettings(): void
     {
-        DB::table('empresa_configuracion')->updateOrInsert(
-            ['id_empresa' => 1],
-            [
-                'ruc' => '20600000001',
-                'razon_social' => 'Market KM2 S.A.C.',
-                'nombre_comercial' => 'Market KM2',
-                'logo_url' => 'logo_default.png',
-                'direccion_fiscal' => 'Lima, Peru',
-                'telefono_contacto' => '999999999',
-                'correo_contacto' => 'ventas@marketkm2.test',
-                'ubigeo' => '150101',
-                'porcentaje_igv' => 18.00,
-                'estado' => 'Activo',
-            ]
+        StorefrontSetting::updateOrCreate(
+            ['id' => 1],
+            array_merge(StorefrontSetting::defaults(), [
+                'whatsapp_number' => '51999999999',
+                'contact_phone' => '999999999',
+                'contact_email' => 'ventas@marketkm2.test',
+                'currency' => 'PEN',
+                'included_tax_percent' => 18.00,
+                'business_hours' => 'Lunes a domingo',
+            ])
         );
     }
 

@@ -136,7 +136,6 @@ Tablas principales:
 - `modulos`
 - `permisos_rol`
 - `permisos_usuario`
-- `empresa_configuracion`
 - `personal_access_tokens`
 - `sessions`
 - `cache`

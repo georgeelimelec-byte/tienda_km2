@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Inventory\Models\ProductoPresentacion;
 use Modules\Storefront\Models\PedidoWhatsapp;
 use Modules\Storefront\Models\PedidoWhatsappDetalle;
+use Modules\Storefront\Models\StorefrontSetting;
 use Modules\Storefront\Models\ZonaDelivery;
 use Modules\Storefront\Services\OperationalAudit;
 use Modules\Storefront\Services\StockWebService;
@@ -80,7 +81,7 @@ class CheckoutController extends Controller
             $codigo = '#WA-' . now()->format('ymd') . '-' . str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while (PedidoWhatsapp::where('codigo_pedido', $codigo)->exists());
 
-        $numeroEmpresa = preg_replace('/\D+/', '', env('WHATSAPP_EMPRESA', '51999999999')) ?: '51999999999';
+        $numeroEmpresa = StorefrontSetting::current()->whatsappNumberForUrl();
         $message = "Hola, quiero confirmar mi pedido *{$codigo}*.\n";
         foreach ($lines as $line) {
             $message .= "- {$line['quantity']} x {$line['name']}: S/ " . number_format($line['subtotal'], 2) . "\n";

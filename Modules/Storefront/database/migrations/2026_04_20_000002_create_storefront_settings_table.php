@@ -21,6 +21,13 @@ return new class extends Migration
             $table->enum('card_style', ['rounded', 'compact', 'flat'])->default('rounded');
             $table->boolean('show_login_link')->default(true);
             $table->string('footer_text', 160)->nullable();
+            $table->string('whatsapp_number', 24)->nullable();
+            $table->string('contact_phone', 24)->nullable();
+            $table->string('contact_email', 120)->nullable();
+            $table->string('currency', 10)->default('PEN');
+            $table->decimal('included_tax_percent', 5, 2)->default(18.00);
+            $table->string('business_hours', 160)->nullable();
+            $table->text('operational_message')->nullable();
             $table->timestamps();
         });
     }

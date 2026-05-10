@@ -3,7 +3,6 @@
 namespace Modules\Storefront\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\EmpresaConfiguracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +15,7 @@ use Modules\Storefront\Models\Cliente;
 use Modules\Storefront\Models\PedidoWhatsapp;
 use Modules\Storefront\Models\PedidoWhatsappDetalle;
 use Modules\Storefront\Models\Promocion;
+use Modules\Storefront\Models\StorefrontSetting;
 use Modules\Storefront\Models\ZonaDelivery;
 use Modules\Storefront\Services\OperationalAudit;
 use Modules\Storefront\Services\StockWebService;
@@ -201,7 +201,7 @@ class StorefrontController extends Controller
             $codigo = '#WA-' . now()->format('ymd') . '-' . str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while (PedidoWhatsapp::where('codigo_pedido', $codigo)->exists());
 
-        $numeroEmpresa = preg_replace('/\D+/', '', env('WHATSAPP_EMPRESA', '51999999999')) ?: '51999999999';
+        $numeroEmpresa = StorefrontSetting::current()->whatsappNumberForUrl();
         $mensaje = "Hola, mi nombre es {$data['nombre']}. Quiero confirmar mi pedido *{$codigo}*.\n";
 
         foreach ($items as $item) {
@@ -403,9 +403,7 @@ class StorefrontController extends Controller
 
     private function igvPercent(): float
     {
-        return (float) optional(
-            EmpresaConfiguracion::where('estado', 'Activo')->first()
-        )->porcentaje_igv ?: 18.0;
+        return (float) (StorefrontSetting::current()->included_tax_percent ?? 18.0);
     }
 
     private function sessionCliente(Request $request): ?Cliente

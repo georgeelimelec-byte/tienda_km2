@@ -494,12 +494,12 @@
             <div>
                 <h3>Configuracion central del sistema</h3>
                 <p>
-                    Desde aqui se ordenan los ajustes del negocio. La estructura queda separada por capas: apariencia publica, operacion de empresa, pedidos WhatsApp y accesos internos.
+                    Desde aqui se ordenan los ajustes del negocio. La estructura queda separada por capas: apariencia publica, operacion de tienda virtual, pedidos WhatsApp y accesos internos.
                 </p>
             </div>
             <div class="settings-card-actions">
-                <a href="#empresa-config" class="settings-btn-ghost">
-                    <i class="fas fa-building"></i> Empresa
+                <a href="#tienda-operacion" class="settings-btn-ghost">
+                    <i class="fab fa-whatsapp"></i> Operacion
                 </a>
                 <a href="{{ route('admin.storefront.index') }}" class="settings-btn">
                     <i class="fas fa-palette"></i> Editar apariencia
@@ -584,83 +584,55 @@
 
             </section>
 
-            <section class="settings-form-card" id="empresa-config">
+            <section class="settings-form-card" id="tienda-operacion">
                 <div class="settings-form-head">
-                    <h3>Empresa y operacion</h3>
-                    <p>Datos fiscales, IGV, moneda, contacto y mensajes internos para la tienda virtual y la operacion por WhatsApp.</p>
+                    <h3>Operacion de tienda virtual</h3>
+                    <p>Datos operativos para pedidos por WhatsApp, contacto publico, horario, moneda y calculo referencial de impuesto incluido. No contiene datos fiscales ni comprobantes.</p>
                 </div>
                 <div class="settings-form-body">
                     <form method="POST" action="{{ route('admin.configuracion.update') }}">
                         @csrf
                         <div class="settings-form-grid">
                             <div class="settings-form-group">
-                                <label class="settings-label" for="ruc">RUC</label>
-                                <input class="settings-field" id="ruc" name="ruc" value="{{ old('ruc', $company->ruc) }}" maxlength="11" required>
-                                @error('ruc') <div class="settings-error">{{ $message }}</div> @enderror
+                                <label class="settings-label" for="whatsapp_number">WhatsApp de atencion</label>
+                                <input class="settings-field" id="whatsapp_number" name="whatsapp_number" value="{{ old('whatsapp_number', $storefront->whatsapp_number) }}" maxlength="24" required>
+                                @error('whatsapp_number') <div class="settings-error">{{ $message }}</div> @enderror
                             </div>
                             <div class="settings-form-group">
-                                <label class="settings-label" for="nombre_comercial">Nombre comercial</label>
-                                <input class="settings-field" id="nombre_comercial" name="nombre_comercial" value="{{ old('nombre_comercial', $company->nombre_comercial) }}" maxlength="150" required>
-                                @error('nombre_comercial') <div class="settings-error">{{ $message }}</div> @enderror
+                                <label class="settings-label" for="contact_phone">Telefono publico</label>
+                                <input class="settings-field" id="contact_phone" name="contact_phone" value="{{ old('contact_phone', $storefront->contact_phone) }}" maxlength="24">
+                                @error('contact_phone') <div class="settings-error">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="settings-form-group">
+                                <label class="settings-label" for="contact_email">Correo de contacto</label>
+                                <input class="settings-field" id="contact_email" name="contact_email" type="email" value="{{ old('contact_email', $storefront->contact_email) }}" maxlength="120">
+                                @error('contact_email') <div class="settings-error">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="settings-form-group">
+                                <label class="settings-label" for="currency">Moneda</label>
+                                <input class="settings-field" id="currency" name="currency" value="{{ old('currency', $storefront->currency ?? 'PEN') }}" maxlength="10" required>
+                                @error('currency') <div class="settings-error">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="settings-form-group">
+                                <label class="settings-label" for="included_tax_percent">Impuesto incluido (%)</label>
+                                <input class="settings-field" id="included_tax_percent" name="included_tax_percent" type="number" step="0.01" min="0" max="99.99" value="{{ old('included_tax_percent', $storefront->included_tax_percent) }}" required>
+                                @error('included_tax_percent') <div class="settings-error">{{ $message }}</div> @enderror
                             </div>
                             <div class="settings-form-group full">
-                                <label class="settings-label" for="razon_social">Razon social</label>
-                                <input class="settings-field" id="razon_social" name="razon_social" value="{{ old('razon_social', $company->razon_social) }}" maxlength="150" required>
-                                @error('razon_social') <div class="settings-error">{{ $message }}</div> @enderror
+                                <label class="settings-label" for="business_hours">Horario de atencion</label>
+                                <input class="settings-field" id="business_hours" name="business_hours" value="{{ old('business_hours', $storefront->business_hours) }}" maxlength="160" placeholder="Lunes a domingo | 7:00 a.m. - 10:00 p.m.">
+                                @error('business_hours') <div class="settings-error">{{ $message }}</div> @enderror
                             </div>
                             <div class="settings-form-group full">
-                                <label class="settings-label" for="direccion_fiscal">Direccion fiscal</label>
-                                <textarea class="settings-field" id="direccion_fiscal" name="direccion_fiscal" rows="3" required>{{ old('direccion_fiscal', $company->direccion_fiscal) }}</textarea>
-                                @error('direccion_fiscal') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group">
-                                <label class="settings-label" for="telefono_contacto">Telefono</label>
-                                <input class="settings-field" id="telefono_contacto" name="telefono_contacto" value="{{ old('telefono_contacto', $company->telefono_contacto) }}" maxlength="20">
-                                @error('telefono_contacto') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group">
-                                <label class="settings-label" for="correo_contacto">Correo</label>
-                                <input class="settings-field" id="correo_contacto" name="correo_contacto" type="email" value="{{ old('correo_contacto', $company->correo_contacto) }}" maxlength="100">
-                                @error('correo_contacto') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group">
-                                <label class="settings-label" for="ubigeo">Ubigeo</label>
-                                <input class="settings-field" id="ubigeo" name="ubigeo" value="{{ old('ubigeo', $company->ubigeo) }}" maxlength="6">
-                                @error('ubigeo') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group">
-                                <label class="settings-label" for="porcentaje_igv">IGV (%)</label>
-                                <input class="settings-field" id="porcentaje_igv" name="porcentaje_igv" type="number" step="0.01" min="0" max="99.99" value="{{ old('porcentaje_igv', $company->porcentaje_igv) }}" required>
-                                @error('porcentaje_igv') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group">
-                                <label class="settings-label" for="moneda">Moneda</label>
-                                <input class="settings-field" id="moneda" name="moneda" value="{{ old('moneda', $company->moneda ?? 'PEN') }}" maxlength="10" required>
-                                @error('moneda') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group">
-                                <label class="settings-label" for="estado">Estado</label>
-                                <select class="settings-field" id="estado" name="estado">
-                                    <option value="Activo" @selected(old('estado', $company->estado ?: 'Activo') === 'Activo')>Activo</option>
-                                    <option value="Inactivo" @selected(old('estado', $company->estado) === 'Inactivo')>Inactivo</option>
-                                </select>
-                                @error('estado') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group full">
-                                <label class="settings-label" for="horario_atencion">Horario de atencion</label>
-                                <input class="settings-field" id="horario_atencion" name="horario_atencion" value="{{ old('horario_atencion', $company->horario_atencion) }}" maxlength="160" placeholder="Lunes a domingo | 7:00 a.m. - 10:00 p.m.">
-                                @error('horario_atencion') <div class="settings-error">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="settings-form-group full">
-                                <label class="settings-label" for="mensaje_operativo">Mensaje operativo</label>
-                                <textarea class="settings-field" id="mensaje_operativo" name="mensaje_operativo" rows="4" placeholder="Mensaje visible para el equipo o para avisos internos.">{{ old('mensaje_operativo', $company->mensaje_operativo) }}</textarea>
-                                @error('mensaje_operativo') <div class="settings-error">{{ $message }}</div> @enderror
+                                <label class="settings-label" for="operational_message">Mensaje operativo</label>
+                                <textarea class="settings-field" id="operational_message" name="operational_message" rows="4" placeholder="Mensaje visible para el equipo o para avisos internos.">{{ old('operational_message', $storefront->operational_message) }}</textarea>
+                                @error('operational_message') <div class="settings-error">{{ $message }}</div> @enderror
                             </div>
                         </div>
 
                         <div class="settings-form-actions">
                             <button type="submit" class="settings-btn">
-                                <i class="fas fa-save"></i> Guardar configuracion general
+                                <i class="fas fa-save"></i> Guardar operacion
                             </button>
                         </div>
                     </form>

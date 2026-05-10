@@ -18,10 +18,18 @@ class StorefrontSetting extends Model
         'card_style',
         'show_login_link',
         'footer_text',
+        'whatsapp_number',
+        'contact_phone',
+        'contact_email',
+        'currency',
+        'included_tax_percent',
+        'business_hours',
+        'operational_message',
     ];
 
     protected $casts = [
         'show_login_link' => 'boolean',
+        'included_tax_percent' => 'decimal:2',
     ];
 
     public static function defaults(): array
@@ -38,6 +46,13 @@ class StorefrontSetting extends Model
             'card_style' => 'rounded',
             'show_login_link' => true,
             'footer_text' => null,
+            'whatsapp_number' => '51999999999',
+            'contact_phone' => null,
+            'contact_email' => 'ventas@marketkm2.test',
+            'currency' => 'PEN',
+            'included_tax_percent' => 18.00,
+            'business_hours' => 'Lunes a domingo',
+            'operational_message' => null,
         ];
     }
 
@@ -85,5 +100,10 @@ class StorefrontSetting extends Model
         ])->first(fn ($path) => file_exists(public_path($path)));
 
         return $path ? '/' . $path : null;
+    }
+
+    public function whatsappNumberForUrl(): string
+    {
+        return preg_replace('/\D+/', '', (string) $this->whatsapp_number) ?: '51999999999';
     }
 }

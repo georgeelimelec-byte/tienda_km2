@@ -33,15 +33,6 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasTable('empresa_configuracion')) {
-            Schema::table('empresa_configuracion', function (Blueprint $table) {
-                foreach ($this->hardwareColumns() as $column) {
-                    if (Schema::hasColumn('empresa_configuracion', $column)) {
-                        $table->dropColumn($column);
-                    }
-                }
-            });
-        }
     }
 
     public function down(): void
@@ -49,23 +40,4 @@ return new class extends Migration
         // The dropped tables/columns belonged to removed or unimplemented modules.
     }
 
-    private function hardwareColumns(): array
-    {
-        return [
-            'printer_enabled',
-            'printer_name',
-            'printer_connection_type',
-            'printer_target_host',
-            'printer_device_reference',
-            'printer_paper_width',
-            'printer_auto_print',
-            'printer_copies',
-            'scanner_enabled',
-            'scanner_device_name',
-            'scanner_input_mode',
-            'scanner_accept_qr',
-            'scanner_accept_barcode',
-            'scanner_suffix_enter',
-        ];
-    }
 };
