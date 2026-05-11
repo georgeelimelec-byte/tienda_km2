@@ -44,10 +44,10 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Número de WhatsApp <span class="text-brand">*</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Numero de WhatsApp <span class="text-brand">*</span></label>
                             <div class="flex">
                                 <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500 font-medium">+51</span>
-                                <input type="tel" name="whatsapp" value="{{ old('whatsapp', $cliente->celular ?? '') }}" required class="flex-1 w-full border-gray-200 rounded-r-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="999 888 777">
+                                <input type="tel" name="numero_whatsapp" value="{{ old('numero_whatsapp', old('whatsapp', $cliente->celular ?? '')) }}" required class="flex-1 w-full border-gray-200 rounded-r-lg px-4 py-3 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none" placeholder="999 888 777">
                             </div>
                         </div>
                     </div>

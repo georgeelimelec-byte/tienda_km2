@@ -33,18 +33,23 @@ class AuthApiController extends Controller
 
     public function register(Request $request): JsonResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'nombre' => 'required|max:150',
             'email' => 'required|email|unique:clientes_web,email',
-            'telefono' => 'nullable|max:20',
+            'numero_whatsapp' => 'required_without:telefono|string|max:20',
+            'telefono' => 'nullable|string|max:20',
             'password' => 'required|string|min:6',
+        ], [], [
+            'numero_whatsapp' => 'numero de WhatsApp',
+            'telefono' => 'numero de WhatsApp',
         ]);
+        $numeroWhatsapp = $data['numero_whatsapp'] ?? $data['telefono'] ?? null;
 
         $cliente = Cliente::create([
-            'nombre_o_razon_social' => $request->nombre,
-            'email' => $request->email,
-            'celular' => $request->telefono,
-            'password' => Hash::make($request->password),
+            'nombre_o_razon_social' => $data['nombre'],
+            'email' => $data['email'],
+            'celular' => $numeroWhatsapp,
+            'password' => Hash::make($data['password']),
         ]);
 
         return response()->json([
@@ -73,6 +78,7 @@ class AuthApiController extends Controller
             'id' => $cliente->id_cliente,
             'nombre' => $cliente->nombre_o_razon_social,
             'email' => $cliente->email,
+            'numero_whatsapp' => $cliente->celular,
             'telefono' => $cliente->celular,
         ];
     }

@@ -56,6 +56,8 @@ php artisan serve
 
 El numero de WhatsApp, horario, moneda, impuesto incluido y modo de control de stock se configuran desde `/admin/configuracion` y se guardan en `configuracion_tienda`.
 
+En el modelo de datos, `clientes_web.celular` representa el numero de WhatsApp declarado por el cliente, `pedidos_tienda.cliente_whatsapp` conserva el numero usado para contactar el pedido y `configuracion_tienda.whatsapp_number` conserva el numero de atencion del negocio.
+
 ## Validacion
 
 ```bash

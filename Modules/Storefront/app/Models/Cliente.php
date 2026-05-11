@@ -30,4 +30,14 @@ class Cliente extends Authenticatable
     {
         $this->attributes['celular'] = $value;
     }
+
+    public function getNumeroWhatsappAttribute(): ?string
+    {
+        return $this->celular;
+    }
+
+    public function setNumeroWhatsappAttribute(?string $value): void
+    {
+        $this->attributes['celular'] = $value;
+    }
 }

@@ -14,7 +14,7 @@ El sistema debe mostrar una vitrina publica con productos activos, categorias, b
 
 ### RG02. Cuenta De Cliente
 
-El cliente debe registrarse o iniciar sesion antes de completar el pedido. El checkout debe precargar nombre, WhatsApp y direccion cuando el cliente ya existe.
+El cliente debe registrarse o iniciar sesion antes de completar el pedido. El checkout debe precargar nombre, numero de WhatsApp y direccion cuando el cliente ya existe.
 
 ### RG03. Pedidos Por WhatsApp
 
@@ -55,9 +55,9 @@ La numeracion funcional se organiza por requerimiento general. Cada codigo `RFxx
 
 | Codigo | Descripcion | Criterio de aceptacion |
 | --- | --- | --- |
-| RF02.1 | Registrar clientes con nombre, correo, WhatsApp, direccion y contrasena. | El cliente queda registrado en `clientes_web`. |
+| RF02.1 | Registrar clientes con nombre, correo, numero de WhatsApp, direccion y contrasena. | El cliente queda registrado en `clientes_web`. |
 | RF02.2 | Permitir inicio y cierre de sesion de clientes. | La sesion se crea al autenticar y se elimina al cerrar sesion. |
-| RF02.3 | Precargar en checkout los datos disponibles del cliente autenticado. | Nombre, WhatsApp y direccion aparecen precargados cuando existen. |
+| RF02.3 | Precargar en checkout los datos disponibles del cliente autenticado. | Nombre, numero de WhatsApp y direccion aparecen precargados cuando existen. |
 | RF02.4 | Exigir sesion de cliente antes de finalizar pedido. | Un cliente no autenticado es redirigido al login antes de completar checkout. |
 
 ### RF03. Pedidos Por WhatsApp
@@ -140,6 +140,9 @@ Campos clave del pedido:
 - `presentaciones_producto.stock` conserva el stock unico del sistema por presentacion.
 - `presentaciones_producto.stock_minimo` conserva el umbral referencial de bajo stock.
 - `configuracion_tienda.control_stock_habilitado` define si el pedido valida/descuenta stock o si opera en modo catalogo.
+- `clientes_web.celular` conserva el numero de WhatsApp declarado por el cliente para contacto y precarga de checkout.
+- `pedidos_tienda.cliente_whatsapp` conserva el numero de WhatsApp usado para contactar al cliente por el pedido.
+- `configuracion_tienda.whatsapp_number` conserva el numero de WhatsApp de atencion del negocio para generar el enlace `wa.me`.
 - `pedidos_tienda.referencia_atencion` guarda una referencia interna de pago o atencion por WhatsApp. No representa boleta, factura ni comprobante SUNAT.
 - `detalle_pedidos_tienda.cantidad_solicitada` conserva lo pedido por el cliente.
 - `detalle_pedidos_tienda.cantidad_confirmada` conserva lo validado por el operador.

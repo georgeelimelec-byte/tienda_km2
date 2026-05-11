@@ -23,7 +23,7 @@
 
         <div class="section">
             <strong>{{ $pedido->cliente_nombre }}</strong><br>
-            WhatsApp: {{ $pedido->cliente_whatsapp }}<br>
+            Numero de WhatsApp: {{ $pedido->cliente_whatsapp }}<br>
             Direccion: {{ $pedido->cliente_direccion ?: 'Sin direccion' }}<br>
             @if($pedido->cliente_referencia)
                 Referencia: {{ $pedido->cliente_referencia }}<br>

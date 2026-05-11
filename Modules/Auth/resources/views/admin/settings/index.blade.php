@@ -594,7 +594,7 @@
                         @csrf
                         <div class="settings-form-grid">
                             <div class="settings-form-group">
-                                <label class="settings-label" for="whatsapp_number">WhatsApp de atencion</label>
+                                <label class="settings-label" for="whatsapp_number">Numero de WhatsApp de atencion</label>
                                 <input class="settings-field" id="whatsapp_number" name="whatsapp_number" value="{{ old('whatsapp_number', $storefront->whatsapp_number) }}" maxlength="24" required>
                                 @error('whatsapp_number') <div class="settings-error">{{ $message }}</div> @enderror
                             </div>

@@ -41,6 +41,9 @@ class AdminSettingsController extends Controller
             'business_hours' => ['nullable', 'string', 'max:160'],
             'operational_message' => ['nullable', 'string'],
             'control_stock_habilitado' => ['nullable', 'boolean'],
+        ], [], [
+            'whatsapp_number' => 'numero de WhatsApp de atencion',
+            'contact_phone' => 'telefono publico',
         ]);
 
         $data['control_stock_habilitado'] = $request->boolean('control_stock_habilitado');

@@ -22,7 +22,7 @@
 
         <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
             <form method="GET" action="{{ route('admin.pedidos.index') }}" class="grid gap-3 md:grid-cols-[1fr_220px_auto]">
-                <input type="search" name="q" value="{{ $search }}" class="rounded-lg border-gray-200 bg-gray-50 px-4 py-2.5 focus:border-brand focus:ring-brand" placeholder="Buscar por codigo, cliente o WhatsApp">
+                <input type="search" name="q" value="{{ $search }}" class="rounded-lg border-gray-200 bg-gray-50 px-4 py-2.5 focus:border-brand focus:ring-brand" placeholder="Buscar por codigo, cliente o numero de WhatsApp">
                 <select name="estado" class="rounded-lg border-gray-200 bg-gray-50 px-4 py-2.5 focus:border-brand focus:ring-brand">
                     <option value="">Todos los estados</option>
                     @foreach($statuses as $status)
@@ -70,6 +70,7 @@
                                 </td>
                                 <td class="px-5 py-5">
                                     <div class="font-bold text-gray-900">{{ $pedido->cliente_nombre }}</div>
+                                    <div class="mt-1 text-[11px] font-bold uppercase text-gray-400">Numero de WhatsApp</div>
                                     <a class="mt-1 block text-sm font-bold text-green-700" href="https://wa.me/{{ preg_replace('/\D+/', '', $pedido->cliente_whatsapp) }}" target="_blank">
                                         {{ $pedido->cliente_whatsapp }}
                                     </a>

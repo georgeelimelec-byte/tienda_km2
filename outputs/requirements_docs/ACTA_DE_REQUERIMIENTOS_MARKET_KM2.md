@@ -2,7 +2,7 @@
 
 **Proyecto:** Market KM2 - tienda virtual con pedidos por WhatsApp  
 **Codigo de acta:** AR-MKM2-2026-05-11  
-**Version:** 1.2
+**Version:** 1.3
 **Fecha:** 11 de mayo de 2026  
 **Ubicacion:** Lima, Peru  
 **Documento preparado para:** Revision, conformidad y firma de alcance funcional
@@ -66,7 +66,7 @@ El cliente debe poder registrarse e iniciar sesion para completar pedidos. El ch
 
 Incluye:
 
-- Registro de cliente con nombre, correo, WhatsApp, direccion y contrasena.
+- Registro de cliente con nombre, correo, numero de WhatsApp, direccion y contrasena.
 - Inicio y cierre de sesion de cliente.
 - Conservacion de sesion de cliente para checkout.
 - Asociacion de pedidos a los datos declarados por el cliente.
@@ -172,9 +172,9 @@ La siguiente matriz desglosa cada requerimiento general en requerimientos funcio
 | RF01.3 | RG01 Tienda virtual operativa | El sistema debe mostrar una vista de detalle por producto con variantes, galeria, precio efectivo, precio referencial y productos relacionados. | La ruta `/producto/{id}` muestra la informacion completa del producto activo. |
 | RF01.4 | RG01 Tienda virtual operativa | El sistema debe mostrar banners y promociones activas configuradas desde el panel. | Las promociones vigentes y banners activos aparecen en la tienda publica. |
 | RF01.5 | RG01 Tienda virtual operativa | El sistema debe adaptar la disponibilidad de compra segun el modo de stock configurado. | Con control activo bloquea productos sin stock; con modo catalogo permite pedir aunque el stock este en cero. |
-| RF02.1 | RG02 Cuenta de cliente | El sistema debe permitir registrar clientes con nombre, correo, WhatsApp, direccion y contrasena. | El cliente queda registrado en `clientes_web` y puede iniciar sesion. |
+| RF02.1 | RG02 Cuenta de cliente | El sistema debe permitir registrar clientes con nombre, correo, numero de WhatsApp, direccion y contrasena. | El cliente queda registrado en `clientes_web` y puede iniciar sesion. |
 | RF02.2 | RG02 Cuenta de cliente | El sistema debe permitir inicio y cierre de sesion de clientes. | La sesion de cliente se crea al autenticar y se elimina al cerrar sesion. |
-| RF02.3 | RG02 Cuenta de cliente | El checkout debe precargar los datos disponibles del cliente autenticado. | Nombre, WhatsApp y direccion aparecen precargados cuando existen. |
+| RF02.3 | RG02 Cuenta de cliente | El checkout debe precargar los datos disponibles del cliente autenticado. | Nombre, numero de WhatsApp y direccion aparecen precargados cuando existen. |
 | RF02.4 | RG02 Cuenta de cliente | El sistema debe exigir sesion de cliente antes de finalizar pedido. | Un cliente no autenticado es redirigido al login antes de completar checkout. |
 | RF03.1 | RG03 Pedidos por WhatsApp | El sistema debe permitir agregar, actualizar y retirar productos del carrito. | El carrito conserva items, cantidades y subtotales antes del checkout. |
 | RF03.2 | RG03 Pedidos por WhatsApp | El checkout debe recalcular precios, promociones, delivery y total referencial en servidor. | El pedido se registra usando valores recalculados desde base de datos. |
@@ -252,6 +252,9 @@ Campos clave:
 - `presentaciones_producto.stock`: stock unico del sistema por presentacion.
 - `presentaciones_producto.stock_minimo`: umbral referencial de bajo stock.
 - `configuracion_tienda.control_stock_habilitado`: define si el sistema valida/descuenta stock o si opera como catalogo.
+- `clientes_web.celular`: numero de WhatsApp declarado por el cliente para contacto y precarga de checkout.
+- `pedidos_tienda.cliente_whatsapp`: numero de WhatsApp usado para contactar al cliente por el pedido.
+- `configuracion_tienda.whatsapp_number`: numero de WhatsApp de atencion del negocio usado para generar el enlace `wa.me`.
 - `detalle_pedidos_tienda.cantidad_solicitada`: cantidad solicitada por el cliente.
 - `detalle_pedidos_tienda.cantidad_confirmada`: cantidad validada por el operador.
 - `detalle_pedidos_tienda.motivo_ajuste`: motivo de variacion entre cantidad solicitada y confirmada.
@@ -264,10 +267,10 @@ Para considerar conforme el alcance descrito, se deben cumplir los siguientes cr
 | Codigo | Criterio |
 | --- | --- |
 | CA-01 | La tienda publica muestra productos activos, categorias, imagenes, precios, promociones y disponibilidad segun configuracion. |
-| CA-02 | El cliente puede registrarse, iniciar sesion y completar checkout. |
+| CA-02 | El cliente puede registrarse con numero de WhatsApp, iniciar sesion y completar checkout. |
 | CA-03 | El checkout recalcula precios en servidor y valida stock cuando el control de stock esta habilitado. |
 | CA-04 | Al crear un pedido se registra cabecera y detalle en base de datos. |
-| CA-05 | El pedido genera enlace de WhatsApp con resumen. |
+| CA-05 | El pedido genera enlace de WhatsApp con resumen hacia el numero de atencion configurado. |
 | CA-06 | Con control de stock habilitado, el stock se descuenta al crear pedido y se devuelve al cancelar. |
 | CA-07 | Con control de stock deshabilitado, se pueden registrar pedidos con stock cero sin descontar ni devolver stock. |
 | CA-08 | Los ajustes de cantidad actualizan subtotales, estado de item, auditoria y stock solo si el control esta habilitado. |

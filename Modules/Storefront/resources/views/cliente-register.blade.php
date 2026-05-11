@@ -25,8 +25,8 @@
                 <input type="email" name="email" value="{{ old('email') }}" required class="w-full rounded-lg border-gray-200 bg-gray-50 px-4 py-3 focus:border-brand focus:ring-brand">
             </div>
             <div>
-                <label class="mb-1 block text-sm font-bold text-gray-700">WhatsApp</label>
-                <input type="tel" name="whatsapp" value="{{ old('whatsapp') }}" required class="w-full rounded-lg border-gray-200 bg-gray-50 px-4 py-3 focus:border-brand focus:ring-brand">
+                <label class="mb-1 block text-sm font-bold text-gray-700">Numero de WhatsApp</label>
+                <input type="tel" name="numero_whatsapp" value="{{ old('numero_whatsapp', old('whatsapp')) }}" required class="w-full rounded-lg border-gray-200 bg-gray-50 px-4 py-3 focus:border-brand focus:ring-brand">
             </div>
             <div class="md:col-span-2">
                 <label class="mb-1 block text-sm font-bold text-gray-700">Direccion</label>

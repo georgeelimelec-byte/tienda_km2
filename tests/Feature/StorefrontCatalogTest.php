@@ -57,7 +57,7 @@ class StorefrontCatalogTest extends TestCase
         $response = $this->withSession(['cliente_id' => $cliente->id_cliente])
             ->post(route('storefront.store_pedido'), [
             'nombre' => 'Cliente Demo',
-            'whatsapp' => '51988887777',
+            'numero_whatsapp' => '51988887777',
             'direccion' => 'Av. Demo 123',
             'referencia' => 'Puerta principal',
             'id_zona' => 1,
@@ -100,7 +100,7 @@ class StorefrontCatalogTest extends TestCase
         $response = $this->withSession(['cliente_id' => $cliente->id_cliente])
             ->post(route('storefront.store_pedido'), [
                 'nombre' => 'Cliente Catalogo',
-                'whatsapp' => '51988887777',
+                'numero_whatsapp' => '51988887777',
                 'direccion' => 'Av. Demo 456',
                 'referencia' => 'Pedido sin control de stock',
                 'id_zona' => 1,
@@ -223,6 +223,7 @@ class StorefrontCatalogTest extends TestCase
         ])
             ->assertOk()
             ->assertJsonPath('cliente.id', $cliente->id_cliente)
+            ->assertJsonPath('cliente.numero_whatsapp', '51977776666')
             ->assertJsonStructure(['token']);
 
         Sanctum::actingAs($cliente);
@@ -247,6 +248,25 @@ class StorefrontCatalogTest extends TestCase
         $this->getJson('/api/v1/storefront/cart')
             ->assertOk()
             ->assertJsonFragment(['id_presentacion' => $presentation->id_presentacion]);
+    }
+
+    public function test_storefront_api_register_uses_numero_whatsapp_contract(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $this->postJson('/api/v1/storefront/register', [
+            'nombre' => 'Cliente WhatsApp API',
+            'email' => 'cliente.whatsapp.api@example.test',
+            'numero_whatsapp' => '51966665555',
+            'password' => 'secret123',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('cliente.numero_whatsapp', '51966665555');
+
+        $this->assertDatabaseHas('clientes_web', [
+            'email' => 'cliente.whatsapp.api@example.test',
+            'celular' => '51966665555',
+        ]);
     }
 
     public function test_admin_can_manage_banners_images_and_product_promotions(): void

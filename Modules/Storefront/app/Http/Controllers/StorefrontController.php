@@ -230,12 +230,17 @@ class StorefrontController extends Controller
 
         $data = $request->validate([
             'nombre' => 'required|string|max:100',
-            'whatsapp' => 'required|string|max:20',
+            'numero_whatsapp' => 'required_without:whatsapp|string|max:20',
+            'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'required|string',
             'referencia' => 'nullable|string',
             'id_zona' => 'required|integer|exists:zonas_entrega,id_zona',
             'cart' => 'required|json',
+        ], [], [
+            'numero_whatsapp' => 'numero de WhatsApp',
+            'whatsapp' => 'numero de WhatsApp',
         ]);
+        $data['numero_whatsapp'] = $data['numero_whatsapp'] ?? $data['whatsapp'];
 
         $cart = json_decode($data['cart'], true);
         if (!is_array($cart) || empty($cart)) {
@@ -260,7 +265,7 @@ class StorefrontController extends Controller
 
         $cliente->update([
             'nombre_o_razon_social' => $data['nombre'],
-            'celular' => $data['whatsapp'],
+            'celular' => $data['numero_whatsapp'],
             'direccion' => $data['direccion'],
         ]);
 
@@ -291,7 +296,7 @@ class StorefrontController extends Controller
                 $pedido = PedidoWhatsapp::create([
                     'codigo_pedido' => $codigo,
                     'cliente_nombre' => $data['nombre'],
-                    'cliente_whatsapp' => $data['whatsapp'],
+                    'cliente_whatsapp' => $data['numero_whatsapp'],
                     'cliente_direccion' => $data['direccion'],
                     'cliente_referencia' => $data['referencia'] ?? '',
                     'id_zona_delivery' => $zona->id_zona,
@@ -378,15 +383,20 @@ class StorefrontController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
             'email' => 'required|email|unique:clientes_web,email',
-            'whatsapp' => 'required|string|max:20',
+            'numero_whatsapp' => 'required_without:whatsapp|string|max:20',
+            'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:500',
             'password' => 'required|string|min:6|confirmed',
+        ], [], [
+            'numero_whatsapp' => 'numero de WhatsApp',
+            'whatsapp' => 'numero de WhatsApp',
         ]);
+        $data['numero_whatsapp'] = $data['numero_whatsapp'] ?? $data['whatsapp'];
 
         $cliente = Cliente::create([
             'nombre_o_razon_social' => $data['nombre'],
             'email' => $data['email'],
-            'celular' => $data['whatsapp'],
+            'celular' => $data['numero_whatsapp'],
             'direccion' => $data['direccion'] ?? null,
             'password' => Hash::make($data['password']),
         ]);

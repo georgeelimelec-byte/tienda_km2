@@ -92,7 +92,7 @@ class AdminReportsController extends Controller
 
         return response()->streamDownload(function () use ($rows) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Codigo', 'Cliente', 'WhatsApp', 'Zona', 'Estado', 'Productos', 'Delivery', 'Total', 'Fecha']);
+            fputcsv($handle, ['Codigo', 'Cliente', 'Numero de WhatsApp', 'Zona', 'Estado', 'Productos', 'Delivery', 'Total', 'Fecha']);
 
             foreach ($rows as $row) {
                 fputcsv($handle, [

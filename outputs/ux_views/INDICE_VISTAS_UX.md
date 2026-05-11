@@ -7,8 +7,8 @@ Indice operativo de vistas vigentes despues del refactor a tienda virtual y pedi
 | 1 | Tienda virtual - catalogo | `/` | Busqueda y exploracion de productos activos. |
 | 2 | Tienda virtual - detalle de producto | `/producto/{id}` | Imagenes, variantes, precio, disponibilidad segun modo de stock y productos relacionados. |
 | 3 | Login cliente | `/cliente/login` | Acceso del cliente para precargar datos de pedido. |
-| 4 | Registro cliente | `/cliente/registro` | Alta de cliente con WhatsApp y direccion. |
-| 5 | Checkout | `/checkout` | Datos precargados del cliente, direccion, zona de delivery y envio a WhatsApp. |
+| 4 | Registro cliente | `/cliente/registro` | Alta de cliente con numero de WhatsApp y direccion. |
+| 5 | Checkout | `/checkout` | Datos precargados del cliente, numero de WhatsApp, direccion, zona de delivery y envio a WhatsApp. |
 | 6 | Login administrativo | `/login` | Acceso seguro al panel interno. |
 | 7 | Dashboard administrativo | `/dashboard` | Resumen operativo de pedidos, catalogo, banners, zonas, reportes y usuarios. |
 | 8 | Bandeja de pedidos | `/admin/pedidos` | Tabla operativa de pedidos WhatsApp, estados y ajustes de cantidades. |

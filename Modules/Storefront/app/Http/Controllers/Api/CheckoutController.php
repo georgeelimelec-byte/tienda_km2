@@ -21,14 +21,19 @@ class CheckoutController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:100',
-            'whatsapp' => 'required|string|max:20',
+            'numero_whatsapp' => 'required_without:whatsapp|string|max:20',
+            'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'required|string',
             'referencia' => 'nullable|string',
             'id_zona' => 'required|exists:zonas_entrega,id_zona',
             'items' => 'required|array|min:1',
             'items.*.id_presentacion' => 'required|exists:presentaciones_producto,id_presentacion',
             'items.*.cantidad' => 'required|integer|min:1',
+        ], [], [
+            'numero_whatsapp' => 'numero de WhatsApp',
+            'whatsapp' => 'numero de WhatsApp',
         ]);
+        $data['numero_whatsapp'] = $data['numero_whatsapp'] ?? $data['whatsapp'];
 
         $zona = ZonaDelivery::where('estado', 'Activo')->findOrFail($data['id_zona']);
         $lines = [];
@@ -99,7 +104,7 @@ class CheckoutController extends Controller
                 $pedido = PedidoWhatsapp::create([
                     'codigo_pedido' => $codigo,
                     'cliente_nombre' => $data['nombre'],
-                    'cliente_whatsapp' => $data['whatsapp'],
+                    'cliente_whatsapp' => $data['numero_whatsapp'],
                     'cliente_direccion' => $data['direccion'],
                     'cliente_referencia' => $data['referencia'] ?? '',
                     'id_zona_delivery' => $zona->id_zona,
@@ -149,9 +154,9 @@ class CheckoutController extends Controller
 
     public function myOrders(Request $request): JsonResponse
     {
-        $whatsapp = $request->query('whatsapp');
+        $numeroWhatsapp = $request->query('numero_whatsapp', $request->query('whatsapp'));
         $orders = PedidoWhatsapp::with('detalles', 'zonaDelivery')
-            ->when($whatsapp, fn ($q) => $q->where('cliente_whatsapp', $whatsapp))
+            ->when($numeroWhatsapp, fn ($q) => $q->where('cliente_whatsapp', $numeroWhatsapp))
             ->orderByDesc('id_pedido_whatsapp')
             ->paginate($request->integer('per_page', 20));
 
