@@ -37,93 +37,71 @@ El panel administrativo debe gestionar productos, categorias, promociones, banne
 
 Las acciones relevantes deben registrar usuario, rol, accion, entidad, descripcion legible, valores antes/despues, IP, dispositivo y fecha. El administrador debe poder revisar la auditoria desde el panel.
 
-## Requerimientos Funcionales
+## Requerimientos Funcionales Detallados
 
-### RF01. Usuarios, Roles Y Permisos
+La numeracion funcional se organiza por requerimiento general. Cada codigo `RFxx.y` puede usarse para validacion, pruebas y control de cambios.
 
-- Permitir inicio y cierre de sesion administrativo.
-- Crear, editar, activar, inactivar y eliminar usuarios internos.
-- Administrar roles: `Admin General`, `Administrador`, `Atencion WhatsApp` y `Operador WhatsApp`.
-- Administrar permisos por modulo: `Pedidos`, `Catalogo`, `Tienda Virtual`, `Reportes`, `Configuracion` y `Usuarios`.
-- Evitar que el sistema quede sin usuarios administrativos validos.
+### RF01. Tienda Virtual Operativa
 
-### RF02. Clientes
+| Codigo | Descripcion | Criterio de aceptacion |
+| --- | --- | --- |
+| RF01.1 | Mostrar una pagina publica de tienda con productos activos, categorias, imagenes, precios y presentaciones activas. | El cliente ingresa a `/` y visualiza productos publicados con precio e imagen. |
+| RF01.2 | Permitir busqueda por texto y filtrado por categoria o subcategoria. | El listado se actualiza segun texto o categoria seleccionada. |
+| RF01.3 | Mostrar detalle de producto con variantes, galeria, precio efectivo, precio referencial y productos relacionados. | La ruta `/producto/{id}` presenta la informacion completa del producto activo. |
+| RF01.4 | Mostrar banners y promociones activas configuradas desde el panel. | Banners y promociones vigentes aparecen en la tienda publica. |
+| RF01.5 | Adaptar la disponibilidad de compra segun el modo de stock configurado. | Con control activo bloquea productos sin stock; con modo catalogo permite pedir con stock cero. |
 
-- Registrar cliente con nombre, correo, WhatsApp, direccion y contrasena.
-- Permitir inicio y cierre de sesion de cliente.
-- Precargar datos del cliente en checkout.
-- Asociar carrito y trazabilidad de pedidos por datos del cliente.
+### RF02. Cuenta De Cliente
 
-### RF03. Catalogo Tecnico
+| Codigo | Descripcion | Criterio de aceptacion |
+| --- | --- | --- |
+| RF02.1 | Registrar clientes con nombre, correo, WhatsApp, direccion y contrasena. | El cliente queda registrado en `clientes_web`. |
+| RF02.2 | Permitir inicio y cierre de sesion de clientes. | La sesion se crea al autenticar y se elimina al cerrar sesion. |
+| RF02.3 | Precargar en checkout los datos disponibles del cliente autenticado. | Nombre, WhatsApp y direccion aparecen precargados cuando existen. |
+| RF02.4 | Exigir sesion de cliente antes de finalizar pedido. | Un cliente no autenticado es redirigido al login antes de completar checkout. |
 
-- Crear y editar productos.
-- Crear presentaciones con codigo de barras, unidad, costo, precio, precio referencial, stock y stock minimo.
-- Cargar imagenes de productos y presentaciones.
-- Administrar categorias y subcategorias.
-- Evitar eliminaciones que rompan relaciones con pedidos.
+### RF03. Pedidos Por WhatsApp
 
-### RF04. Promociones
+| Codigo | Descripcion | Criterio de aceptacion |
+| --- | --- | --- |
+| RF03.1 | Permitir agregar, actualizar y retirar productos del carrito. | El carrito conserva items, cantidades y subtotales antes del checkout. |
+| RF03.2 | Recalcular precios, promociones, delivery y total referencial en servidor. | El pedido usa valores recalculados desde base de datos. |
+| RF03.3 | Crear cabecera y detalle de pedido WhatsApp. | Se registran datos en `pedidos_tienda` y `detalle_pedidos_tienda`. |
+| RF03.4 | Guardar cantidad solicitada, cantidad confirmada, precio unitario, subtotal y estado de item. | Cada item conserva trazabilidad operativa de cantidades y subtotales. |
+| RF03.5 | Generar enlace `wa.me` con el resumen del pedido. | Al completar checkout se redirige al cliente a WhatsApp con codigo, items y total referencial. |
 
-- Crear promociones por porcentaje o monto.
-- Aplicar promociones a productos especificos.
-- Aplicar promociones a categorias completas.
-- Mantener fechas de vigencia y estado.
-- Calcular el mejor precio promocional sin modificar el precio base del producto.
+### RF04. Stock Del Sistema
 
-### RF05. Tienda Publica
+| Codigo | Descripcion | Criterio de aceptacion |
+| --- | --- | --- |
+| RF04.1 | Manejar un unico stock por presentacion en `presentaciones_producto.stock`. | No existen saldos funcionales paralelos como stock real o stock web. |
+| RF04.2 | Permitir activar o desactivar el control de stock desde configuracion. | `configuracion_tienda.control_stock_habilitado` define el modo operativo. |
+| RF04.3 | Validar disponibilidad antes de crear pedido cuando el control de stock este habilitado. | Si la cantidad supera el stock disponible, el pedido no se registra. |
+| RF04.4 | Descontar stock al crear pedido y devolverlo al cancelar cuando el control este habilitado. | El stock baja al registrar pedido y retorna si se cancela. |
+| RF04.5 | Ajustar stock por diferencias de cantidad confirmada cuando el control este habilitado. | Aumentos reservan stock adicional y reducciones devuelven unidades. |
+| RF04.6 | Operar como catalogo cuando el control de stock este deshabilitado. | Se aceptan pedidos con stock cero y no se generan movimientos de descuento o devolucion. |
+| RF04.7 | Registrar movimientos de stock solo cuando exista variacion real de stock. | `movimientos_stock` conserva cantidad, stock anterior, stock nuevo, motivo y usuario cuando aplica. |
 
-- Mostrar productos activos con presentaciones activas.
-- Permitir busqueda por texto y filtrado por categoria.
-- Mostrar banners activos y promociones vigentes.
-- Mostrar detalle de producto, variantes y productos relacionados.
-- Mostrar stock disponible solo como condicion de compra cuando el control de stock este habilitado.
-- Permitir agregar productos con stock cero cuando el control de stock este deshabilitado y el sistema opere como catalogo.
+### RF05. Administracion Interna
 
-### RF06. Carrito Y Checkout
+| Codigo | Descripcion | Criterio de aceptacion |
+| --- | --- | --- |
+| RF05.1 | Administrar productos, categorias, subcategorias, presentaciones e imagenes. | El administrador crea y edita catalogo desde las rutas administrativas. |
+| RF05.2 | Administrar promociones, banners y zonas de delivery. | El administrador gestiona descuentos, piezas visibles y tarifas por zona. |
+| RF05.3 | Mostrar pedidos en tabla operativa con busqueda, filtro, estados y ticket. | El operador revisa y actualiza pedidos desde `/admin/pedidos`. |
+| RF05.4 | Ajustar cantidades confirmadas con motivo de ajuste. | El detalle guarda cantidad confirmada y motivo cuando difiere de lo solicitado. |
+| RF05.5 | Administrar usuarios, roles y permisos internos. | Roles y permisos controlan acceso a modulos administrativos. |
+| RF05.6 | Configurar datos comerciales, apariencia y modo de stock. | Los cambios impactan la tienda publica y el flujo de pedido. |
 
-- Agregar, actualizar y retirar productos del carrito.
-- Recalcular precios y promociones en servidor durante checkout.
-- Validar stock en servidor solamente cuando el control de stock este habilitado.
-- Aceptar pedidos con stock cero cuando el control de stock este deshabilitado.
-- Validar sesion de cliente, direccion y zona de delivery.
-- Crear `pedidos_tienda` y `detalle_pedidos_tienda`.
-- Guardar `cantidad_solicitada`, `cantidad_confirmada`, `motivo_ajuste` y `estado_item`.
-- Redirigir al cliente a WhatsApp con el resumen.
+### RF06. Seguridad, Auditoria Y Reportes
 
-### RF07. Bandeja De Pedidos
-
-- Mostrar pedidos en tabla operativa.
-- Estados vigentes: `Pendiente`, `Observado`, `Ajustado`, `Confirmado`, `En Preparacion`, `En Delivery`, `Entregado`, `Cancelado`.
-- Actualizar estado desde el panel.
-- Ajustar cantidades confirmadas por item cuando el operador confirme una cantidad distinta a la solicitada.
-- Devolver stock al cancelar un pedido solamente cuando el control de stock este habilitado.
-- Ajustar stock por diferencias de cantidad solamente cuando el control de stock este habilitado.
-- Ver detalle y ticket operativo del pedido.
-
-### RF08. Zonas De Delivery
-
-- Crear y editar zonas con tarifa, cobertura y estado.
-- Usar la tarifa de la zona en el total referencial del pedido.
-- Permitir recojo en tienda como zona con tarifa cero.
-
-### RF09. Auditoria
-
-- Registrar acciones de pedidos, ajustes, productos, promociones y movimientos de stock.
-- Mostrar auditoria en una vista administrativa.
-- Mostrar movimientos de stock con stock anterior y nuevo cuando el control de stock genere movimientos.
-
-### RF11. Configuracion De Tienda
-
-- Permitir activar o desactivar el control de stock desde configuracion.
-- Mantener el control de stock habilitado por defecto.
-- Cuando el control se desactive, comunicar el modo catalogo en la tienda y evitar bloqueos por stock.
-
-### RF10. Reportes Y Analitica
-
-- Consultar pedidos por rango de fechas.
-- Calcular ingresos estimados, pedidos pendientes, productos vendidos y zonas con demanda.
-- Exportar reporte CSV de pedidos WhatsApp.
-- Mostrar tendencia diaria y mix de estados.
+| Codigo | Descripcion | Criterio de aceptacion |
+| --- | --- | --- |
+| RF06.1 | Proteger rutas administrativas mediante autenticacion y permisos. | Usuarios sin permiso no acceden a modulos restringidos. |
+| RF06.2 | Registrar acciones relevantes de pedidos, productos, promociones y configuracion. | La auditoria guarda usuario, accion, entidad, descripcion, valores, IP y fecha. |
+| RF06.3 | Mostrar auditoria y movimientos de stock desde el panel. | El administrador revisa acciones y movimientos operativos. |
+| RF06.4 | Emitir reportes de pedidos, ingresos estimados, productos vendidos, estados y zonas. | Los reportes muestran indicadores y permiten exportacion CSV. |
+| RF06.5 | Evitar rutas y tablas funcionales fuera del alcance aprobado. | No se publican flujos de POS, caja, SUNAT, almacenes, compras, proveedores, lotes o kardex. |
 
 ## Modelo De Datos Vigente
 

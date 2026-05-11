@@ -2,7 +2,7 @@
 
 **Proyecto:** Market KM2 - tienda virtual con pedidos por WhatsApp  
 **Codigo de acta:** AR-MKM2-2026-05-11  
-**Version:** 1.1  
+**Version:** 1.2
 **Fecha:** 11 de mayo de 2026  
 **Ubicacion:** Lima, Peru  
 **Documento preparado para:** Revision, conformidad y firma de alcance funcional
@@ -161,7 +161,46 @@ Incluye:
 - Reportes de pedidos, ingresos estimados, productos vendidos, estados y zonas.
 - Exportacion CSV de pedidos WhatsApp.
 
-## 6. Alcance No Incluido
+## 6. Matriz Detallada De Requerimientos
+
+La siguiente matriz desglosa cada requerimiento general en requerimientos funcionales firmables. Esta numeracion se usara como referencia para validacion, pruebas y control de cambios.
+
+| Codigo | Requerimiento general | Requerimiento funcional detallado | Criterio de aceptacion |
+| --- | --- | --- | --- |
+| RF01.1 | RG01 Tienda virtual operativa | El sistema debe mostrar una pagina publica de tienda con productos activos, categorias, imagenes, precios y presentaciones activas. | El cliente puede ingresar a `/` y ver productos publicados con precio e imagen. |
+| RF01.2 | RG01 Tienda virtual operativa | El sistema debe permitir busqueda por texto y filtrado por categoria o subcategoria. | La vitrina actualiza el listado segun texto o categoria seleccionada. |
+| RF01.3 | RG01 Tienda virtual operativa | El sistema debe mostrar una vista de detalle por producto con variantes, galeria, precio efectivo, precio referencial y productos relacionados. | La ruta `/producto/{id}` muestra la informacion completa del producto activo. |
+| RF01.4 | RG01 Tienda virtual operativa | El sistema debe mostrar banners y promociones activas configuradas desde el panel. | Las promociones vigentes y banners activos aparecen en la tienda publica. |
+| RF01.5 | RG01 Tienda virtual operativa | El sistema debe adaptar la disponibilidad de compra segun el modo de stock configurado. | Con control activo bloquea productos sin stock; con modo catalogo permite pedir aunque el stock este en cero. |
+| RF02.1 | RG02 Cuenta de cliente | El sistema debe permitir registrar clientes con nombre, correo, WhatsApp, direccion y contrasena. | El cliente queda registrado en `clientes_web` y puede iniciar sesion. |
+| RF02.2 | RG02 Cuenta de cliente | El sistema debe permitir inicio y cierre de sesion de clientes. | La sesion de cliente se crea al autenticar y se elimina al cerrar sesion. |
+| RF02.3 | RG02 Cuenta de cliente | El checkout debe precargar los datos disponibles del cliente autenticado. | Nombre, WhatsApp y direccion aparecen precargados cuando existen. |
+| RF02.4 | RG02 Cuenta de cliente | El sistema debe exigir sesion de cliente antes de finalizar pedido. | Un cliente no autenticado es redirigido al login antes de completar checkout. |
+| RF03.1 | RG03 Pedidos por WhatsApp | El sistema debe permitir agregar, actualizar y retirar productos del carrito. | El carrito conserva items, cantidades y subtotales antes del checkout. |
+| RF03.2 | RG03 Pedidos por WhatsApp | El checkout debe recalcular precios, promociones, delivery y total referencial en servidor. | El pedido se registra usando valores recalculados desde base de datos. |
+| RF03.3 | RG03 Pedidos por WhatsApp | El sistema debe crear cabecera y detalle de pedido WhatsApp. | Se registran datos en `pedidos_tienda` y `detalle_pedidos_tienda`. |
+| RF03.4 | RG03 Pedidos por WhatsApp | El detalle debe guardar cantidad solicitada, cantidad confirmada, precio unitario, subtotal y estado de item. | Cada item del pedido conserva trazabilidad operativa de cantidades y subtotales. |
+| RF03.5 | RG03 Pedidos por WhatsApp | El sistema debe generar enlace `wa.me` con el resumen del pedido. | Al completar el checkout se redirige al cliente a WhatsApp con codigo, items y total referencial. |
+| RF04.1 | RG04 Stock | El sistema debe manejar un unico stock por presentacion en `presentaciones_producto.stock`. | No existen saldos funcionales paralelos como stock real o stock web. |
+| RF04.2 | RG04 Stock | El sistema debe permitir activar o desactivar el control de stock desde configuracion. | El campo `configuracion_tienda.control_stock_habilitado` define el modo operativo. |
+| RF04.3 | RG04 Stock | Con control de stock habilitado, el checkout debe validar disponibilidad antes de crear pedido. | Si la cantidad supera el stock disponible, el pedido no se registra. |
+| RF04.4 | RG04 Stock | Con control de stock habilitado, el sistema debe descontar stock al crear pedido y devolverlo al cancelar. | El stock baja al registrar pedido y retorna cuando el pedido se cancela. |
+| RF04.5 | RG04 Stock | Con control de stock habilitado, los ajustes de cantidad confirmada deben descontar o devolver diferencias. | Aumentos reservan stock adicional y reducciones devuelven unidades. |
+| RF04.6 | RG04 Stock | Con control de stock deshabilitado, la tienda debe operar como catalogo. | Se aceptan pedidos con stock cero y no se generan movimientos de descuento o devolucion. |
+| RF04.7 | RG04 Stock | Los movimientos de stock deben registrarse solo cuando exista una variacion real de stock. | `movimientos_stock` conserva cantidad, stock anterior, stock nuevo, motivo y usuario cuando aplica. |
+| RF05.1 | RG05 Administracion interna | El panel debe permitir administrar productos, categorias, subcategorias, presentaciones e imagenes. | El administrador puede crear y editar catalogo desde las rutas administrativas. |
+| RF05.2 | RG05 Administracion interna | El panel debe permitir administrar promociones, banners y zonas de delivery. | El administrador gestiona descuentos, piezas visibles y tarifas por zona. |
+| RF05.3 | RG05 Administracion interna | El panel debe mostrar pedidos en tabla operativa con busqueda, filtro, estados y ticket. | El operador puede revisar y actualizar pedidos desde `/admin/pedidos`. |
+| RF05.4 | RG05 Administracion interna | El panel debe permitir ajustar cantidades confirmadas con motivo de ajuste. | El detalle guarda la cantidad confirmada y el motivo cuando difiere de lo solicitado. |
+| RF05.5 | RG05 Administracion interna | El panel debe permitir administrar usuarios, roles y permisos internos. | Los roles vigentes y permisos controlan acceso a modulos administrativos. |
+| RF05.6 | RG05 Administracion interna | El panel debe permitir configurar datos comerciales, apariencia y modo de stock. | Los cambios de configuracion impactan la tienda publica y el flujo de pedido. |
+| RF06.1 | RG06 Seguridad y auditoria | El sistema debe proteger rutas administrativas mediante autenticacion y permisos. | Usuarios sin permiso no acceden a modulos administrativos restringidos. |
+| RF06.2 | RG06 Seguridad y auditoria | El sistema debe registrar acciones relevantes de pedidos, productos, promociones y configuracion. | La auditoria guarda usuario, accion, entidad, descripcion, valores, IP y fecha. |
+| RF06.3 | RG06 Seguridad y auditoria | El sistema debe mostrar auditoria y movimientos de stock desde el panel. | El administrador puede revisar acciones y movimientos operativos. |
+| RF06.4 | RG06 Seguridad y auditoria | El sistema debe emitir reportes de pedidos, ingresos estimados, productos vendidos, estados y zonas. | Los reportes muestran indicadores y permiten exportacion CSV. |
+| RF06.5 | RG06 Seguridad y auditoria | El sistema no debe exponer rutas ni tablas funcionales fuera del alcance aprobado. | No se publican flujos de POS, caja, SUNAT, almacenes, compras, proveedores, lotes o kardex. |
+
+## 7. Alcance No Incluido
 
 Quedan expresamente fuera del alcance aprobado:
 
@@ -181,7 +220,7 @@ Quedan expresamente fuera del alcance aprobado:
 
 PECAN permanece como sistema externo para venta oficial y comprobantes. Market KM2 genera pedidos y tickets operativos referenciales; no reemplaza documentos fiscales.
 
-## 7. Modelo De Datos Principal
+## 8. Modelo De Datos Principal
 
 Tablas principales consideradas dentro del alcance:
 
@@ -218,7 +257,7 @@ Campos clave:
 - `detalle_pedidos_tienda.motivo_ajuste`: motivo de variacion entre cantidad solicitada y confirmada.
 - `pedidos_tienda.referencia_atencion`: referencia interna de atencion o pago, sin valor fiscal.
 
-## 8. Criterios De Aceptacion
+## 9. Criterios De Aceptacion
 
 Para considerar conforme el alcance descrito, se deben cumplir los siguientes criterios:
 
@@ -238,7 +277,7 @@ Para considerar conforme el alcance descrito, se deben cumplir los siguientes cr
 | CA-12 | Las pruebas automatizadas del proyecto deben ejecutarse correctamente con `php artisan test`. |
 | CA-13 | Las rutas publicadas no deben exponer modulos fuera del alcance aprobado. |
 
-## 9. Supuestos Y Restricciones
+## 10. Supuestos Y Restricciones
 
 - La atencion final del cliente continua por WhatsApp.
 - Los totales del pedido son referenciales para atencion operativa.
@@ -246,7 +285,7 @@ Para considerar conforme el alcance descrito, se deben cumplir los siguientes cr
 - La disponibilidad de compra depende del modo de stock configurado: control activo o catalogo.
 - Cualquier integracion futura con sistemas externos debe ser solicitada y aprobada mediante control de cambios.
 
-## 10. Control De Cambios
+## 11. Control De Cambios
 
 Cualquier modificacion posterior al alcance aprobado debera registrarse como solicitud de cambio, indicando:
 
@@ -260,11 +299,11 @@ Cualquier modificacion posterior al alcance aprobado debera registrarse como sol
 
 Los cambios no aprobados formalmente no forman parte del alcance de esta acta.
 
-## 11. Declaracion De Conformidad
+## 12. Declaracion De Conformidad
 
 Las partes declaran haber revisado el alcance funcional, criterios de aceptacion, restricciones y documentacion anexa. Con la firma de esta acta se deja constancia de la conformidad para continuar con la presentacion, validacion o cierre de la etapa correspondiente del proyecto Market KM2.
 
-## 12. Firmas
+## 13. Firmas
 
 | Rol | Nombre | Documento / ID | Fecha | Firma |
 | --- | --- | --- | --- | --- |
@@ -273,7 +312,7 @@ Las partes declaran haber revisado el alcance funcional, criterios de aceptacion
 | Responsable tecnico |  |  |  |  |
 | Representante de conformidad |  |  |  |  |
 
-## 13. Observaciones
+## 14. Observaciones
 
 | Nro. | Observacion | Responsable | Fecha compromiso |
 | --- | --- | --- | --- |
