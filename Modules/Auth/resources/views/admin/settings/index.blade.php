@@ -618,6 +618,17 @@
                                 <input class="settings-field" id="included_tax_percent" name="included_tax_percent" type="number" step="0.01" min="0" max="99.99" value="{{ old('included_tax_percent', $storefront->included_tax_percent) }}" required>
                                 @error('included_tax_percent') <div class="settings-error">{{ $message }}</div> @enderror
                             </div>
+                            <div class="settings-subsection">
+                                <div class="settings-subsection-head">
+                                    <h4>Modo de stock</h4>
+                                    <p>Cuando el control esta apagado, la tienda funciona como catalogo: permite registrar pedidos aunque el stock este en cero y no descuenta cantidades.</p>
+                                </div>
+                                <input type="hidden" name="control_stock_habilitado" value="0">
+                                <label class="settings-checkline">
+                                    <input type="checkbox" name="control_stock_habilitado" value="1" @checked(old('control_stock_habilitado', $storefront->stockControlEnabled()))>
+                                    Controlar stock en pedidos
+                                </label>
+                            </div>
                             <div class="settings-form-group full">
                                 <label class="settings-label" for="business_hours">Horario de atencion</label>
                                 <input class="settings-field" id="business_hours" name="business_hours" value="{{ old('business_hours', $storefront->business_hours) }}" maxlength="160" placeholder="Lunes a domingo | 7:00 a.m. - 10:00 p.m.">
@@ -714,6 +725,12 @@
                             <span>{{ number_format($settingsSummary['role_permissions']) }} permisos por rol y {{ number_format($settingsSummary['user_overrides']) }} excepciones por usuario.</span>
                         </div>
                         <a href="{{ route('admin.permisos.index') }}" class="settings-btn-ghost">Abrir</a>
+                    </div>
+                    <div class="settings-list-item">
+                        <div>
+                            <strong>Modo de stock</strong>
+                            <span>{{ $storefront->stockControlEnabled() ? 'Control activo: valida y descuenta stock en pedidos.' : 'Catalogo activo: permite pedidos sin validar ni descontar stock.' }}</span>
+                        </div>
                     </div>
                     <div class="settings-list-item">
                         <div>

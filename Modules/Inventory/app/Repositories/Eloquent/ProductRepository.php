@@ -45,20 +45,20 @@ class ProductRepository implements ProductRepositoryInterface
                 ->lockForUpdate()
                 ->find($presentacionId);
 
-            if (! $presentacion || (int) $presentacion->stock_web < $cantidad) {
+            if (! $presentacion || (int) $presentacion->stock < $cantidad) {
                 return false;
             }
 
             return ProductoPresentacion::where('id_presentacion', $presentacionId)
-                ->where('stock_web', '>=', $cantidad)
-                ->decrement('stock_web', $cantidad) > 0;
+                ->where('stock', '>=', $cantidad)
+                ->decrement('stock', $cantidad) > 0;
         });
     }
 
     public function getLowStockProducts(): Collection
     {
         return ProductoPresentacion::with('producto')
-            ->whereColumn('stock_web', '<=', 'stock_web_minimo')
+            ->whereColumn('stock', '<=', 'stock_minimo')
             ->where('estado', 'Activo')
             ->get();
     }

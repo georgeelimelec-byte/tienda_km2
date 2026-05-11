@@ -75,7 +75,7 @@ class AdminRolesController extends Controller
         $role = Role::withCount('usuarios')->findOrFail($id);
 
         if ((int) $role->id_rol === 1) {
-            return back()->with('error', 'El rol Admin General no se puede eliminar.');
+            return back()->with('error', 'El rol Superadministrador no se puede eliminar.');
         }
 
         if ($role->usuarios_count > 0) {

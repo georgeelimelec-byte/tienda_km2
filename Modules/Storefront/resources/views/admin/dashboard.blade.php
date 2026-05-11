@@ -467,7 +467,7 @@
         ],
         [
             'title' => 'Catalogo tecnico',
-            'description' => 'Gestiona maestro-detalle, codigos de barra, variantes, costos y stock web.',
+            'description' => 'Gestiona maestro-detalle, codigos de barra, variantes, costos y stock.',
             'icon' => 'fa-layer-group',
             'route' => \Illuminate\Support\Facades\Route::has('inventory.products') ? route('inventory.products') : null,
             'status' => 'Activo',

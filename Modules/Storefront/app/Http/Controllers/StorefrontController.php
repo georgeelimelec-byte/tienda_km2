@@ -18,7 +18,7 @@ use Modules\Storefront\Models\Promocion;
 use Modules\Storefront\Models\StorefrontSetting;
 use Modules\Storefront\Models\ZonaDelivery;
 use Modules\Storefront\Services\OperationalAudit;
-use Modules\Storefront\Services\StockWebService;
+use Modules\Storefront\Services\StockService;
 use RuntimeException;
 
 class StorefrontController extends Controller
@@ -41,7 +41,9 @@ class StorefrontController extends Controller
             ->get();
 
         $categorias = Categoria::where('estado', 'Activo')->orderBy('nombre')->get();
-        $igv = $this->igvPercent();
+        $setting = StorefrontSetting::current();
+        $igv = (float) ($setting->included_tax_percent ?? 18.0);
+        $stockControlEnabled = $setting->stockControlEnabled();
         $bannersCarrusel = BannerWeb::where('estado', 'Activo')
             ->where('posicion', 'Carrusel')
             ->orderBy('id_banner')
@@ -56,6 +58,13 @@ class StorefrontController extends Controller
             ->take(6)
             ->get();
         $promotedProductIds = $this->promotedProductIds($promociones);
+
+        $catalogoCompleto = Producto::query()
+            ->where('estado', 'Activo')
+            ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
+            ->with($this->catalogRelations($stockControlEnabled))
+            ->orderBy('nombre_base')
+            ->get();
 
         $productos = Producto::query()
             ->where('estado', 'Activo')
@@ -88,15 +97,65 @@ class StorefrontController extends Controller
                         });
                 });
             })
-            ->with($this->catalogRelations())
+            ->with($this->catalogRelations($stockControlEnabled))
             ->orderBy('nombre_base')
             ->get();
 
+        $destacados = $catalogoCompleto
+            ->sortByDesc(fn (Producto $producto) => ($stockControlEnabled ? (int) $producto->presentaciones->sum('stock') : 0)
+                + ($producto->presentaciones->contains(fn ($presentacion) => $presentacion->tiene_promocion) ? 1000 : 0))
+            ->take(8)
+            ->values();
+
+        $cafeProductos = $catalogoCompleto
+            ->filter(fn (Producto $producto) => $this->isCafeProduct($producto))
+            ->take(8)
+            ->values();
+
+        $marketProductos = $catalogoCompleto
+            ->reject(fn (Producto $producto) => $this->isCafeProduct($producto))
+            ->take(8)
+            ->values();
+
+        $categoryCards = $categoriasTree
+            ->map(function (Categoria $categoria) use ($catalogoCompleto) {
+                $categoryIds = $this->categoryAndChildrenIds((int) $categoria->id_categoria);
+                $products = $catalogoCompleto->whereIn('id_categoria', $categoryIds);
+                $firstProduct = $products->first();
+                $firstPresentation = $firstProduct?->presentaciones?->first();
+
+                return [
+                    'id' => $categoria->id_categoria,
+                    'nombre' => $categoria->nombre,
+                    'subcategorias' => $categoria->hijos->count(),
+                    'productos' => $products->count(),
+                    'stock' => (int) $products->sum(fn (Producto $producto) => $producto->presentaciones->sum('stock')),
+                    'imagen' => $firstPresentation
+                        ? (optional($firstPresentation->imagenes->first())->url ?: $firstProduct->imagen_principal_url)
+                        : null,
+                ];
+            })
+            ->filter(fn (array $card) => $card['productos'] > 0)
+            ->values();
+
+        $storefrontStats = [
+            'productos' => $catalogoCompleto->count(),
+            'presentaciones' => $catalogoCompleto->sum(fn (Producto $producto) => $producto->presentaciones->count()),
+            'promociones' => $promociones->count(),
+            'zonas' => ZonaDelivery::where('estado', 'Activo')->count(),
+        ];
+
         return view('storefront::index', compact(
             'productos',
+            'destacados',
+            'cafeProductos',
+            'marketProductos',
+            'categoryCards',
+            'storefrontStats',
             'categorias',
             'categoriasTree',
             'igv',
+            'stockControlEnabled',
             'bannersCarrusel',
             'bannersPromocionales',
             'promociones'
@@ -105,19 +164,22 @@ class StorefrontController extends Controller
 
     public function show($id)
     {
+        $setting = StorefrontSetting::current();
+        $stockControlEnabled = $setting->stockControlEnabled();
+
         $producto = Producto::query()
             ->where('estado', 'Activo')
             ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
-            ->with($this->catalogRelations())
+            ->with($this->catalogRelations($stockControlEnabled))
             ->findOrFail($id);
 
-        $igv = $this->igvPercent();
+        $igv = (float) ($setting->included_tax_percent ?? 18.0);
 
         $relacionados = Producto::where('estado', 'Activo')
             ->where('id_producto', '!=', $id)
             ->where('id_categoria', $producto->id_categoria)
             ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
-            ->with($this->catalogRelations())
+            ->with($this->catalogRelations($stockControlEnabled))
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -126,21 +188,23 @@ class StorefrontController extends Controller
             $relacionados = Producto::where('estado', 'Activo')
                 ->where('id_producto', '!=', $id)
                 ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
-                ->with($this->catalogRelations())
+                ->with($this->catalogRelations($stockControlEnabled))
                 ->inRandomOrder()
                 ->take(4)
                 ->get();
         }
 
-        return view('storefront::producto', compact('producto', 'relacionados', 'igv'));
+        return view('storefront::producto', compact('producto', 'relacionados', 'igv', 'stockControlEnabled'));
     }
 
     public function checkout()
     {
         $cliente = $this->sessionCliente(request());
         if (! $cliente) {
+            request()->session()->put('cliente.intended', route('storefront.checkout'));
+
             return redirect()
-                ->route('storefront.cliente.login')
+                ->route('auth.login')
                 ->with('error', 'Inicia sesion o registrate para completar el pedido.');
         }
 
@@ -153,12 +217,14 @@ class StorefrontController extends Controller
         return view('storefront::checkout', compact('zonas', 'igv', 'cliente'));
     }
 
-    public function storePedido(Request $request, StockWebService $stockWeb, OperationalAudit $audit)
+    public function storePedido(Request $request, StockService $stockService, OperationalAudit $audit)
     {
         $cliente = $this->sessionCliente($request);
         if (! $cliente) {
+            $request->session()->put('cliente.intended', route('storefront.checkout'));
+
             return redirect()
-                ->route('storefront.cliente.login')
+                ->route('auth.login')
                 ->with('error', 'Inicia sesion o registrate para completar el pedido.');
         }
 
@@ -176,14 +242,15 @@ class StorefrontController extends Controller
             return back()->with('error', 'El carrito esta vacio');
         }
 
-        $items = $this->normalizeCartItems($cart);
+        $stockControlEnabled = StorefrontSetting::current()->stockControlEnabled();
+        $items = $this->normalizeCartItems($cart, $stockControlEnabled);
         if (empty($items)) {
             return back()->with('error', 'No se pudieron validar los productos del carrito');
         }
 
         foreach ($items as $item) {
-            if ($item['quantity'] > (int) $item['presentation']->stock_web) {
-                return back()->with('error', "Stock web insuficiente para {$item['name']}. Disponible: {$item['presentation']->stock_web}");
+            if ($stockControlEnabled && $item['quantity'] > (int) $item['presentation']->stock) {
+                return back()->with('error', "Stock insuficiente para {$item['name']}. Disponible: {$item['presentation']->stock}");
             }
         }
 
@@ -220,7 +287,7 @@ class StorefrontController extends Controller
         $whatsappUrl = "https://wa.me/{$numeroEmpresa}?text=" . urlencode($mensaje);
 
         try {
-            DB::transaction(function () use ($codigo, $data, $zona, $totalProductos, $costoDelivery, $items, $whatsappUrl, $stockWeb, $audit, $request) {
+            DB::transaction(function () use ($codigo, $data, $zona, $totalProductos, $costoDelivery, $items, $whatsappUrl, $stockService, $stockControlEnabled, $audit, $request) {
                 $pedido = PedidoWhatsapp::create([
                     'codigo_pedido' => $codigo,
                     'cliente_nombre' => $data['nombre'],
@@ -236,8 +303,8 @@ class StorefrontController extends Controller
                 ]);
 
                 foreach ($items as $item) {
-                    if (! $stockWeb->reserve($item['presentation'], $item['quantity'], $pedido->id_pedido_whatsapp, 'Reserva automatica al crear pedido web')) {
-                        throw new RuntimeException("Stock web insuficiente para {$item['name']}. El pedido no fue registrado.");
+                    if ($stockControlEnabled && ! $stockService->reserve($item['presentation'], $item['quantity'], $pedido->id_pedido_whatsapp, 'Reserva automatica al crear pedido web')) {
+                        throw new RuntimeException("Stock insuficiente para {$item['name']}. El pedido no fue registrado.");
                     }
 
                     PedidoWhatsappDetalle::create([
@@ -280,7 +347,7 @@ class StorefrontController extends Controller
 
     public function loginForm()
     {
-        return view('storefront::cliente-login');
+        return redirect()->route('auth.login');
     }
 
     public function registerForm()
@@ -300,9 +367,10 @@ class StorefrontController extends Controller
             return back()->withErrors(['email' => 'Credenciales incorrectas.'])->withInput();
         }
 
+        $request->session()->regenerate();
         $request->session()->put('cliente_id', $cliente->id_cliente);
 
-        return redirect()->route('storefront.checkout');
+        return redirect()->to($request->session()->pull('cliente.intended', route('storefront.checkout')));
     }
 
     public function registerCliente(Request $request)
@@ -323,9 +391,10 @@ class StorefrontController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
+        $request->session()->regenerate();
         $request->session()->put('cliente_id', $cliente->id_cliente);
 
-        return redirect()->route('storefront.checkout');
+        return redirect()->to($request->session()->pull('cliente.intended', route('storefront.index')));
     }
 
     public function logoutCliente(Request $request)
@@ -335,16 +404,22 @@ class StorefrontController extends Controller
         return redirect()->route('storefront.index');
     }
 
-    private function catalogRelations(): array
+    private function catalogRelations(?bool $stockControlEnabled = null): array
     {
+        $stockControlEnabled ??= StorefrontSetting::current()->stockControlEnabled();
+
         return [
             'categoria.padre',
             'imagenes',
-            'presentaciones' => function ($q) {
-                $q->where('estado', 'Activo')
-                    ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
-                    ->orderBy('precio')
-                    ->orderBy('id_presentacion');
+            'presentaciones' => function ($q) use ($stockControlEnabled) {
+                $q->where('estado', 'Activo');
+
+                if ($stockControlEnabled) {
+                    $q->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END');
+                }
+
+                $q->orderBy('precio')
+                  ->orderBy('id_presentacion');
             },
             'presentaciones.unidadMedida',
             'presentaciones.imagenes',
@@ -401,6 +476,20 @@ class StorefrontController extends Controller
         return array_values(array_unique(array_merge($directProductIds, $categoryProductIds)));
     }
 
+    private function isCafeProduct(Producto $producto): bool
+    {
+        $category = $producto->categoria;
+        $categoryName = strtolower((string) ($category->nombre ?? ''));
+        $parentName = strtolower((string) optional($category?->padre)->nombre);
+        $context = $categoryName . ' ' . $parentName . ' ' . strtolower((string) $producto->nombre_base);
+
+        return str_contains($context, 'cafe')
+            || str_contains($context, 'cafeteria')
+            || str_contains($context, 'panaderia')
+            || str_contains($context, 'sandwich')
+            || str_contains($context, 'postre');
+    }
+
     private function igvPercent(): float
     {
         return (float) (StorefrontSetting::current()->included_tax_percent ?? 18.0);
@@ -413,8 +502,9 @@ class StorefrontController extends Controller
         return $clienteId ? Cliente::find($clienteId) : null;
     }
 
-    private function normalizeCartItems(array $cart): array
+    private function normalizeCartItems(array $cart, ?bool $stockControlEnabled = null): array
     {
+        $stockControlEnabled ??= StorefrontSetting::current()->stockControlEnabled();
         $items = [];
 
         foreach ($cart as $rawItem) {
@@ -434,7 +524,7 @@ class StorefrontController extends Controller
                 $presentation = ProductoPresentacion::with('producto')
                     ->where('estado', 'Activo')
                     ->where('id_producto', $productId)
-                    ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
+                    ->when($stockControlEnabled, fn ($query) => $query->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END'))
                     ->orderBy('precio')
                     ->first();
             }
@@ -443,7 +533,7 @@ class StorefrontController extends Controller
                 $presentation = ProductoPresentacion::with('producto')
                     ->where('estado', 'Activo')
                     ->where('id_producto', $rawItem['id'])
-                    ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
+                    ->when($stockControlEnabled, fn ($query) => $query->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END'))
                     ->orderBy('precio')
                     ->first();
             }

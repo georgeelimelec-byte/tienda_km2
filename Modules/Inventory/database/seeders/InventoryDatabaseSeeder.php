@@ -219,8 +219,8 @@ class InventoryDatabaseSeeder extends Seeder
                         'costo_reposicion' => 0,
                         'precio' => $presentationData['offer'] ?? $presentationData['price'],
                         'precio_referencial' => $presentationData['offer'] ? $presentationData['price'] : null,
-                        'stock_web' => $presentationData['stock'],
-                        'stock_web_minimo' => 3,
+                        'stock' => $presentationData['stock'],
+                        'stock_minimo' => 3,
                         'estado' => 'Activo',
                     ]
                 );

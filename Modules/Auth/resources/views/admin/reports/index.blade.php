@@ -153,8 +153,8 @@
                             <div style="color:#64748b;font-size:13px;">{{ $presentation->nombre_variante }}</div>
                         </div>
                         <div style="text-align:right;">
-                            <div style="font-weight:900;color:#dc2626;">{{ $presentation->stock_web }}</div>
-                            <div style="color:#64748b;font-size:12px;">Min {{ $presentation->stock_web_minimo }}</div>
+                            <div style="font-weight:900;color:#dc2626;">{{ $presentation->stock }}</div>
+                            <div style="color:#64748b;font-size:12px;">Min {{ $presentation->stock_minimo }}</div>
                         </div>
                     </div>
                 @empty

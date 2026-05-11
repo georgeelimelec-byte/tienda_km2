@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Storefront\Models\PedidoWhatsapp;
 use Modules\Storefront\Models\PedidoWhatsappDetalle;
+use Modules\Storefront\Models\StorefrontSetting;
 use Modules\Storefront\Services\OperationalAudit;
-use Modules\Storefront\Services\StockWebService;
+use Modules\Storefront\Services\StockService;
 use RuntimeException;
 
 class AdminPedidoWhatsappController extends Controller
@@ -56,7 +57,7 @@ class AdminPedidoWhatsappController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, int $id, StockWebService $stockWeb, OperationalAudit $audit)
+    public function updateStatus(Request $request, int $id, StockService $stockService, OperationalAudit $audit)
     {
         $data = $request->validate([
             'estado' => 'required|in:' . implode(',', self::STATUSES),
@@ -65,17 +66,17 @@ class AdminPedidoWhatsappController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($id, $data, $stockWeb, $audit, $request) {
+            DB::transaction(function () use ($id, $data, $stockService, $audit, $request) {
                 $pedido = PedidoWhatsapp::whereKey($id)->lockForUpdate()->firstOrFail();
                 $pedido->load('detalles.presentacion');
                 $previousStatus = $pedido->estado;
 
                 if ($previousStatus !== 'Cancelado' && $data['estado'] === 'Cancelado') {
-                    $this->restoreOrderStock($pedido, $stockWeb, 'Devolucion por cancelacion del pedido');
+                    $this->restoreOrderStock($pedido, $stockService, 'Devolucion por cancelacion del pedido');
                 }
 
                 if ($previousStatus === 'Cancelado' && $data['estado'] !== 'Cancelado') {
-                    $reserveError = $this->reserveOrderStock($pedido, $stockWeb, 'Nueva reserva al reactivar pedido cancelado');
+                    $reserveError = $this->reserveOrderStock($pedido, $stockService, 'Nueva reserva al reactivar pedido cancelado');
                     if ($reserveError) {
                         throw new RuntimeException($reserveError);
                     }
@@ -106,14 +107,14 @@ class AdminPedidoWhatsappController extends Controller
         return $this->statusResponse($request, true, 'Estado del pedido actualizado.');
     }
 
-    public function adjustItem(Request $request, int $id, int $detailId, StockWebService $stockWeb, OperationalAudit $audit)
+    public function adjustItem(Request $request, int $id, int $detailId, StockService $stockService, OperationalAudit $audit)
     {
         $data = $request->validate([
             'cantidad_confirmada' => 'required|integer|min:0',
             'motivo_ajuste' => 'required|string|max:1000',
         ]);
 
-        $result = DB::transaction(function () use ($id, $detailId, $data, $stockWeb, $audit, $request) {
+        $result = DB::transaction(function () use ($id, $detailId, $data, $stockService, $audit, $request) {
             $pedido = PedidoWhatsapp::whereKey($id)->lockForUpdate()->firstOrFail();
             $detalle = PedidoWhatsappDetalle::with('presentacion')
                 ->where('id_pedido_whatsapp', $pedido->id_pedido_whatsapp)
@@ -128,13 +129,14 @@ class AdminPedidoWhatsappController extends Controller
             $oldQuantity = (int) $detalle->cantidad_confirmada;
             $newQuantity = (int) $data['cantidad_confirmada'];
             $diff = $newQuantity - $oldQuantity;
+            $stockControlEnabled = StorefrontSetting::current()->stockControlEnabled();
 
-            if ($diff > 0 && ! $stockWeb->reserve($detalle->presentacion, $diff, $pedido->id_pedido_whatsapp, 'Reserva por ajuste operativo de pedido')) {
-                return ['ok' => false, 'message' => "Stock web insuficiente para aumentar {$detalle->nombre_producto}."];
+            if ($stockControlEnabled && $diff > 0 && ! $stockService->reserve($detalle->presentacion, $diff, $pedido->id_pedido_whatsapp, 'Reserva por ajuste operativo de pedido')) {
+                return ['ok' => false, 'message' => "Stock insuficiente para aumentar {$detalle->nombre_producto}."];
             }
 
-            if ($diff < 0) {
-                $stockWeb->restore($detalle->presentacion, abs($diff), $pedido->id_pedido_whatsapp, 'Devolucion por ajuste operativo de pedido');
+            if ($stockControlEnabled && $diff < 0) {
+                $stockService->restore($detalle->presentacion, abs($diff), $pedido->id_pedido_whatsapp, 'Devolucion por ajuste operativo de pedido');
             }
 
             $old = $detalle->only(['cantidad_solicitada', 'cantidad_confirmada', 'subtotal', 'motivo_ajuste', 'estado_item']);
@@ -164,14 +166,18 @@ class AdminPedidoWhatsappController extends Controller
                 $request
             );
 
-            return ['ok' => true];
+            return ['ok' => true, 'stock_control_enabled' => $stockControlEnabled];
         });
 
         if (!$result['ok']) {
             return back()->with('error', $result['message']);
         }
 
-        return back()->with('success', 'Item del pedido ajustado y stock web actualizado.');
+        $message = ($result['stock_control_enabled'] ?? true)
+            ? 'Item del pedido ajustado y stock actualizado.'
+            : 'Item del pedido ajustado.';
+
+        return back()->with('success', $message);
     }
 
     public function ticket(int $id)
@@ -181,24 +187,32 @@ class AdminPedidoWhatsappController extends Controller
         return view('storefront::admin.pedido-ticket', compact('pedido'));
     }
 
-    private function restoreOrderStock(PedidoWhatsapp $pedido, StockWebService $stockWeb, string $motivo): void
+    private function restoreOrderStock(PedidoWhatsapp $pedido, StockService $stockService, string $motivo): void
     {
+        if (! StorefrontSetting::current()->stockControlEnabled()) {
+            return;
+        }
+
         foreach ($pedido->detalles as $detalle) {
             if ($detalle->presentacion) {
-                $stockWeb->restore($detalle->presentacion, (int) $detalle->cantidad_confirmada, $pedido->id_pedido_whatsapp, $motivo);
+                $stockService->restore($detalle->presentacion, (int) $detalle->cantidad_confirmada, $pedido->id_pedido_whatsapp, $motivo);
             }
         }
     }
 
-    private function reserveOrderStock(PedidoWhatsapp $pedido, StockWebService $stockWeb, string $motivo): ?string
+    private function reserveOrderStock(PedidoWhatsapp $pedido, StockService $stockService, string $motivo): ?string
     {
+        if (! StorefrontSetting::current()->stockControlEnabled()) {
+            return null;
+        }
+
         foreach ($pedido->detalles as $detalle) {
             if (! $detalle->presentacion) {
                 continue;
             }
 
-            if (! $stockWeb->reserve($detalle->presentacion, (int) $detalle->cantidad_confirmada, $pedido->id_pedido_whatsapp, $motivo)) {
-                return "Stock web insuficiente para reactivar {$detalle->nombre_producto}.";
+            if (! $stockService->reserve($detalle->presentacion, (int) $detalle->cantidad_confirmada, $pedido->id_pedido_whatsapp, $motivo)) {
+                return "Stock insuficiente para reactivar {$detalle->nombre_producto}.";
             }
         }
 

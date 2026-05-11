@@ -101,7 +101,7 @@ class AdminUsersController extends Controller
         }
 
         if ((int) $user->id_rol === 1 && Usuario::where('id_rol', 1)->count() <= 1) {
-            return back()->with('error', 'Debe existir al menos un Admin General activo en el sistema.');
+            return back()->with('error', 'Debe existir al menos un Superadministrador activo en el sistema.');
         }
 
         try {

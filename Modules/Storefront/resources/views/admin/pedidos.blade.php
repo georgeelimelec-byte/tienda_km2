@@ -112,7 +112,7 @@
                                 <td class="px-5 py-5">
                                     <div class="text-sm">
                                         <div class="font-bold text-gray-900">{{ optional($pedido->operador)->nombres ?: 'Sin operador asignado' }}</div>
-                                        <div class="mt-1 text-xs text-gray-500">El operador valida stock real en PECAN/tienda y actualiza este pedido.</div>
+                                        <div class="mt-1 text-xs text-gray-500">El operador confirma cantidades y actualiza este pedido.</div>
                                     </div>
                                 </td>
                             </tr>

@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\Auth\Models\Usuario;
 use Modules\Inventory\Models\ProductoPresentacion;
 
-class StockWebMovimiento extends Model
+class StockMovimiento extends Model
 {
-    protected $table = 'movimientos_stock_web';
+    protected $table = 'movimientos_stock';
     protected $primaryKey = 'id_movimiento';
 
     protected $fillable = [

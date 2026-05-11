@@ -70,12 +70,12 @@
             --store-accent: {{ $storeAccentColor }};
         }
 
-        body.store-card-rounded main article.group { border-radius: 18px !important; }
-        body.store-card-compact main article.group { border-radius: 10px !important; }
+        body.store-card-rounded main article.group { border-radius: 8px !important; }
+        body.store-card-compact main article.group { border-radius: 8px !important; }
         body.store-card-flat main article.group { border-radius: 6px !important; box-shadow: none !important; }
     </style>
 </head>
-<body class="bg-white font-sans text-gray-800 antialiased store-header-{{ $storeHeaderStyle }} store-card-{{ $storeCardStyle }}" x-data="cartStore()">
+<body class="overflow-x-hidden bg-white font-sans text-gray-800 antialiased store-header-{{ $storeHeaderStyle }} store-card-{{ $storeCardStyle }}" x-data="cartStore()">
     @php
         $headerSelectedCategory = request('categoria_id');
         $headerSearch = request('q');
@@ -113,13 +113,13 @@
     @endphp
     
     <!-- Navbar -->
-    <nav class="sticky top-0 z-50 border-b shadow-sm shadow-orange-950/15 transition-all duration-300" style="background: {{ $storeHeaderStyle === 'dark' ? $storeAccentColor : $storePrimaryColor }}; border-color: {{ $storeHeaderStyle === 'dark' ? $storeAccentColor : $storePrimaryDarkColor }};" x-data="{ mobileMenuOpen: false, categoriesOpen: false, activeRoot: @js((string) $headerActiveRootId) }" @keydown.escape.window="mobileMenuOpen = false; categoriesOpen = false">
+    <nav class="sticky top-0 z-50 border-b border-white/10 bg-[#10151f]/96 shadow-xl shadow-gray-950/20 backdrop-blur-xl transition-all duration-300" x-data="{ mobileMenuOpen: false, categoriesOpen: false, activeRoot: @js((string) $headerActiveRootId) }" @keydown.escape.window="mobileMenuOpen = false; categoriesOpen = false">
         <div class="w-full px-4 sm:px-6 lg:px-10">
-            <div class="mx-auto flex min-h-[74px] max-w-[1800px] items-center gap-3 xl:gap-4">
+            <div class="mx-auto flex min-h-[86px] max-w-[1800px] items-center gap-3 xl:gap-4">
                 <!-- Logo -->
                 <div class="flex flex-shrink-0 items-center group cursor-pointer" onclick="window.location='{{ route('storefront.index') }}'">
                     @if($storefrontLogoSrc)
-                        <span class="inline-flex h-16 w-20 items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                        <span class="inline-flex h-14 w-14 items-center justify-center rounded-lg border border-white/10 bg-white p-1 shadow-lg shadow-black/20 transition-transform duration-300 group-hover:scale-105">
                             <img src="{{ $storefrontLogoSrc }}" alt="{{ $storeName }}" class="h-full w-full object-contain">
                         </span>
                     @else
@@ -131,18 +131,22 @@
                             <span class="hidden sm:block text-xs font-bold uppercase text-orange-100">{{ $storeTagline }}</span>
                         </div>
                     @endif
+                    <div class="ml-3 hidden leading-tight sm:block">
+                        <span class="block text-base font-black text-white">{{ $storeName }}</span>
+                        <span class="block text-xs font-bold uppercase tracking-wide text-orange-200">{{ $storeTagline }}</span>
+                    </div>
                 </div>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden items-center gap-2 text-sm font-bold text-white xl:flex">
                     <div @click.outside="categoriesOpen = false">
-                        <button type="button" @click="categoriesOpen = !categoriesOpen" class="inline-flex h-11 items-center gap-2 rounded-lg bg-orange-800 px-4 text-white shadow-sm shadow-orange-950/20 transition hover:bg-orange-900 focus:outline-none focus:ring-2 focus:ring-white/60" :aria-expanded="categoriesOpen.toString()">
+                        <button type="button" @click="categoriesOpen = !categoriesOpen" class="inline-flex h-11 items-center gap-2 rounded-lg bg-white px-4 text-gray-950 shadow-sm transition hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-200" :aria-expanded="categoriesOpen.toString()">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18"></path></svg>
                             Categorias
                             <svg class="h-4 w-4 transition-transform" :class="categoriesOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
 
-                        <div x-cloak x-show="categoriesOpen" x-transition.opacity class="fixed inset-x-0 top-[74px] z-50 bg-gray-950/30 px-4 pb-6 pt-3 backdrop-blur-[2px]" @click.self="categoriesOpen = false">
+                        <div x-cloak x-show="categoriesOpen" x-transition.opacity class="fixed inset-x-0 top-[86px] z-50 bg-gray-950/30 px-4 pb-6 pt-3 backdrop-blur-[2px]" @click.self="categoriesOpen = false">
                             <div class="mx-auto grid max-h-[calc(100vh-104px)] max-w-[1500px] grid-cols-[300px_minmax(0,1fr)] overflow-hidden rounded-lg bg-white text-gray-900 shadow-2xl ring-1 ring-orange-950/10">
                                 <aside class="overflow-y-auto border-r border-orange-100 bg-gradient-to-b from-orange-50 to-white py-4">
                                     <div class="px-4 pb-3">
@@ -232,19 +236,19 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('storefront.index', ['filtro' => 'promociones']) }}" class="inline-flex h-11 items-center gap-2 rounded-lg px-3.5 transition focus:outline-none focus:ring-2 focus:ring-white/60 {{ $headerActiveFilter === 'promociones' ? 'bg-white text-brand shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
+                    <a href="{{ route('storefront.index', ['filtro' => 'promociones']) }}" class="inline-flex h-11 items-center gap-2 rounded-lg px-3.5 transition focus:outline-none focus:ring-2 focus:ring-orange-200 {{ $headerActiveFilter === 'promociones' ? 'bg-brand text-white shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a4 4 0 118 0v2M12 8V6a4 4 0 00-8 0v2m8 0H4m8 0h8"></path></svg>
                         Promociones
                     </a>
 
-                    <a href="{{ route('storefront.index', ['filtro' => 'combos']) }}" class="inline-flex h-11 items-center gap-2 rounded-lg px-3.5 transition focus:outline-none focus:ring-2 focus:ring-white/60 {{ $headerActiveFilter === 'combos' ? 'bg-white text-brand shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
+                    <a href="{{ route('storefront.index', ['filtro' => 'combos']) }}" class="inline-flex h-11 items-center gap-2 rounded-lg px-3.5 transition focus:outline-none focus:ring-2 focus:ring-orange-200 {{ $headerActiveFilter === 'combos' ? 'bg-brand text-white shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7m16 0H4m16 0l-2-5H6l-2 5m8-5v14"></path></svg>
                         Combos
                     </a>
                 </div>
 
                 <!-- Search -->
-                <form action="{{ route('storefront.index') }}" method="GET" class="hidden h-12 min-w-[280px] flex-1 items-center rounded-lg bg-white p-1 shadow-sm ring-1 ring-orange-950/10 transition focus-within:ring-2 focus-within:ring-orange-200 md:flex">
+                <form action="{{ route('storefront.index') }}" method="GET" class="hidden h-12 min-w-[280px] flex-1 items-center rounded-lg bg-white p-1 shadow-lg shadow-black/10 ring-1 ring-white/10 transition focus-within:ring-2 focus-within:ring-orange-200 md:flex">
                     @if($headerSelectedCategory)
                         <input type="hidden" name="categoria_id" value="{{ $headerSelectedCategory }}">
                     @endif
@@ -258,7 +262,7 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </a>
                     @endif
-                    <button type="submit" class="inline-flex h-10 items-center justify-center rounded-md bg-ink px-5 text-sm font-bold text-white transition hover:bg-gray-900">
+                    <button type="submit" class="inline-flex h-10 items-center justify-center rounded-md bg-gray-950 px-5 text-sm font-bold text-white transition hover:bg-brand">
                         Buscar
                     </button>
                 </form>
@@ -268,25 +272,24 @@
                     @if($storefrontCliente)
                         <form method="POST" action="{{ route('storefront.cliente.logout') }}" class="hidden sm:block">
                             @csrf
-                            <button class="h-11 rounded-lg bg-white px-4 text-sm font-bold text-gray-900 shadow-sm transition hover:bg-orange-50" title="Cerrar sesion de cliente">
+                            <button class="h-11 rounded-lg bg-white px-4 text-sm font-bold text-gray-900 shadow-sm transition hover:bg-orange-50" title="Cerrar sesion">
                                 {{ \Illuminate\Support\Str::limit($storefrontCliente->nombre_o_razon_social, 18) }}
                             </button>
                         </form>
-                    @else
-                        <a href="{{ route('storefront.cliente.login') }}" class="hidden h-11 items-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-gray-900 shadow-sm transition hover:bg-orange-50 sm:flex">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            Cliente
-                        </a>
                     @endif
 
-                    <!-- Admin Login Button -->
                     @if($showLoginLink)
                         @auth
                             <a href="{{ route('admin.dashboard.main') }}" class="hidden h-11 items-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-gray-900 shadow-sm transition hover:bg-orange-50 sm:flex">
-                                <span>Panel Admin</span>
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h7"></path></svg>
+                                <span>Panel</span>
                             </a>
-                        @else
-                            <a href="{{ route('auth.login') }}" class="hidden h-11 items-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-gray-900 shadow-sm transition hover:bg-orange-50 sm:flex">
+                        @elseif(!$storefrontCliente)
+                            <a href="{{ route('storefront.cliente.register') }}" class="hidden h-11 items-center gap-2 rounded-lg bg-white/10 px-4 text-sm font-bold text-white ring-1 ring-white/20 transition hover:bg-white/20 sm:flex">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3M15 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0"></path></svg>
+                                <span>Crear cuenta</span>
+                            </a>
+                            <a href="{{ route('auth.login') }}" class="hidden h-11 items-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-gray-950 shadow-sm transition hover:bg-orange-50 sm:flex">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
                                 <span>Ingresar</span>
                             </a>
@@ -294,7 +297,7 @@
                     @endif
 
                     <!-- Cart Toggle -->
-                    <button @click="cartOpen = true" class="relative inline-flex h-11 w-11 items-center justify-center rounded-lg bg-orange-800 text-white shadow-sm transition hover:bg-orange-900 focus:outline-none focus:ring-2 focus:ring-white/60">
+                    <button @click="cartOpen = true" class="relative inline-flex h-11 w-11 items-center justify-center rounded-lg bg-brand text-white shadow-sm shadow-orange-950/20 transition hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-orange-200">
                         <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10px] font-bold text-white shadow-sm border-2 border-brand transition-transform" x-show="totalItems > 0" x-text="totalItems" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="scale-0" x-transition:enter-end="scale-100"></span>
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -302,7 +305,7 @@
                     </button>
                     
                     <!-- Mobile Menu Toggle -->
-                    <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-orange-800 text-white shadow-sm transition hover:bg-orange-900 focus:outline-none focus:ring-2 focus:ring-white/60 xl:hidden" aria-label="Abrir menu" :aria-expanded="mobileMenuOpen.toString()">
+                    <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" class="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-white/10 text-white shadow-sm ring-1 ring-white/15 transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-orange-200 xl:hidden" aria-label="Abrir menu" :aria-expanded="mobileMenuOpen.toString()">
                         <svg x-show="!mobileMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                         <svg x-cloak x-show="mobileMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
@@ -352,27 +355,28 @@
                             Combos
                         </a>
                     </div>
-                    @if($showLoginLink)
-                        <div class="mt-2 border-t border-gray-100 pt-2 sm:hidden">
-                            <a href="{{ auth()->check() ? route('admin.dashboard.main') : route('auth.login') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
-                                <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                {{ auth()->check() ? 'Panel Admin' : 'Ingresar' }}
-                            </a>
-                        </div>
-                    @endif
                     <div class="mt-2 border-t border-gray-100 pt-2 sm:hidden">
                         @if($storefrontCliente)
                             <form method="POST" action="{{ route('storefront.cliente.logout') }}">
                                 @csrf
                                 <button class="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
                                     <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"></path></svg>
-                                    Salir de cuenta cliente
+                                    Salir de cuenta
                                 </button>
                             </form>
+                        @elseif(auth()->check())
+                            <a href="{{ route('admin.dashboard.main') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
+                                <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h7"></path></svg>
+                                Panel
+                            </a>
                         @else
-                            <a href="{{ route('storefront.cliente.login') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
+                            <a href="{{ route('auth.login') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
+                                <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14"></path></svg>
+                                Ingresar
+                            </a>
+                            <a href="{{ route('storefront.cliente.register') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-bold text-gray-700 transition hover:bg-gray-50 hover:text-brand">
                                 <svg class="h-5 w-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                Cuenta cliente
+                                Crear cuenta cliente
                             </a>
                         @endif
                     </div>
@@ -382,7 +386,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="w-full pb-24 px-4 sm:px-6 lg:px-10 relative min-h-screen">
+    <main class="w-full overflow-x-hidden pb-24 px-4 sm:px-6 lg:px-10 relative min-h-screen">
         <div class="absolute inset-0 bg-gray-50 -z-10"></div>
         @yield('content')
     </main>
@@ -465,6 +469,8 @@
 
     <!-- Alpine Data Store -->
     <script>
+        const storefrontStockControlEnabled = @js($storefrontSetting->stockControlEnabled());
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('cartStore', () => ({
                 cartOpen: false,
@@ -476,28 +482,45 @@
                     return this.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
                 },
                 addToCart(product) {
+                    if (!product) {
+                        return;
+                    }
+
                     product.id = product.presentation_id || product.id;
                     product.quantity = product.quantity ? parseInt(product.quantity) : 1;
 
                     const existing = this.items.find(i => String(i.id) === String(product.id));
-                    const qtyToAdd = product.quantity ? parseInt(product.quantity) : 1;
-                    const maxStock = Number(product.max_stock || product.stock || 0);
+                    const qtyToAdd = Math.max(1, product.quantity ? parseInt(product.quantity) : 1);
+                    const stockControlEnabled = storefrontStockControlEnabled && product.stock_control_enabled !== false;
+                    const maxStock = stockControlEnabled ? Number(product.max_stock ?? product.stock ?? 0) : 0;
+
+                    if (stockControlEnabled && maxStock <= 0) {
+                        return;
+                    }
                     
                     if (existing) {
+                        existing.stock_control_enabled = stockControlEnabled;
+                        existing.max_stock = stockControlEnabled ? maxStock : null;
                         existing.quantity += qtyToAdd;
-                        if (maxStock > 0 && existing.quantity > maxStock) {
+                        if (stockControlEnabled && maxStock > 0 && existing.quantity > maxStock) {
                             existing.quantity = maxStock;
                         }
                     } else {
-                        this.items.push({...product, quantity: maxStock > 0 ? Math.min(qtyToAdd, maxStock) : qtyToAdd});
+                        this.items.push({
+                            ...product,
+                            max_stock: stockControlEnabled ? maxStock : null,
+                            stock_control_enabled: stockControlEnabled,
+                            quantity: stockControlEnabled && maxStock > 0 ? Math.min(qtyToAdd, maxStock) : qtyToAdd,
+                        });
                     }
                     this.save();
                     this.cartOpen = true;
                 },
                 updateQuantity(index, change) {
                     this.items[index].quantity += change;
-                    const maxStock = Number(this.items[index].max_stock || this.items[index].stock || 0);
-                    if (maxStock > 0 && this.items[index].quantity > maxStock) {
+                    const stockControlEnabled = storefrontStockControlEnabled && this.items[index].stock_control_enabled !== false;
+                    const maxStock = stockControlEnabled ? Number(this.items[index].max_stock ?? this.items[index].stock ?? 0) : 0;
+                    if (stockControlEnabled && maxStock > 0 && this.items[index].quantity > maxStock) {
                         this.items[index].quantity = maxStock;
                     }
                     if (this.items[index].quantity <= 0) {

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->decimal('included_tax_percent', 5, 2)->default(18.00);
             $table->string('business_hours', 160)->nullable();
             $table->text('operational_message')->nullable();
+            $table->boolean('control_stock_habilitado')->default(true);
             $table->timestamps();
         });
     }

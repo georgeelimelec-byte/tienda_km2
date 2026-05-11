@@ -27,11 +27,13 @@ class StorefrontSetting extends Model
         'included_tax_percent',
         'business_hours',
         'operational_message',
+        'control_stock_habilitado',
     ];
 
     protected $casts = [
         'show_login_link' => 'boolean',
         'included_tax_percent' => 'decimal:2',
+        'control_stock_habilitado' => 'boolean',
     ];
 
     public static function defaults(): array
@@ -55,6 +57,7 @@ class StorefrontSetting extends Model
             'included_tax_percent' => 18.00,
             'business_hours' => 'Lunes a domingo',
             'operational_message' => null,
+            'control_stock_habilitado' => true,
         ];
     }
 
@@ -69,7 +72,17 @@ class StorefrontSetting extends Model
 
     public function displayLogoUrl(): ?string
     {
-        return self::normalizeLogoUrl($this->logo_url) ?: self::defaultLogoUrl();
+        $logoUrl = self::normalizeLogoUrl($this->logo_url);
+
+        if ($logoUrl && ! preg_match('/^https?:\/\//i', $logoUrl) && ! str_starts_with($logoUrl, 'data:')) {
+            $relativePath = ltrim(parse_url($logoUrl, PHP_URL_PATH) ?: $logoUrl, '/');
+
+            if (! file_exists(public_path($relativePath))) {
+                $logoUrl = null;
+            }
+        }
+
+        return $logoUrl ?: self::defaultLogoUrl();
     }
 
     public static function normalizeLogoUrl(?string $url): ?string
@@ -107,5 +120,10 @@ class StorefrontSetting extends Model
     public function whatsappNumberForUrl(): string
     {
         return preg_replace('/\D+/', '', (string) $this->whatsapp_number) ?: '51999999999';
+    }
+
+    public function stockControlEnabled(): bool
+    {
+        return (bool) ($this->control_stock_habilitado ?? true);
     }
 }

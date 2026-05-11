@@ -23,11 +23,14 @@ class DatabaseSeeder extends Seeder
 
     private function seedRoles(): void
     {
+        DB::table('usuarios_internos')->where('id_rol', 4)->update(['id_rol' => 3]);
+        DB::table('permisos_por_rol')->where('id_rol', 4)->delete();
+        DB::table('roles_sistema')->where('id_rol', 4)->delete();
+
         foreach ([
-            ['id_rol' => 1, 'nombre_rol' => 'Admin General', 'nivel_acceso' => 1, 'estado' => 'Activo'],
+            ['id_rol' => 1, 'nombre_rol' => 'Superadministrador', 'nivel_acceso' => 1, 'estado' => 'Activo'],
             ['id_rol' => 2, 'nombre_rol' => 'Administrador', 'nivel_acceso' => 2, 'estado' => 'Activo'],
-            ['id_rol' => 3, 'nombre_rol' => 'Atencion WhatsApp', 'nivel_acceso' => 3, 'estado' => 'Activo'],
-            ['id_rol' => 4, 'nombre_rol' => 'Operador WhatsApp', 'nivel_acceso' => 4, 'estado' => 'Activo'],
+            ['id_rol' => 3, 'nombre_rol' => 'Operador', 'nivel_acceso' => 3, 'estado' => 'Activo'],
         ] as $role) {
             DB::table('roles_sistema')->updateOrInsert(['id_rol' => $role['id_rol']], $role);
         }
@@ -37,7 +40,7 @@ class DatabaseSeeder extends Seeder
     {
         foreach ([
             ['id_modulo' => 1, 'nombre' => 'Pedidos', 'descripcion' => 'Bandeja de pedidos WhatsApp y cambios de estado', 'estado' => 'Activo'],
-            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock web', 'estado' => 'Activo'],
+            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock', 'estado' => 'Activo'],
             ['id_modulo' => 3, 'nombre' => 'Tienda Virtual', 'descripcion' => 'Banners, zonas de delivery, promociones y vitrina web', 'estado' => 'Activo'],
             ['id_modulo' => 4, 'nombre' => 'Reportes', 'descripcion' => 'Metricas y exportaciones de pedidos WhatsApp', 'estado' => 'Activo'],
             ['id_modulo' => 5, 'nombre' => 'Configuracion', 'descripcion' => 'Datos comerciales, apariencia y ajustes del sistema', 'estado' => 'Activo'],
@@ -62,10 +65,10 @@ class DatabaseSeeder extends Seeder
             ['id_rol' => 2, 'id_modulo' => 3, 'leer' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 0],
             ['id_rol' => 2, 'id_modulo' => 4, 'leer' => 1, 'crear' => 0, 'editar' => 0, 'eliminar' => 0],
             ['id_rol' => 2, 'id_modulo' => 6, 'leer' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 0],
-            ['id_rol' => 3, 'id_modulo' => 1, 'leer' => 1, 'crear' => 1, 'editar' => 0, 'eliminar' => 0],
-            ['id_rol' => 3, 'id_modulo' => 2, 'leer' => 1, 'crear' => 1, 'editar' => 0, 'eliminar' => 0],
-            ['id_rol' => 4, 'id_modulo' => 1, 'leer' => 1, 'crear' => 0, 'editar' => 1, 'eliminar' => 0],
-            ['id_rol' => 4, 'id_modulo' => 4, 'leer' => 1, 'crear' => 0, 'editar' => 0, 'eliminar' => 0],
+            ['id_rol' => 3, 'id_modulo' => 1, 'leer' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 0],
+            ['id_rol' => 3, 'id_modulo' => 2, 'leer' => 1, 'crear' => 0, 'editar' => 0, 'eliminar' => 0],
+            ['id_rol' => 3, 'id_modulo' => 3, 'leer' => 1, 'crear' => 0, 'editar' => 1, 'eliminar' => 0],
+            ['id_rol' => 3, 'id_modulo' => 4, 'leer' => 1, 'crear' => 0, 'editar' => 0, 'eliminar' => 0],
         ] as $permission) {
             DB::table('permisos_por_rol')->updateOrInsert(
                 ['id_rol' => $permission['id_rol'], 'id_modulo' => $permission['id_modulo']],
@@ -89,6 +92,10 @@ class DatabaseSeeder extends Seeder
 
     private function seedAdminUser(): void
     {
+        DB::table('usuarios_internos')
+            ->whereIn('email', ['admin@km2.com', 'vendedora@localmarket.com'])
+            ->delete();
+
         DB::table('usuarios_internos')->updateOrInsert(
             ['id_usuario' => 1],
             [

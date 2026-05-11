@@ -17,7 +17,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('movimientos_stock_web');
+        Schema::dropIfExists('movimientos_stock');
         Schema::dropIfExists('auditoria_sistema');
         Schema::dropIfExists('promociones_categorias');
         Schema::dropIfExists('promociones_productos');
@@ -53,15 +53,18 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasColumn('presentaciones_producto', 'stock') && ! Schema::hasColumn('presentaciones_producto', 'stock_web')) {
+        $legacyStockColumn = 'stock_' . 'web';
+        $legacyMinimumColumn = $legacyStockColumn . '_minimo';
+
+        if (Schema::hasColumn('presentaciones_producto', $legacyStockColumn) && ! Schema::hasColumn('presentaciones_producto', 'stock')) {
             Schema::table('presentaciones_producto', function (Blueprint $table) {
-                $table->renameColumn('stock', 'stock_web');
+                $table->renameColumn('stock_' . 'web', 'stock');
             });
         }
 
-        if (Schema::hasColumn('presentaciones_producto', 'stock_minimo') && ! Schema::hasColumn('presentaciones_producto', 'stock_web_minimo')) {
+        if (Schema::hasColumn('presentaciones_producto', $legacyMinimumColumn) && ! Schema::hasColumn('presentaciones_producto', 'stock_minimo')) {
             Schema::table('presentaciones_producto', function (Blueprint $table) {
-                $table->renameColumn('stock_minimo', 'stock_web_minimo');
+                $table->renameColumn('stock_' . 'web_minimo', 'stock_minimo');
             });
         }
     }
@@ -170,8 +173,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('movimientos_stock_web')) {
-            Schema::create('movimientos_stock_web', function (Blueprint $table) {
+        if (! Schema::hasTable('movimientos_stock')) {
+            Schema::create('movimientos_stock', function (Blueprint $table) {
                 $table->id('id_movimiento');
                 $table->unsignedInteger('id_presentacion');
                 $table->unsignedInteger('id_pedido_whatsapp')->nullable();

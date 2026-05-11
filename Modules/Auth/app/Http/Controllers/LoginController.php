@@ -7,16 +7,10 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Modules\Auth\Models\Usuario;
+use Modules\Storefront\Models\Cliente;
 
-/**
- * Controlador de autenticación web (panel administrativo).
- * Solo recibe la petición y delega al guard de Laravel.
- */
 class LoginController extends Controller
 {
-    /**
-     * Muestra el formulario de login.
-     */
     public function showLoginForm()
     {
         if (Auth::check()) {
@@ -26,51 +20,56 @@ class LoginController extends Controller
         return view('auth::login');
     }
 
-    /**
-     * Procesa el login por email/password.
-     */
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required|min:4',
         ], [
-            'email.required'    => 'El correo es obligatorio.',
-            'email.email'       => 'Ingresa un correo válido.',
-            'password.required' => 'La contraseña es obligatoria.',
+            'email.required' => 'El correo es obligatorio.',
+            'email.email' => 'Ingresa un correo valido.',
+            'password.required' => 'La contrasena es obligatoria.',
         ]);
 
-        // Buscar usuario por email
         $usuario = Usuario::where('email', $request->email)->first();
 
-        if (!$usuario || !Hash::check($request->password, $usuario->password_hash)) {
-            return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['auth' => 'Credenciales incorrectas. Verifica tu email y contraseña.']);
+        if ($usuario && Hash::check($request->password, $usuario->password_hash)) {
+            if ($usuario->estado !== 'Activo') {
+                return back()
+                    ->withInput($request->only('email'))
+                    ->withErrors(['auth' => 'Tu cuenta esta desactivada. Contacta al administrador.']);
+            }
+
+            $request->session()->forget('cliente_id');
+            Auth::login($usuario);
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('admin.dashboard'));
         }
 
-        if ($usuario->estado !== 'Activo') {
-            return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['auth' => 'Tu cuenta está desactivada. Contacta al administrador.']);
+        $cliente = Cliente::where('email', $request->email)->first();
+
+        if ($cliente && $cliente->password && Hash::check($request->password, (string) $cliente->password)) {
+            Auth::logout();
+            $request->session()->regenerate();
+            $request->session()->put('cliente_id', $cliente->id_cliente);
+
+            return redirect()->to($request->session()->pull('cliente.intended', route('storefront.index')));
         }
 
-        Auth::login($usuario);
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('admin.dashboard'));
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors(['auth' => 'Credenciales incorrectas. Verifica tu email y contrasena.']);
     }
 
-    /**
-     * Cierra la sesión.
-     */
     public function logout(Request $request)
     {
         Auth::logout();
+        $request->session()->forget('cliente_id');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route('auth.login')
-            ->with('success', 'Sesión cerrada correctamente.');
+            ->with('success', 'Sesion cerrada correctamente.');
     }
 }

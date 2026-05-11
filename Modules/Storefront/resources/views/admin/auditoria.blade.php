@@ -79,7 +79,7 @@
 
         <section class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
             <div class="border-b border-gray-100 px-5 py-4">
-                <h2 class="text-xl font-black text-gray-900">Ultimos movimientos de stock web</h2>
+                <h2 class="text-xl font-black text-gray-900">Ultimos movimientos de stock</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -110,7 +110,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-12 text-center text-gray-500">No hay movimientos de stock web.</td>
+                                <td colspan="5" class="px-5 py-12 text-center text-gray-500">No hay movimientos de stock.</td>
                             </tr>
                         @endforelse
                     </tbody>

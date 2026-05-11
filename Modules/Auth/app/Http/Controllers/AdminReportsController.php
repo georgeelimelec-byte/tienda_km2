@@ -60,8 +60,8 @@ class AdminReportsController extends Controller
 
         $lowStock = ProductoPresentacion::with('producto')
             ->where('estado', 'Activo')
-            ->whereColumn('stock_web', '<=', 'stock_web_minimo')
-            ->orderBy('stock_web')
+            ->whereColumn('stock', '<=', 'stock_minimo')
+            ->orderBy('stock')
             ->limit(8)
             ->get();
 

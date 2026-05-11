@@ -8,11 +8,14 @@ use Illuminate\Routing\Controller;
 use Modules\Inventory\Models\Categoria;
 use Modules\Inventory\Models\Producto;
 use Modules\Storefront\Models\BannerWeb;
+use Modules\Storefront\Models\StorefrontSetting;
 
 class CatalogController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $stockControlEnabled = StorefrontSetting::current()->stockControlEnabled();
+
         $products = Producto::query()
             ->where('estado', 'Activo')
             ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
@@ -25,22 +28,24 @@ class CatalogController extends Controller
                 });
             })
             ->when($request->filled('categoria_id'), fn ($q) => $q->where('id_categoria', $request->integer('categoria_id')))
-            ->with($this->relations())
+            ->with($this->relations($stockControlEnabled))
             ->orderBy('nombre_base')
             ->paginate($request->integer('per_page', 20));
 
-        return response()->json($products->through(fn ($product) => $this->productPayload($product)));
+        return response()->json($products->through(fn ($product) => $this->productPayload($product, $stockControlEnabled)));
     }
 
     public function show(int $id): JsonResponse
     {
+        $stockControlEnabled = StorefrontSetting::current()->stockControlEnabled();
+
         $product = Producto::query()
             ->where('estado', 'Activo')
             ->whereHas('presentaciones', fn ($q) => $q->where('estado', 'Activo'))
-            ->with($this->relations())
+            ->with($this->relations($stockControlEnabled))
             ->findOrFail($id);
 
-        return response()->json($this->productPayload($product));
+        return response()->json($this->productPayload($product, $stockControlEnabled));
     }
 
     public function categories(): JsonResponse
@@ -67,20 +72,26 @@ class CatalogController extends Controller
         );
     }
 
-    private function relations(): array
+    private function relations(bool $stockControlEnabled): array
     {
         return [
             'categoria',
             'imagenes',
-            'presentaciones' => fn ($q) => $q->where('estado', 'Activo')
-                ->orderByRaw('CASE WHEN stock_web > 0 THEN 0 ELSE 1 END')
-                ->orderBy('precio'),
+            'presentaciones' => function ($q) use ($stockControlEnabled) {
+                $q->where('estado', 'Activo');
+
+                if ($stockControlEnabled) {
+                    $q->orderByRaw('CASE WHEN stock > 0 THEN 0 ELSE 1 END');
+                }
+
+                $q->orderBy('precio');
+            },
             'presentaciones.unidadMedida',
             'presentaciones.imagenes',
         ];
     }
 
-    private function productPayload(Producto $product): array
+    private function productPayload(Producto $product, bool $stockControlEnabled): array
     {
         return [
             'id_producto' => $product->id_producto,
@@ -93,6 +104,7 @@ class CatalogController extends Controller
                 'url' => $image->url,
                 'orden' => $image->orden,
             ])->values(),
+            'stock_control_enabled' => $stockControlEnabled,
             'presentaciones' => $product->presentaciones->map(fn ($presentation) => [
                 'id_presentacion' => $presentation->id_presentacion,
                 'nombre_variante' => $presentation->nombre_variante,
@@ -100,7 +112,9 @@ class CatalogController extends Controller
                 'precio' => (float) $presentation->precio,
                 'precio_referencial' => $presentation->precio_referencial !== null ? (float) $presentation->precio_referencial : null,
                 'precio_efectivo' => (float) $presentation->precio_efectivo,
-                'stock_web' => (int) $presentation->stock_web,
+                'stock' => (int) $presentation->stock,
+                'max_stock' => $stockControlEnabled ? (int) $presentation->stock : null,
+                'stock_control_enabled' => $stockControlEnabled,
                 'tiene_promocion' => (bool) $presentation->tiene_promocion,
                 'promocion_activa' => optional($presentation->promocion_activa)->nombre,
                 'unidad' => $presentation->unidadMedida,

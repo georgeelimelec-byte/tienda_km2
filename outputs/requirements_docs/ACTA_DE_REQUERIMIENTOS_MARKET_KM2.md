@@ -1,0 +1,282 @@
+# Acta De Requerimientos Y Aprobacion De Alcance
+
+**Proyecto:** Market KM2 - tienda virtual con pedidos por WhatsApp  
+**Codigo de acta:** AR-MKM2-2026-05-11  
+**Version:** 1.1  
+**Fecha:** 11 de mayo de 2026  
+**Ubicacion:** Lima, Peru  
+**Documento preparado para:** Revision, conformidad y firma de alcance funcional
+
+## 1. Participantes
+
+| Rol | Nombre | Cargo / Area | Organizacion | Firma |
+| --- | --- | --- | --- | --- |
+| Solicitante / Usuario responsable |  |  | Market KM2 |  |
+| Aprobador funcional |  |  | Market KM2 |  |
+| Responsable tecnico |  |  |  |  |
+| Observador / interesado |  |  |  |  |
+
+## 2. Objeto Del Acta
+
+El presente documento formaliza los requerimientos, alcance funcional y criterios de aceptacion del sistema Market KM2, con el fin de dejar constancia de lo solicitado, lo incluido, lo excluido y las condiciones bajo las cuales el sistema sera presentado para validacion.
+
+La firma de esta acta representa la conformidad de las partes respecto al alcance vigente descrito en este documento y sus anexos tecnicos.
+
+## 3. Documentos De Referencia
+
+Forman parte de la documentacion de soporte de esta acta:
+
+| Documento | Ruta | Finalidad |
+| --- | --- | --- |
+| Requerimientos detallados | `outputs/requirements_docs/REQUERIMIENTOS_DETALLADOS_MARKET_KM2.md` | Define requerimientos generales, funcionales, modelo de datos y criterios de aceptacion. |
+| Arquitectura y diagramas | `outputs/architecture_docs/ARQUITECTURA_Y_DIAGRAMAS.md` | Describe arquitectura modular, flujo principal, capas, modelo de datos y rutas principales. |
+| README del proyecto | `README.md` | Resume alcance, modulos activos, flujo principal, base de datos y validacion tecnica. |
+
+En caso de diferencia entre documentos, prevalece esta acta para efectos de alcance aprobado. Los anexos sirven como detalle tecnico y funcional complementario.
+
+## 4. Resumen Ejecutivo
+
+Market KM2 es una aplicacion web desarrollada sobre Laravel 11 para operar una tienda virtual con pedidos por WhatsApp. El sistema permite publicar productos, gestionar catalogo, registrar clientes, operar carrito y checkout, aplicar control de stock cuando este habilitado, generar pedidos, redirigir al cliente a WhatsApp y administrar internamente la atencion de pedidos desde un panel operativo.
+
+El sistema se organiza en tres modulos activos:
+
+- `Auth`: autenticacion, usuarios internos, roles, permisos, configuracion, reportes y analitica.
+- `Inventory`: catalogo tecnico, categorias, productos, presentaciones, imagenes, precios, precio referencial y stock.
+- `Storefront`: tienda publica, cuenta de cliente, carrito, checkout, pedidos WhatsApp, promociones, banners, zonas de delivery, auditoria y APIs.
+
+## 5. Alcance Funcional Aprobado
+
+### 5.1 Tienda Virtual Publica
+
+El sistema debe permitir que el cliente navegue una vitrina publica con productos activos, categorias, subcategorias, banners, promociones vigentes, precio, precio referencial, imagenes, presentaciones y disponibilidad segun el modo de stock configurado.
+
+Incluye:
+
+- Pagina principal de tienda.
+- Detalle de producto.
+- Busqueda por texto.
+- Filtro por categoria.
+- Visualizacion de promociones y banners.
+- Bloqueo de compra para productos sin stock solo cuando el control de stock este habilitado.
+- Modo catalogo para aceptar pedidos aunque el stock este en cero cuando el control de stock este deshabilitado.
+
+### 5.2 Registro E Inicio De Sesion De Clientes
+
+El cliente debe poder registrarse e iniciar sesion para completar pedidos. El checkout debe precargar la informacion disponible del cliente.
+
+Incluye:
+
+- Registro de cliente con nombre, correo, WhatsApp, direccion y contrasena.
+- Inicio y cierre de sesion de cliente.
+- Conservacion de sesion de cliente para checkout.
+- Asociacion de pedidos a los datos declarados por el cliente.
+
+### 5.3 Catalogo Tecnico
+
+El sistema debe permitir la administracion de productos, categorias, presentaciones e imagenes.
+
+Incluye:
+
+- Alta y edicion de productos.
+- Administracion de categorias y subcategorias.
+- Presentaciones con unidad, codigo de barras, costo, precio, precio referencial, stock y stock minimo.
+- Imagen principal y galeria.
+- Control de estado activo o inactivo.
+
+### 5.4 Stock Del Sistema
+
+El sistema maneja un solo stock dentro del alcance aprobado: `presentaciones_producto.stock`.
+
+Condiciones aprobadas:
+
+- El stock se registra por presentacion de producto.
+- El sistema tiene una configuracion global `control_stock_habilitado`.
+- Con control de stock habilitado, el checkout valida stock desde base de datos.
+- Con control de stock habilitado, al crear un pedido se descuenta stock.
+- Con control de stock habilitado, al cancelar un pedido se devuelve stock.
+- Con control de stock habilitado, al ajustar cantidades confirmadas se descuenta o devuelve la diferencia.
+- Con control de stock deshabilitado, la tienda funciona como catalogo y permite registrar pedidos aunque el stock este en cero.
+- Con control de stock deshabilitado, el sistema no descuenta ni devuelve stock por pedidos.
+- Los movimientos se registran en `movimientos_stock` solo cuando existe movimiento de stock.
+
+No se aprueba ninguna separacion o duplicidad de stock dentro del sistema, para evitar confusion operativa y documental.
+
+### 5.5 Carrito Y Checkout
+
+El sistema debe permitir convertir un carrito en pedido WhatsApp.
+
+Incluye:
+
+- Agregar, actualizar y retirar productos del carrito.
+- Validar sesion de cliente antes de finalizar pedido.
+- Seleccionar zona de delivery.
+- Recalcular precios, promociones, delivery y stock en servidor segun el modo configurado.
+- Crear `pedidos_tienda` y `detalle_pedidos_tienda`.
+- Registrar cantidad solicitada y cantidad confirmada.
+- Generar enlace `wa.me` con resumen del pedido.
+
+### 5.6 Bandeja Administrativa De Pedidos
+
+El personal interno debe gestionar pedidos desde una tabla operativa.
+
+Incluye:
+
+- Listado de pedidos.
+- Busqueda y filtro por estado.
+- Estados: `Pendiente`, `Observado`, `Ajustado`, `Confirmado`, `En Preparacion`, `En Delivery`, `Entregado`, `Cancelado`.
+- Actualizacion de estado.
+- Ajuste de cantidad confirmada por item.
+- Motivo de ajuste.
+- Recalculo de totales.
+- Ticket operativo referencial.
+
+### 5.7 Promociones, Banners Y Zonas
+
+Incluye:
+
+- Administracion de promociones por porcentaje o monto.
+- Aplicacion de promociones a productos o categorias.
+- Vigencia por fechas y estado.
+- Administracion de banners de tienda.
+- Administracion de zonas de delivery con tarifa y estado.
+- Opcion de recojo en tienda como zona con tarifa cero.
+
+### 5.8 Usuarios, Roles Y Permisos
+
+Incluye:
+
+- Inicio y cierre de sesion administrativo.
+- Usuarios internos.
+- Roles vigentes: `Superadministrador`, `Administrador`, `Operador`.
+- Permisos por modulo.
+- Proteccion para evitar dejar el sistema sin usuarios administrativos validos.
+
+### 5.9 Auditoria Y Reportes
+
+Incluye:
+
+- Registro de acciones relevantes con usuario, rol, accion, entidad, descripcion, valores anteriores y nuevos, IP, dispositivo y fecha.
+- Auditoria administrativa.
+- Movimientos de stock.
+- Reportes de pedidos, ingresos estimados, productos vendidos, estados y zonas.
+- Exportacion CSV de pedidos WhatsApp.
+
+## 6. Alcance No Incluido
+
+Quedan expresamente fuera del alcance aprobado:
+
+- POS.
+- Caja.
+- SUNAT.
+- Boletas, facturas o comprobantes fiscales.
+- Reservas.
+- Almacenes.
+- Compras.
+- Proveedores.
+- Lotes.
+- Kardex.
+- Hardware de impresion.
+- Integracion automatica con PECAN.
+- Conciliacion contable o tributaria.
+
+PECAN permanece como sistema externo para venta oficial y comprobantes. Market KM2 genera pedidos y tickets operativos referenciales; no reemplaza documentos fiscales.
+
+## 7. Modelo De Datos Principal
+
+Tablas principales consideradas dentro del alcance:
+
+- `clientes_web`
+- `carrito_items`
+- `productos`
+- `presentaciones_producto`
+- `imagenes_producto`
+- `categorias_producto`
+- `unidades_medida`
+- `promociones`
+- `promociones_productos`
+- `promociones_categorias`
+- `pedidos_tienda`
+- `detalle_pedidos_tienda`
+- `movimientos_stock`
+- `auditoria_sistema`
+- `banners_tienda`
+- `zonas_entrega`
+- `configuracion_tienda`
+- `usuarios_internos`
+- `roles_sistema`
+- `modulos_sistema`
+- `permisos_por_rol`
+- `permisos_por_usuario`
+
+Campos clave:
+
+- `presentaciones_producto.stock`: stock unico del sistema por presentacion.
+- `presentaciones_producto.stock_minimo`: umbral referencial de bajo stock.
+- `configuracion_tienda.control_stock_habilitado`: define si el sistema valida/descuenta stock o si opera como catalogo.
+- `detalle_pedidos_tienda.cantidad_solicitada`: cantidad solicitada por el cliente.
+- `detalle_pedidos_tienda.cantidad_confirmada`: cantidad validada por el operador.
+- `detalle_pedidos_tienda.motivo_ajuste`: motivo de variacion entre cantidad solicitada y confirmada.
+- `pedidos_tienda.referencia_atencion`: referencia interna de atencion o pago, sin valor fiscal.
+
+## 8. Criterios De Aceptacion
+
+Para considerar conforme el alcance descrito, se deben cumplir los siguientes criterios:
+
+| Codigo | Criterio |
+| --- | --- |
+| CA-01 | La tienda publica muestra productos activos, categorias, imagenes, precios, promociones y disponibilidad segun configuracion. |
+| CA-02 | El cliente puede registrarse, iniciar sesion y completar checkout. |
+| CA-03 | El checkout recalcula precios en servidor y valida stock cuando el control de stock esta habilitado. |
+| CA-04 | Al crear un pedido se registra cabecera y detalle en base de datos. |
+| CA-05 | El pedido genera enlace de WhatsApp con resumen. |
+| CA-06 | Con control de stock habilitado, el stock se descuenta al crear pedido y se devuelve al cancelar. |
+| CA-07 | Con control de stock deshabilitado, se pueden registrar pedidos con stock cero sin descontar ni devolver stock. |
+| CA-08 | Los ajustes de cantidad actualizan subtotales, estado de item, auditoria y stock solo si el control esta habilitado. |
+| CA-09 | La administracion permite gestionar productos, categorias, promociones, banners, zonas, pedidos, usuarios y permisos. |
+| CA-10 | La auditoria registra acciones relevantes y movimientos de stock cuando apliquen. |
+| CA-11 | La base de datos no contiene tablas funcionales fuera del alcance aprobado para POS, caja, almacenes, compras, proveedores, lotes o kardex. |
+| CA-12 | Las pruebas automatizadas del proyecto deben ejecutarse correctamente con `php artisan test`. |
+| CA-13 | Las rutas publicadas no deben exponer modulos fuera del alcance aprobado. |
+
+## 9. Supuestos Y Restricciones
+
+- La atencion final del cliente continua por WhatsApp.
+- Los totales del pedido son referenciales para atencion operativa.
+- La emision de comprobantes oficiales no forma parte del sistema Market KM2.
+- La disponibilidad de compra depende del modo de stock configurado: control activo o catalogo.
+- Cualquier integracion futura con sistemas externos debe ser solicitada y aprobada mediante control de cambios.
+
+## 10. Control De Cambios
+
+Cualquier modificacion posterior al alcance aprobado debera registrarse como solicitud de cambio, indicando:
+
+- Codigo de solicitud.
+- Descripcion del cambio.
+- Justificacion.
+- Impacto funcional.
+- Impacto tecnico.
+- Impacto en plazo y costo, si corresponde.
+- Aprobacion del responsable funcional.
+
+Los cambios no aprobados formalmente no forman parte del alcance de esta acta.
+
+## 11. Declaracion De Conformidad
+
+Las partes declaran haber revisado el alcance funcional, criterios de aceptacion, restricciones y documentacion anexa. Con la firma de esta acta se deja constancia de la conformidad para continuar con la presentacion, validacion o cierre de la etapa correspondiente del proyecto Market KM2.
+
+## 12. Firmas
+
+| Rol | Nombre | Documento / ID | Fecha | Firma |
+| --- | --- | --- | --- | --- |
+| Solicitante / Usuario responsable |  |  |  |  |
+| Aprobador funcional |  |  |  |  |
+| Responsable tecnico |  |  |  |  |
+| Representante de conformidad |  |  |  |  |
+
+## 13. Observaciones
+
+| Nro. | Observacion | Responsable | Fecha compromiso |
+| --- | --- | --- | --- |
+| 1 |  |  |  |
+| 2 |  |  |  |
+| 3 |  |  |  |

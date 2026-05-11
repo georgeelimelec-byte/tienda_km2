@@ -11,7 +11,7 @@ use Modules\Inventory\Models\Producto;
 use Modules\Inventory\Models\ProductoImagen;
 use Modules\Inventory\Models\ProductoPresentacion;
 use Modules\Storefront\Services\OperationalAudit;
-use Modules\Storefront\Services\StockWebService;
+use Modules\Storefront\Services\StockService;
 
 class AdminProductoController extends Controller
 {
@@ -25,7 +25,7 @@ class AdminProductoController extends Controller
         return view('storefront::admin.productos', compact('productos', 'categorias'));
     }
 
-    public function store(Request $request, StockWebService $stockWeb, OperationalAudit $audit)
+    public function store(Request $request, StockService $stockService, OperationalAudit $audit)
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
@@ -33,7 +33,7 @@ class AdminProductoController extends Controller
             'id_categoria' => 'required|exists:categorias_producto,id_categoria',
             'precio_venta' => 'required|numeric|min:0',
             'precio_referencial' => 'nullable|numeric|min:0|gt:precio_venta',
-            'stock_web' => 'required|integer|min:0',
+            'stock' => 'required|integer|min:0',
             'foto_archivo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'galeria_urls' => 'nullable|string',
             'nombre_variante' => 'nullable|string|max:100',
@@ -44,7 +44,7 @@ class AdminProductoController extends Controller
         $imageUrl = $this->resolveImageUrl($request);
         $imageUrls = $this->imageUrls($imageUrl, $data['galeria_urls'] ?? null);
 
-        DB::transaction(function () use ($data, $imageUrl, $imageUrls, $stockWeb, $audit, $request) {
+        DB::transaction(function () use ($data, $imageUrl, $imageUrls, $stockService, $audit, $request) {
             $producto = Producto::create([
                 'nombre_base' => $data['nombre'],
                 'descripcion' => $data['descripcion'] ?? null,
@@ -60,12 +60,12 @@ class AdminProductoController extends Controller
                 'codigo_barras' => $data['codigo_barras'] ?? null,
                 'precio' => $data['precio_venta'],
                 'precio_referencial' => $data['precio_referencial'] ?? null,
-                'stock_web' => 0,
-                'stock_web_minimo' => 1,
+                'stock' => 0,
+                'stock_minimo' => 1,
                 'estado' => $data['estado'] ?? 'Activo',
             ]);
 
-            $stockWeb->adjustManual($presentacion, (int) $data['stock_web'], 'Carga inicial de stock web desde productos');
+            $stockService->adjustManual($presentacion, (int) $data['stock'], 'Carga inicial de stock desde productos');
             $this->syncImages($producto, $imageUrls);
             $audit->log(
                 'crear_producto',
@@ -76,7 +76,7 @@ class AdminProductoController extends Controller
                 [
                     'precio' => $presentacion->precio,
                     'precio_referencial' => $presentacion->precio_referencial,
-                    'stock_web' => $data['stock_web'],
+                    'stock' => $data['stock'],
                 ],
                 $request
             );
@@ -85,7 +85,7 @@ class AdminProductoController extends Controller
         return back()->with('success', 'Producto creado exitosamente');
     }
 
-    public function update(Request $request, $id, StockWebService $stockWeb, OperationalAudit $audit)
+    public function update(Request $request, $id, StockService $stockService, OperationalAudit $audit)
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
@@ -93,7 +93,7 @@ class AdminProductoController extends Controller
             'id_categoria' => 'required|exists:categorias_producto,id_categoria',
             'precio_venta' => 'required|numeric|min:0',
             'precio_referencial' => 'nullable|numeric|min:0|gt:precio_venta',
-            'stock_web' => 'required|integer|min:0',
+            'stock' => 'required|integer|min:0',
             'estado' => 'required|in:Activo,Inactivo',
             'foto_archivo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'galeria_urls' => 'nullable|string',
@@ -104,7 +104,7 @@ class AdminProductoController extends Controller
         $imageUrl = $this->resolveImageUrl($request);
         $imageUrls = $this->imageUrls($imageUrl, $data['galeria_urls'] ?? null);
 
-        DB::transaction(function () use ($data, $id, $imageUrl, $imageUrls, $stockWeb, $audit, $request) {
+        DB::transaction(function () use ($data, $id, $imageUrl, $imageUrls, $stockService, $audit, $request) {
             $producto = Producto::with(['presentaciones.imagenes', 'imagenes'])->findOrFail($id);
             $oldProduct = $producto->only(['nombre_base', 'descripcion', 'id_categoria', 'estado']);
             $producto->update([
@@ -117,7 +117,7 @@ class AdminProductoController extends Controller
 
             $presentacion = $producto->presentaciones->first();
             if ($presentacion) {
-                $oldPresentation = $presentacion->only(['nombre_variante', 'codigo_barras', 'precio', 'precio_referencial', 'stock_web', 'estado']);
+                $oldPresentation = $presentacion->only(['nombre_variante', 'codigo_barras', 'precio', 'precio_referencial', 'stock', 'estado']);
                 $presentacion->update([
                     'nombre_variante' => ($data['nombre_variante'] ?? '') ?: 'Unidad',
                     'codigo_barras' => $data['codigo_barras'] ?? null,
@@ -126,8 +126,8 @@ class AdminProductoController extends Controller
                     'estado' => $data['estado'],
                 ]);
 
-                if ((int) $oldPresentation['stock_web'] !== (int) $data['stock_web']) {
-                    $stockWeb->adjustManual($presentacion, (int) $data['stock_web'], 'Ajuste manual de stock web desde productos');
+                if ((int) $oldPresentation['stock'] !== (int) $data['stock']) {
+                    $stockService->adjustManual($presentacion, (int) $data['stock'], 'Ajuste manual de stock desde productos');
                 }
             } else {
                 $oldPresentation = null;
@@ -138,11 +138,11 @@ class AdminProductoController extends Controller
                     'codigo_barras' => $data['codigo_barras'] ?? null,
                     'precio' => $data['precio_venta'],
                     'precio_referencial' => $data['precio_referencial'] ?? null,
-                    'stock_web' => 0,
-                    'stock_web_minimo' => 1,
+                    'stock' => 0,
+                    'stock_minimo' => 1,
                     'estado' => $data['estado'],
                 ]);
-                $stockWeb->adjustManual($presentacion, (int) $data['stock_web'], 'Carga inicial de stock web desde productos');
+                $stockService->adjustManual($presentacion, (int) $data['stock'], 'Carga inicial de stock desde productos');
             }
 
             $this->syncImages($producto, $imageUrls);
@@ -157,7 +157,7 @@ class AdminProductoController extends Controller
                 ],
                 [
                     'producto' => $producto->fresh()->only(['nombre_base', 'descripcion', 'id_categoria', 'estado']),
-                    'presentacion' => $presentacion->fresh()->only(['nombre_variante', 'codigo_barras', 'precio', 'precio_referencial', 'stock_web', 'estado']),
+                    'presentacion' => $presentacion->fresh()->only(['nombre_variante', 'codigo_barras', 'precio', 'precio_referencial', 'stock', 'estado']),
                 ],
                 $request
             );

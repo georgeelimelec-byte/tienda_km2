@@ -163,10 +163,10 @@
                                 <td style="font-weight: 700; color: var(--primary);">{{ number_format($pres->precio, 2) }}</td>
                                 <td>{{ $pres->precio_referencial ? number_format($pres->precio_referencial, 2) : '---' }}</td>
                                 <td>
-                                    @if ($pres->stock_web <= $pres->stock_web_minimo)
-                                        <span class="badge-stock low">{{ $pres->stock_web }} <i class="fas fa-arrow-down" style="font-size:10px;"></i></span>
+                                    @if ($pres->stock <= $pres->stock_minimo)
+                                        <span class="badge-stock low">{{ $pres->stock }} <i class="fas fa-arrow-down" style="font-size:10px;"></i></span>
                                     @else
-                                        <span class="badge-stock">{{ $pres->stock_web }}</span>
+                                        <span class="badge-stock">{{ $pres->stock }}</span>
                                     @endif
                                 </td>
                                 <td>
@@ -267,7 +267,7 @@
                                 <div class="variant-col-label">Costo S/</div>
                                 <div class="variant-col-label">Precio S/</div>
                                 <div class="variant-col-label">Ref. S/</div>
-                                <div class="variant-col-label">Stock web</div>
+                                <div class="variant-col-label">Stock</div>
                                 <div></div>
                             </div>
                         @endif
@@ -300,8 +300,8 @@
                                     @error('presentaciones.'.$index.'.precio_referencial') <span class="form-error">Inv</span> @enderror
                                 </div>
                                 <div>
-                                    <input type="number" class="form-control" wire:model="presentaciones.{{ $index }}.stock_web" min="0" placeholder="0">
-                                    @error('presentaciones.'.$index.'.stock_web') <span class="form-error">Req</span> @enderror
+                                    <input type="number" class="form-control" wire:model="presentaciones.{{ $index }}.stock" min="0" placeholder="0">
+                                    @error('presentaciones.'.$index.'.stock') <span class="form-error">Req</span> @enderror
                                 </div>
                                 <button type="button" wire:click="removePresentacion({{ $index }})" class="btn-remove" title="Quitar variante">
                                     <i class="fas fa-trash"></i>

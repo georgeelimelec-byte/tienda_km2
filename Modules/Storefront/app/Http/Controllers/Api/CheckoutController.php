@@ -12,12 +12,12 @@ use Modules\Storefront\Models\PedidoWhatsappDetalle;
 use Modules\Storefront\Models\StorefrontSetting;
 use Modules\Storefront\Models\ZonaDelivery;
 use Modules\Storefront\Services\OperationalAudit;
-use Modules\Storefront\Services\StockWebService;
+use Modules\Storefront\Services\StockService;
 use RuntimeException;
 
 class CheckoutController extends Controller
 {
-    public function process(Request $request, StockWebService $stockWeb, OperationalAudit $audit): JsonResponse
+    public function process(Request $request, StockService $stockService, OperationalAudit $audit): JsonResponse
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:100',
@@ -32,13 +32,15 @@ class CheckoutController extends Controller
 
         $zona = ZonaDelivery::where('estado', 'Activo')->findOrFail($data['id_zona']);
         $lines = [];
+        $setting = StorefrontSetting::current();
+        $stockControlEnabled = $setting->stockControlEnabled();
 
         foreach ($data['items'] as $item) {
             $presentation = ProductoPresentacion::with('producto')
                 ->where('estado', 'Activo')
                 ->findOrFail($item['id_presentacion']);
 
-            if ($item['cantidad'] > $presentation->stock_web) {
+            if ($stockControlEnabled && $item['cantidad'] > $presentation->stock) {
                 return response()->json([
                     'message' => "Stock insuficiente para {$presentation->producto->nombre_base}.",
                 ], 422);
@@ -70,7 +72,7 @@ class CheckoutController extends Controller
         $lines = array_values($lines);
 
         foreach ($lines as $line) {
-            if ($line['quantity'] > $line['presentation']->stock_web) {
+            if ($stockControlEnabled && $line['quantity'] > $line['presentation']->stock) {
                 return response()->json([
                     'message' => "Stock insuficiente para {$line['name']}.",
                 ], 422);
@@ -81,7 +83,7 @@ class CheckoutController extends Controller
             $codigo = '#WA-' . now()->format('ymd') . '-' . str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while (PedidoWhatsapp::where('codigo_pedido', $codigo)->exists());
 
-        $numeroEmpresa = StorefrontSetting::current()->whatsappNumberForUrl();
+        $numeroEmpresa = $setting->whatsappNumberForUrl();
         $message = "Hola, quiero confirmar mi pedido *{$codigo}*.\n";
         foreach ($lines as $line) {
             $message .= "- {$line['quantity']} x {$line['name']}: S/ " . number_format($line['subtotal'], 2) . "\n";
@@ -92,7 +94,7 @@ class CheckoutController extends Controller
         $whatsappUrl = "https://wa.me/{$numeroEmpresa}?text=" . urlencode($message);
 
         try {
-            $pedido = DB::transaction(function () use ($codigo, $data, $zona, $lines, $whatsappUrl, $stockWeb, $audit, $request) {
+            $pedido = DB::transaction(function () use ($codigo, $data, $zona, $lines, $whatsappUrl, $stockService, $stockControlEnabled, $audit, $request) {
                 $totalProductos = collect($lines)->sum('subtotal');
                 $pedido = PedidoWhatsapp::create([
                     'codigo_pedido' => $codigo,
@@ -109,7 +111,7 @@ class CheckoutController extends Controller
                 ]);
 
                 foreach ($lines as $line) {
-                    if (! $stockWeb->reserve($line['presentation'], $line['quantity'], $pedido->id_pedido_whatsapp, 'Reserva automatica al crear pedido API')) {
+                    if ($stockControlEnabled && ! $stockService->reserve($line['presentation'], $line['quantity'], $pedido->id_pedido_whatsapp, 'Reserva automatica al crear pedido API')) {
                         throw new RuntimeException("Stock insuficiente para {$line['name']}.");
                     }
 

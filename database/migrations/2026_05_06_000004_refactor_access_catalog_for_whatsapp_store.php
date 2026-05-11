@@ -37,6 +37,10 @@ return new class extends Migration
                 );
             }
         }
+
+        DB::table('usuarios_internos')->where('id_rol', 4)->update(['id_rol' => 3]);
+        DB::table('permisos_por_rol')->where('id_rol', 4)->delete();
+        DB::table('roles_sistema')->where('id_rol', 4)->delete();
     }
 
     public function down(): void
@@ -48,7 +52,7 @@ return new class extends Migration
     {
         return [
             ['id_modulo' => 1, 'nombre' => 'Pedidos', 'descripcion' => 'Bandeja de pedidos WhatsApp y cambios de estado'],
-            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock web'],
+            ['id_modulo' => 2, 'nombre' => 'Catalogo', 'descripcion' => 'Productos, presentaciones, precios, fotos y stock'],
             ['id_modulo' => 3, 'nombre' => 'Tienda Virtual', 'descripcion' => 'Banners, zonas de delivery, promociones y vitrina web'],
             ['id_modulo' => 4, 'nombre' => 'Reportes', 'descripcion' => 'Metricas y exportaciones de pedidos WhatsApp'],
             ['id_modulo' => 5, 'nombre' => 'Configuracion', 'descripcion' => 'Datos comerciales, apariencia y ajustes del sistema'],
@@ -59,10 +63,9 @@ return new class extends Migration
     private function roles(): array
     {
         return [
-            ['id_rol' => 1, 'nombre_rol' => 'Admin General', 'nivel_acceso' => 1],
+            ['id_rol' => 1, 'nombre_rol' => 'Superadministrador', 'nivel_acceso' => 1],
             ['id_rol' => 2, 'nombre_rol' => 'Administrador', 'nivel_acceso' => 2],
-            ['id_rol' => 3, 'nombre_rol' => 'Atencion WhatsApp', 'nivel_acceso' => 3],
-            ['id_rol' => 4, 'nombre_rol' => 'Operador WhatsApp', 'nivel_acceso' => 4],
+            ['id_rol' => 3, 'nombre_rol' => 'Operador', 'nivel_acceso' => 3],
         ];
     }
 
@@ -79,14 +82,6 @@ return new class extends Migration
                 1 => ['leer' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 0],
                 2 => $readOnly,
                 3 => ['leer' => 1, 'crear' => 0, 'editar' => 1, 'eliminar' => 0],
-                4 => $readOnly,
-                5 => $none,
-                6 => $none,
-            ],
-            4 => [
-                1 => ['leer' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 0],
-                2 => $readOnly,
-                3 => $readOnly,
                 4 => $readOnly,
                 5 => $none,
                 6 => $none,

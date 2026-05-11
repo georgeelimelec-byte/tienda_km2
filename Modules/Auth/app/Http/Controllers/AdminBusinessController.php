@@ -69,7 +69,7 @@ class AdminBusinessController extends Controller
             ->get();
 
         $lowStockCount = ProductoPresentacion::where('estado', 'Activo')
-            ->whereColumn('stock_web', '<=', 'stock_web_minimo')
+            ->whereColumn('stock', '<=', 'stock_minimo')
             ->count();
 
         $activeProducts = Producto::where('estado', 'Activo')->count();

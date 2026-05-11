@@ -40,7 +40,10 @@ class AdminSettingsController extends Controller
             'included_tax_percent' => ['required', 'numeric', 'min:0', 'max:99.99'],
             'business_hours' => ['nullable', 'string', 'max:160'],
             'operational_message' => ['nullable', 'string'],
+            'control_stock_habilitado' => ['nullable', 'boolean'],
         ]);
+
+        $data['control_stock_habilitado'] = $request->boolean('control_stock_habilitado');
 
         StorefrontSetting::current()->fill($data)->save();
 

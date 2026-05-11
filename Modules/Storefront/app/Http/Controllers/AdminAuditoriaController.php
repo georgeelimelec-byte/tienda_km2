@@ -5,7 +5,7 @@ namespace Modules\Storefront\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Storefront\Models\AuditoriaOperativa;
-use Modules\Storefront\Models\StockWebMovimiento;
+use Modules\Storefront\Models\StockMovimiento;
 
 class AdminAuditoriaController extends Controller
 {
@@ -18,7 +18,7 @@ class AdminAuditoriaController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        $movimientosStock = StockWebMovimiento::with(['presentacion.producto', 'pedido', 'usuario'])
+        $movimientosStock = StockMovimiento::with(['presentacion.producto', 'pedido', 'usuario'])
             ->latest('created_at')
             ->take(12)
             ->get();

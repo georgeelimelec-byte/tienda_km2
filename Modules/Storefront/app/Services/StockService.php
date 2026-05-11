@@ -4,50 +4,51 @@ namespace Modules\Storefront\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Modules\Inventory\Models\ProductoPresentacion;
-use Modules\Storefront\Models\StockWebMovimiento;
+use Modules\Storefront\Models\StockMovimiento;
+use Modules\Storefront\Models\StorefrontSetting;
 
-class StockWebService
+class StockService
 {
     public function reserve(ProductoPresentacion $presentation, int $quantity, int $pedidoId, string $motivo): bool
     {
-        if ($quantity <= 0) {
+        if ($quantity <= 0 || ! $this->stockControlEnabled()) {
             return true;
         }
 
         $updated = ProductoPresentacion::where('id_presentacion', $presentation->id_presentacion)
-            ->where('stock_web', '>=', $quantity)
-            ->decrement('stock_web', $quantity);
+            ->where('stock', '>=', $quantity)
+            ->decrement('stock', $quantity);
 
         if (! $updated) {
             return false;
         }
 
         $presentation->refresh();
-        $this->record($presentation, $pedidoId, 'reserva_pedido', -$quantity, $presentation->stock_web + $quantity, $presentation->stock_web, $motivo);
+        $this->record($presentation, $pedidoId, 'reserva_pedido', -$quantity, $presentation->stock + $quantity, $presentation->stock, $motivo);
 
         return true;
     }
 
     public function restore(ProductoPresentacion $presentation, int $quantity, ?int $pedidoId, string $motivo): void
     {
-        if ($quantity <= 0) {
+        if ($quantity <= 0 || ! $this->stockControlEnabled()) {
             return;
         }
 
-        $before = (int) $presentation->stock_web;
-        $presentation->increment('stock_web', $quantity);
+        $before = (int) $presentation->stock;
+        $presentation->increment('stock', $quantity);
         $presentation->refresh();
 
-        $this->record($presentation, $pedidoId, 'devolucion_stock', $quantity, $before, (int) $presentation->stock_web, $motivo);
+        $this->record($presentation, $pedidoId, 'devolucion_stock', $quantity, $before, (int) $presentation->stock, $motivo);
     }
 
     public function adjustManual(ProductoPresentacion $presentation, int $newStock, string $motivo): void
     {
-        $before = (int) $presentation->stock_web;
-        $presentation->update(['stock_web' => max(0, $newStock)]);
+        $before = (int) $presentation->stock;
+        $presentation->update(['stock' => max(0, $newStock)]);
         $presentation->refresh();
 
-        $this->record($presentation, null, 'ajuste_manual', (int) $presentation->stock_web - $before, $before, (int) $presentation->stock_web, $motivo);
+        $this->record($presentation, null, 'ajuste_manual', (int) $presentation->stock - $before, $before, (int) $presentation->stock, $motivo);
     }
 
     private function record(
@@ -59,7 +60,7 @@ class StockWebService
         int $after,
         string $motivo
     ): void {
-        StockWebMovimiento::create([
+        StockMovimiento::create([
             'id_presentacion' => $presentation->id_presentacion,
             'id_pedido_whatsapp' => $pedidoId,
             'tipo_movimiento' => $type,
@@ -69,5 +70,10 @@ class StockWebService
             'motivo' => $motivo,
             'id_usuario' => Auth::id(),
         ]);
+    }
+
+    private function stockControlEnabled(): bool
+    {
+        return StorefrontSetting::current()->stockControlEnabled();
     }
 }

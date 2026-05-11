@@ -7,11 +7,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        DB::table('usuarios_internos')->where('id_rol', 4)->update(['id_rol' => 3]);
+        DB::table('permisos_por_rol')->where('id_rol', 4)->delete();
+        DB::table('roles_sistema')->where('id_rol', 4)->delete();
         DB::table('roles_sistema')->updateOrInsert(
-            ['id_rol' => 4],
+            ['id_rol' => 3],
             [
-                'nombre_rol' => 'Operador WhatsApp',
-                'nivel_acceso' => 4,
+                'nombre_rol' => 'Operador',
+                'nivel_acceso' => 3,
                 'estado' => 'Activo',
             ]
         );
@@ -34,7 +37,7 @@ return new class extends Migration
             }
 
             DB::table('permisos_por_rol')->updateOrInsert(
-                ['id_rol' => 4, 'id_modulo' => $moduleId],
+                ['id_rol' => 3, 'id_modulo' => $moduleId],
                 $permissions
             );
         }
@@ -42,7 +45,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        DB::table('permisos_por_rol')->where('id_rol', 4)->delete();
-        DB::table('roles_sistema')->where('id_rol', 4)->delete();
+        DB::table('permisos_por_rol')->where('id_rol', 3)->delete();
     }
 };

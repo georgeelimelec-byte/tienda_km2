@@ -2,6 +2,7 @@
 
 @section('content')
 @php
+    $stockControlEnabled = $stockControlEnabled ?? \Modules\Storefront\Models\StorefrontSetting::current()->stockControlEnabled();
     $imgPrincipal = $producto->imagen_principal_url;
     $baseImages = $producto->imagenes
         ->map(fn ($image) => $image->url)
@@ -12,7 +13,7 @@
         $baseImages = collect([$imgPrincipal]);
     }
 
-    $presentacionesData = $producto->presentaciones->map(function ($presentacion) use ($producto, $baseImages) {
+    $presentacionesData = $producto->presentaciones->map(function ($presentacion) use ($producto, $baseImages, $stockControlEnabled) {
         $variantImages = $presentacion->imagenes
             ->map(fn ($image) => $image->url)
             ->filter()
@@ -36,7 +37,9 @@
             'regular_price' => $displayReference,
             'has_offer' => $displayReference !== null,
             'has_promotion' => (bool) $presentacion->tiene_promocion,
-            'stock' => (int) $presentacion->stock_web,
+            'stock' => (int) $presentacion->stock,
+            'max_stock' => $stockControlEnabled ? (int) $presentacion->stock : null,
+            'stock_control_enabled' => $stockControlEnabled,
             'image' => $images->first(),
             'images' => $images->values(),
         ];
@@ -48,7 +51,7 @@
     $isCafe = str_contains($categoryContext, 'cafe') || str_contains($categoryContext, 'cafeteria') || str_contains($categoryContext, 'panaderia') || str_contains($categoryContext, 'sandwich');
 @endphp
 
-<div class="animate-[fadeIn_0.5s_ease-out] pt-6 max-w-[1680px] mx-auto" x-data="productDetail(@js($presentacionesData), @js($imgPrincipal), {{ (float) $igv }})">
+<div class="animate-[fadeIn_0.5s_ease-out] pt-6 max-w-[1680px] mx-auto" x-data="productDetail(@js($presentacionesData), @js($imgPrincipal), {{ (float) $igv }}, @js($stockControlEnabled))">
     <nav class="mb-6 flex items-center text-sm font-medium text-gray-500">
         <a href="{{ route('storefront.index') }}" class="hover:text-brand transition-colors flex items-center">
             <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
@@ -82,11 +85,14 @@
 
             <div class="p-8 lg:p-12 flex flex-col relative z-10">
                 <div class="flex flex-wrap items-center gap-2 mb-4">
-                    <template x-if="selectedPresentation && selectedPresentation.stock > 0">
+                    <template x-if="stockControlEnabled && selectedPresentation && selectedPresentation.stock > 0">
                         <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold uppercase rounded-md flex items-center"><span class="w-2 h-2 bg-brand rounded-full mr-1.5"></span> En stock</span>
                     </template>
-                    <template x-if="selectedPresentation && selectedPresentation.stock <= 0">
+                    <template x-if="stockControlEnabled && selectedPresentation && selectedPresentation.stock <= 0">
                         <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold uppercase rounded-md flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-1.5"></span> Agotado</span>
+                    </template>
+                    <template x-if="!stockControlEnabled && selectedPresentation">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold uppercase rounded-md flex items-center"><span class="w-2 h-2 bg-brand rounded-full mr-1.5"></span> Disponible para pedido</span>
                     </template>
                     <span class="text-sm text-gray-400 font-medium">{{ $parentName }} / {{ $categoryName }}</span>
                     <span class="text-sm text-gray-500">Pedido por WhatsApp</span>
@@ -112,14 +118,14 @@
                         <label class="block text-sm font-bold text-gray-700 mb-2">Presentacion</label>
                         <select x-model.number="selectedId" class="w-full border-gray-200 rounded-lg px-4 py-3 bg-gray-50 hover:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all outline-none">
                             <template x-for="presentation in presentations" :key="presentation.id">
-                                <option :value="presentation.id" x-text="presentation.variant + ' - S/ ' + Number(presentation.price).toFixed(2) + ' (' + presentation.stock + ' disp.)'"></option>
+                                <option :value="presentation.id" x-text="presentationLabel(presentation)"></option>
                             </template>
                         </select>
                     </div>
                 @endif
 
                 <div class="prose prose-gray max-w-none text-gray-600 mb-8 leading-relaxed">
-                    {{ $producto->descripcion ?: 'Producto disponible en la vitrina de minimarket y cafeteria. Revisa presentaciones, precio, stock y envia tu pedido por WhatsApp.' }}
+                    {{ $producto->descripcion ?: ($stockControlEnabled ? 'Producto disponible en la vitrina de minimarket y cafeteria. Revisa presentaciones, precio, stock y envia tu pedido por WhatsApp.' : 'Producto disponible en la vitrina de minimarket y cafeteria. Revisa presentaciones, precio y envia tu pedido por WhatsApp.') }}
                 </div>
 
                 <div class="mt-auto pt-6 border-t border-gray-100 space-y-4">
@@ -127,13 +133,13 @@
                         <label class="font-bold text-gray-700">Cantidad</label>
                         <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-1 h-12">
                             <button @click="if(cantidad > 1) cantidad--" class="w-10 h-full flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm rounded-lg transition-all text-xl font-bold">&minus;</button>
-                            <input type="number" x-model.number="cantidad" class="w-12 h-full text-center font-bold text-gray-900 bg-transparent border-none outline-none appearance-none" min="1" :max="selectedPresentation?.stock || 1">
-                            <button @click="if(selectedPresentation && cantidad < selectedPresentation.stock) cantidad++" class="w-10 h-full flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm rounded-lg transition-all text-xl font-bold">&plus;</button>
+                            <input type="number" x-model.number="cantidad" class="w-12 h-full text-center font-bold text-gray-900 bg-transparent border-none outline-none appearance-none" min="1" :max="stockControlEnabled ? (selectedPresentation?.stock || 1) : null">
+                            <button @click="if(selectedPresentation && (!stockControlEnabled || cantidad < selectedPresentation.stock)) cantidad++" class="w-10 h-full flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm rounded-lg transition-all text-xl font-bold">&plus;</button>
                         </div>
-                        <span class="text-sm text-gray-500" x-text="selectedPresentation ? '(' + selectedPresentation.stock + ' disponibles)' : ''"></span>
+                        <span class="text-sm text-gray-500" x-text="availabilityText"></span>
                     </div>
 
-                    <button @click="addToCart(cartPayload)" :disabled="!selectedPresentation || selectedPresentation.stock <= 0" class="w-full relative group overflow-hidden rounded-lg flex items-center justify-center py-4 bg-ink text-white font-bold text-lg shadow-lg shadow-gray-900/20 transition-all hover:bg-brand hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button @click="addToCart(cartPayload)" :disabled="!selectedPresentation || (stockControlEnabled && selectedPresentation.stock <= 0)" class="w-full relative group overflow-hidden rounded-lg flex items-center justify-center py-4 bg-ink text-white font-bold text-lg shadow-lg shadow-gray-900/20 transition-all hover:bg-brand hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed">
                         <span class="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-96 ease"></span>
                         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                         Anadir a mi pedido
@@ -177,12 +183,13 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('productDetail', (presentations, initialImage, igvPercent) => ({
+        Alpine.data('productDetail', (presentations, initialImage, igvPercent, stockControlEnabled = true) => ({
             presentations,
             selectedId: presentations[0]?.id || null,
             cantidad: 1,
             currentImage: initialImage,
             igvPercent,
+            stockControlEnabled: stockControlEnabled !== false,
             init() {
                 this.syncPresentationImage();
                 this.$watch('selectedId', () => {
@@ -205,13 +212,35 @@
                 }
                 return Number(this.selectedPresentation.price) * (Number(this.igvPercent) / (100 + Number(this.igvPercent)));
             },
+            get availabilityText() {
+                if (!this.selectedPresentation) {
+                    return '';
+                }
+
+                return this.stockControlEnabled
+                    ? '(' + this.selectedPresentation.stock + ' disponibles)'
+                    : 'Pedido sujeto a confirmacion';
+            },
+            presentationLabel(presentation) {
+                const base = presentation.variant + ' - S/ ' + Number(presentation.price).toFixed(2);
+
+                return this.stockControlEnabled ? base + ' (' + presentation.stock + ' disp.)' : base;
+            },
             get cartPayload() {
-                const quantity = Math.min(Number(this.cantidad || 1), Number(this.selectedPresentation.stock));
+                if (!this.selectedPresentation) {
+                    return null;
+                }
+
+                const requested = Math.max(1, Number(this.cantidad || 1));
+                const stock = Number(this.selectedPresentation.stock || 0);
+                const quantity = this.stockControlEnabled ? Math.min(requested, stock) : requested;
+
                 return {
                     ...this.selectedPresentation,
                     image: this.currentImage,
                     quantity,
-                    max_stock: Number(this.selectedPresentation.stock),
+                    max_stock: this.stockControlEnabled ? stock : null,
+                    stock_control_enabled: this.stockControlEnabled,
                 };
             },
         }));

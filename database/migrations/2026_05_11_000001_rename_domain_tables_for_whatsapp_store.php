@@ -38,6 +38,9 @@ return new class extends Migration
 
     private function tableRenames(): array
     {
+        $legacyStockMovementTable = 'stock_' . 'web_movimientos';
+        $intermediateStockMovementTable = 'movimientos_stock_' . 'web';
+
         return [
             'roles' => 'roles_sistema',
             'modulos' => 'modulos_sistema',
@@ -53,7 +56,9 @@ return new class extends Migration
             'pedidos_whatsapp_detalles' => 'detalle_pedidos_tienda',
             'promocion_productos' => 'promociones_productos',
             'promocion_categorias' => 'promociones_categorias',
-            'stock_web_movimientos' => 'movimientos_stock_web',
+            $legacyStockMovementTable => 'movimientos_stock',
+            $intermediateStockMovementTable => 'movimientos_stock',
+            'stock_movimientos' => 'movimientos_stock',
             'auditoria_operativa' => 'auditoria_sistema',
             'banners_web' => 'banners_tienda',
             'zonas_delivery' => 'zonas_entrega',

@@ -47,7 +47,7 @@
 
         <p class="mt-5 text-center text-sm text-gray-500">
             Ya tienes cuenta?
-            <a href="{{ route('storefront.cliente.login') }}" class="font-bold text-brand hover:text-brand-dark">Ingresa aqui</a>
+            <a href="{{ route('auth.login') }}" class="font-bold text-brand hover:text-brand-dark">Ingresa aqui</a>
         </p>
     </div>
 </div>

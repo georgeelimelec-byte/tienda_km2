@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Modules\Auth\Models\Usuario;
@@ -11,13 +12,14 @@ use Modules\Inventory\Models\Categoria;
 use Modules\Inventory\Models\Producto;
 use Modules\Inventory\Models\ProductoPresentacion;
 use Modules\Storefront\Models\Cliente;
+use Modules\Storefront\Models\StorefrontSetting;
 use Tests\TestCase;
 
 class StorefrontCatalogTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function test_storefront_catalog_pages_render_with_real_inventory_data(): void
+    public function test_storefront_catalog_pages_render_with_seeded_inventory_data(): void
     {
         $this->seed(DatabaseSeeder::class);
 
@@ -80,8 +82,99 @@ class StorefrontCatalogTest extends TestCase
 
         $this->assertDatabaseHas('presentaciones_producto', [
             'id_presentacion' => $presentation->id_presentacion,
-            'stock_web' => 38,
+            'stock' => 38,
         ]);
+    }
+
+    public function test_catalog_mode_allows_orders_with_zero_stock_without_stock_movements(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        StorefrontSetting::current()->update(['control_stock_habilitado' => false]);
+
+        $presentation = ProductoPresentacion::where('codigo_barras', 'KM2-CAF-AMER-8')->firstOrFail();
+        $presentation->update(['stock' => 0]);
+
+        $cliente = Cliente::where('email', 'maria@example.test')->firstOrFail();
+
+        $response = $this->withSession(['cliente_id' => $cliente->id_cliente])
+            ->post(route('storefront.store_pedido'), [
+                'nombre' => 'Cliente Catalogo',
+                'whatsapp' => '51988887777',
+                'direccion' => 'Av. Demo 456',
+                'referencia' => 'Pedido sin control de stock',
+                'id_zona' => 1,
+                'cart' => json_encode([
+                    [
+                        'id' => $presentation->id_presentacion,
+                        'presentation_id' => $presentation->id_presentacion,
+                        'product_id' => $presentation->id_producto,
+                        'quantity' => 3,
+                    ],
+                ]),
+            ]);
+
+        $response->assertStatus(302);
+        $this->assertStringContainsString('https://wa.me/', $response->headers->get('Location'));
+
+        $this->assertDatabaseHas('detalle_pedidos_tienda', [
+            'id_presentacion' => $presentation->id_presentacion,
+            'cantidad_solicitada' => 3,
+            'cantidad_confirmada' => 3,
+        ]);
+
+        $this->assertDatabaseHas('presentaciones_producto', [
+            'id_presentacion' => $presentation->id_presentacion,
+            'stock' => 0,
+        ]);
+
+        $this->assertDatabaseMissing('movimientos_stock', [
+            'id_presentacion' => $presentation->id_presentacion,
+            'cantidad' => -3,
+        ]);
+    }
+
+    public function test_unified_login_accepts_customer_accounts_and_preserves_storefront_session(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $response = $this->post(route('auth.login.submit'), [
+            'email' => 'maria@example.test',
+            'password' => 'cliente123',
+        ]);
+
+        $cliente = Cliente::where('email', 'maria@example.test')->firstOrFail();
+
+        $response->assertRedirect(route('storefront.index'));
+        $this->assertGuest();
+        $this->assertSame($cliente->id_cliente, session('cliente_id'));
+    }
+
+    public function test_unified_login_accepts_internal_users_and_routes_to_dashboard(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $response = $this->post(route('auth.login.submit'), [
+            'email' => 'admin@ponteready.com',
+            'password' => 'admin123',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticatedAs(Usuario::findOrFail(1));
+        $this->assertFalse(session()->has('cliente_id'));
+    }
+
+    public function test_seeded_internal_roles_match_store_pilot_scope(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $this->assertSame(
+            ['Superadministrador', 'Administrador', 'Operador'],
+            DB::table('roles_sistema')->orderBy('nivel_acceso')->pluck('nombre_rol')->all()
+        );
+
+        $this->assertDatabaseMissing('roles_sistema', ['nombre_rol' => 'Atencion WhatsApp']);
+        $this->assertDatabaseMissing('roles_sistema', ['nombre_rol' => 'Operador WhatsApp']);
     }
 
     public function test_admin_can_manage_categories_and_subcategories(): void
@@ -234,7 +327,7 @@ class StorefrontCatalogTest extends TestCase
                 'id_categoria' => $product->id_categoria,
                 'precio_venta' => 5.50,
                 'precio_referencial' => 6.50,
-                'stock_web' => 30,
+                'stock' => 30,
                 'estado' => 'Activo',
                 'foto_url' => 'https://example.com/cafe-americano.jpg',
                 'galeria_urls' => "https://example.com/cafe-americano.jpg\nhttps://example.com/cafe-barra.jpg",
@@ -247,7 +340,7 @@ class StorefrontCatalogTest extends TestCase
             'id_presentacion' => $presentation->id_presentacion,
             'precio' => 5.50,
             'precio_referencial' => 6.50,
-            'stock_web' => 30,
+            'stock' => 30,
         ]);
 
         $this->assertDatabaseHas('imagenes_producto', [

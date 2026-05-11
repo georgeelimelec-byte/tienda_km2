@@ -25,7 +25,7 @@
                     id_categoria: '',
                     precio_venta: '',
                     precio_referencial: '',
-                    stock_web: 0,
+                    stock: 0,
                     galeria_urls: '',
                     nombre_variante: 'Unidad',
                     codigo_barras: '',
@@ -138,7 +138,7 @@
                             $precioRegular = $presentacion ? (float) $presentacion->precio : 0;
                             $precioReferencial = $presentacion && $presentacion->precio_referencial !== null ? (float) $presentacion->precio_referencial : null;
                             $precio = $presentacion ? (float) $presentacion->precio_efectivo : 0;
-                            $stock = $presentacion ? (int) $presentacion->stock_web : 0;
+                            $stock = $presentacion ? (int) $presentacion->stock : 0;
                             $galleryUrls = $item->imagenes->pluck('imagen_url')->implode("\n");
                         @endphp
                         <tr class="hover:bg-gray-50 transition-colors">
@@ -176,7 +176,7 @@
                                     "id_categoria" => $item->id_categoria,
                                     "precio_venta" => $precioRegular,
                                     "precio_referencial" => $precioReferencial,
-                                    "stock_web" => $stock,
+                                    "stock" => $stock,
                                     "estado" => $item->estado,
                                     "galeria_urls" => $galleryUrls,
                                     "nombre_variante" => $presentacion->nombre_variante ?? 'Unidad',
@@ -271,8 +271,8 @@
                                     <input type="text" name="codigo_barras" x-model="currentItem.codigo_barras" class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all" placeholder="Opcional">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Stock web <span class="text-red-500">*</span></label>
-                                    <input type="number" name="stock_web" x-model="currentItem.stock_web" required class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Stock <span class="text-red-500">*</span></label>
+                                    <input type="number" name="stock" x-model="currentItem.stock" required class="w-full border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-brand focus:ring-brand outline-none transition-all">
                                 </div>
                             </div>
 

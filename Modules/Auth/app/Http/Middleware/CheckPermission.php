@@ -28,7 +28,7 @@ class CheckPermission
             return redirect()->route('auth.login');
         }
 
-        // Nivel de acceso 1 = Admin General → acceso total
+        // Nivel de acceso 1 = Superadministrador: acceso total.
         if ($user->role && $user->role->nivel_acceso === 1) {
             return $next($request);
         }

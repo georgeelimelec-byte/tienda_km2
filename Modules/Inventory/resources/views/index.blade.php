@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('page-title', 'Catalogo Tecnico')
-@section('page-kicker', 'Productos, variantes y stock web')
+@section('page-kicker', 'Productos, variantes y stock')
 
 @section('content')
     <div class="page-content">

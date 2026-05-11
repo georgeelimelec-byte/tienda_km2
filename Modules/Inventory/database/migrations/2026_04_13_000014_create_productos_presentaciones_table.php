@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Migracion para la tabla 'presentaciones_producto'.
- * Es la entidad central del inventario web: cada variante de un producto
- * tiene precio, precio referencial, stock web y codigo de barras.
+ * Es la entidad central del inventario del sistema: cada variante de un producto
+ * tiene precio, precio referencial, stock y codigo de barras.
  */
 return new class extends Migration
 {
@@ -22,8 +22,8 @@ return new class extends Migration
             $table->decimal('costo_reposicion', 10, 2)->default(0);
             $table->decimal('precio', 10, 2);
             $table->decimal('precio_referencial', 10, 2)->nullable();
-            $table->integer('stock_web')->default(0);
-            $table->integer('stock_web_minimo')->default(5);
+            $table->integer('stock')->default(0);
+            $table->integer('stock_minimo')->default(5);
             $table->enum('estado', ['Activo', 'Inactivo'])->default('Activo');
 
             $table->foreign('id_producto')

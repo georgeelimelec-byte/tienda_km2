@@ -3,7 +3,9 @@
 namespace Modules\Storefront\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Modules\Storefront\Models\BannerWeb;
+use Modules\Storefront\Models\Cliente;
 use Modules\Storefront\Models\Promocion;
 use Modules\Storefront\Models\StorefrontSetting;
 use Modules\Storefront\Models\ZonaDelivery;
@@ -16,6 +18,7 @@ class StorefrontDatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->seedStorefrontSettings();
+        $this->seedCustomers();
         $this->seedDeliveryZones();
         $this->seedBanners();
         $this->seedPromotions();
@@ -32,8 +35,44 @@ class StorefrontDatabaseSeeder extends Seeder
                 'currency' => 'PEN',
                 'included_tax_percent' => 18.00,
                 'business_hours' => 'Lunes a domingo',
+                'control_stock_habilitado' => true,
             ])
         );
+    }
+
+    private function seedCustomers(): void
+    {
+        foreach ([
+            [
+                'id_cliente' => 1,
+                'nombre_o_razon_social' => 'Maria Torres',
+                'email' => 'maria@example.test',
+                'celular' => '51911111111',
+                'direccion' => 'Av. Principal 120',
+            ],
+            [
+                'id_cliente' => 2,
+                'nombre_o_razon_social' => 'Luis Ramirez',
+                'email' => 'luis@example.test',
+                'celular' => '51922222222',
+                'direccion' => 'Jr. Los Cedros 450',
+            ],
+            [
+                'id_cliente' => 3,
+                'nombre_o_razon_social' => 'Carla Mendoza',
+                'email' => 'carla@example.test',
+                'celular' => '51933333333',
+                'direccion' => 'Calle Comercio 245',
+            ],
+        ] as $customer) {
+            Cliente::updateOrCreate(
+                ['id_cliente' => $customer['id_cliente']],
+                $customer + [
+                    'tipo_documento' => 'Sin Documento',
+                    'password' => Hash::make('cliente123'),
+                ]
+            );
+        }
     }
 
     private function seedDeliveryZones(): void

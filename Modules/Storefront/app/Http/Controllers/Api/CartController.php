@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Inventory\Models\ProductoPresentacion;
 use Modules\Storefront\Models\CarritoWeb;
+use Modules\Storefront\Models\StorefrontSetting;
 
 class CartController extends Controller
 {
@@ -37,7 +38,9 @@ class CartController extends Controller
         ]);
 
         $presentacion = ProductoPresentacion::where('estado', 'Activo')->findOrFail($data['id_presentacion']);
-        if ($data['cantidad'] > $presentacion->stock_web) {
+        $stockControlEnabled = StorefrontSetting::current()->stockControlEnabled();
+
+        if ($stockControlEnabled && $data['cantidad'] > $presentacion->stock) {
             return response()->json(['message' => 'Stock insuficiente.'], 422);
         }
 
@@ -59,7 +62,9 @@ class CartController extends Controller
         $data = $request->validate(['cantidad' => 'required|integer|min:1']);
         $item = CarritoWeb::where('id_cliente', $clienteId)->findOrFail($id);
         $presentacion = ProductoPresentacion::where('estado', 'Activo')->findOrFail($item->id_presentacion);
-        if ($data['cantidad'] > $presentacion->stock_web) {
+        $stockControlEnabled = StorefrontSetting::current()->stockControlEnabled();
+
+        if ($stockControlEnabled && $data['cantidad'] > $presentacion->stock) {
             return response()->json(['message' => 'Stock insuficiente.'], 422);
         }
 
