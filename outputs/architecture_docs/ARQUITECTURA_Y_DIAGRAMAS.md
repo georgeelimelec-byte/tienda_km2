@@ -17,17 +17,17 @@ flowchart LR
     Cuenta --> Tienda["Tienda virtual"]
     Tienda --> Carrito["Carrito"]
     Carrito --> Checkout["Checkout"]
-    Checkout --> Pedido["pedidos_whatsapp"]
+    Checkout --> Pedido["pedidos_tienda"]
     Checkout --> Stock["Reserva stock_web"]
-    Pedido --> Detalle["pedidos_whatsapp_detalles"]
+    Pedido --> Detalle["detalle_pedidos_tienda"]
     Pedido --> WhatsApp["Redireccion wa.me"]
 
     Admin["Usuario interno"] --> Panel["Panel administrativo"]
     Panel --> Pedidos["Tabla de pedidos"]
     Panel --> Ajustes["Ajustes de cantidades"]
-    Ajustes --> StockMov["stock_web_movimientos"]
+    Ajustes --> StockMov["movimientos_stock_web"]
     Panel --> Promos["Promociones"]
-    Panel --> Auditoria["Auditoria operativa"]
+    Panel --> Auditoria["Auditoria sistema"]
     Panel --> Reportes["Reportes y analitica"]
 ```
 
@@ -47,21 +47,21 @@ flowchart TB
 
 ```mermaid
 erDiagram
-    CLIENTES ||--o{ CARRITOS_WEB : tiene
-    CLIENTES ||--o{ PEDIDOS_WHATSAPP : genera_por_datos
-    PEDIDOS_WHATSAPP ||--o{ PEDIDOS_WHATSAPP_DETALLES : contiene
-    PRODUCTOS ||--o{ PRODUCTOS_PRESENTACIONES : define
-    PRODUCTOS_PRESENTACIONES ||--o{ PRODUCTOS_IMAGENES : muestra
-    PRODUCTOS_PRESENTACIONES ||--o{ PEDIDOS_WHATSAPP_DETALLES : solicitado_como
-    PRODUCTOS_PRESENTACIONES ||--o{ STOCK_WEB_MOVIMIENTOS : registra
-    PRODUCTOS ||--o{ PROMOCION_PRODUCTOS : participa
-    CATEGORIAS ||--o{ PROMOCION_CATEGORIAS : participa
-    PROMOCIONES ||--o{ PROMOCION_PRODUCTOS : aplica
-    PROMOCIONES ||--o{ PROMOCION_CATEGORIAS : aplica
-    CATEGORIAS ||--o{ PRODUCTOS : agrupa
-    ZONAS_DELIVERY ||--o{ PEDIDOS_WHATSAPP : tarifa
-    USUARIOS ||--o{ PEDIDOS_WHATSAPP : atiende
-    USUARIOS ||--o{ AUDITORIA_OPERATIVA : ejecuta
+    CLIENTES_WEB ||--o{ CARRITO_ITEMS : tiene
+    CLIENTES_WEB ||--o{ PEDIDOS_TIENDA : genera_por_datos
+    PEDIDOS_TIENDA ||--o{ DETALLE_PEDIDOS_TIENDA : contiene
+    PRODUCTOS ||--o{ PRESENTACIONES_PRODUCTO : define
+    PRESENTACIONES_PRODUCTO ||--o{ IMAGENES_PRODUCTO : muestra
+    PRESENTACIONES_PRODUCTO ||--o{ DETALLE_PEDIDOS_TIENDA : solicitado_como
+    PRESENTACIONES_PRODUCTO ||--o{ MOVIMIENTOS_STOCK_WEB : registra
+    PRODUCTOS ||--o{ PROMOCIONES_PRODUCTOS : participa
+    CATEGORIAS_PRODUCTO ||--o{ PROMOCIONES_CATEGORIAS : participa
+    PROMOCIONES ||--o{ PROMOCIONES_PRODUCTOS : aplica
+    PROMOCIONES ||--o{ PROMOCIONES_CATEGORIAS : aplica
+    CATEGORIAS_PRODUCTO ||--o{ PRODUCTOS : agrupa
+    ZONAS_ENTREGA ||--o{ PEDIDOS_TIENDA : tarifa
+    USUARIOS_INTERNOS ||--o{ PEDIDOS_TIENDA : atiende
+    USUARIOS_INTERNOS ||--o{ AUDITORIA_SISTEMA : ejecuta
 ```
 
 ## Flujo De Pedido

@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('pedidos_whatsapp', function (Blueprint $table) {
+        Schema::create('pedidos_tienda', function (Blueprint $table) {
             $table->increments('id_pedido_whatsapp');
             $table->string('codigo_pedido', 24)->unique();
             $table->string('cliente_nombre', 120);
@@ -30,15 +30,15 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_zona_delivery')
-                ->references('id_zona')->on('zonas_delivery')
+                ->references('id_zona')->on('zonas_entrega')
                 ->nullOnDelete();
 
             $table->foreign('id_operador')
-                ->references('id_usuario')->on('usuarios')
+                ->references('id_usuario')->on('usuarios_internos')
                 ->nullOnDelete();
         });
 
-        Schema::create('pedidos_whatsapp_detalles', function (Blueprint $table) {
+        Schema::create('detalle_pedidos_tienda', function (Blueprint $table) {
             $table->id('id_detalle');
             $table->unsignedInteger('id_pedido_whatsapp');
             $table->unsignedInteger('id_producto');
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_pedido_whatsapp')
-                ->references('id_pedido_whatsapp')->on('pedidos_whatsapp')
+                ->references('id_pedido_whatsapp')->on('pedidos_tienda')
                 ->cascadeOnDelete();
 
             $table->foreign('id_producto')
@@ -61,14 +61,14 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             $table->foreign('id_presentacion')
-                ->references('id_presentacion')->on('productos_presentaciones')
+                ->references('id_presentacion')->on('presentaciones_producto')
                 ->nullOnDelete();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('pedidos_whatsapp_detalles');
-        Schema::dropIfExists('pedidos_whatsapp');
+        Schema::dropIfExists('detalle_pedidos_tienda');
+        Schema::dropIfExists('pedidos_tienda');
     }
 };

@@ -107,7 +107,7 @@ class AdminPromocionController extends Controller
             'producto_ids' => 'nullable|array',
             'producto_ids.*' => 'integer|exists:productos,id_producto',
             'categoria_ids' => 'nullable|array',
-            'categoria_ids.*' => 'integer|exists:categorias,id_categoria',
+            'categoria_ids.*' => 'integer|exists:categorias_producto,id_categoria',
         ]);
 
         if (empty($data['producto_ids']) && empty($data['categoria_ids'])) {

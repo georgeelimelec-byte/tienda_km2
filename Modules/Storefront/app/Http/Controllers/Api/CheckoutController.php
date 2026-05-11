@@ -24,9 +24,9 @@ class CheckoutController extends Controller
             'whatsapp' => 'required|string|max:20',
             'direccion' => 'required|string',
             'referencia' => 'nullable|string',
-            'id_zona' => 'required|exists:zonas_delivery,id_zona',
+            'id_zona' => 'required|exists:zonas_entrega,id_zona',
             'items' => 'required|array|min:1',
-            'items.*.id_presentacion' => 'required|exists:productos_presentaciones,id_presentacion',
+            'items.*.id_presentacion' => 'required|exists:presentaciones_producto,id_presentacion',
             'items.*.cantidad' => 'required|integer|min:1',
         ]);
 
@@ -128,7 +128,7 @@ class CheckoutController extends Controller
 
                 $audit->log(
                     'crear_pedido_api',
-                    'pedidos_whatsapp',
+                    'pedidos_tienda',
                     $pedido->id_pedido_whatsapp,
                     "Pedido {$pedido->codigo_pedido} creado desde API de tienda virtual",
                     null,

@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::table('roles')->updateOrInsert(
+        DB::table('roles_sistema')->updateOrInsert(
             ['id_rol' => 4],
             [
                 'nombre_rol' => 'Operador WhatsApp',
@@ -16,7 +16,7 @@ return new class extends Migration
             ]
         );
 
-        $existingModuleIds = DB::table('modulos')
+        $existingModuleIds = DB::table('modulos_sistema')
             ->whereIn('id_modulo', [1, 2, 3, 4, 5, 6])
             ->pluck('id_modulo')
             ->all();
@@ -33,7 +33,7 @@ return new class extends Migration
                 continue;
             }
 
-            DB::table('permisos_rol')->updateOrInsert(
+            DB::table('permisos_por_rol')->updateOrInsert(
                 ['id_rol' => 4, 'id_modulo' => $moduleId],
                 $permissions
             );
@@ -42,7 +42,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        DB::table('permisos_rol')->where('id_rol', 4)->delete();
-        DB::table('roles')->where('id_rol', 4)->delete();
+        DB::table('permisos_por_rol')->where('id_rol', 4)->delete();
+        DB::table('roles_sistema')->where('id_rol', 4)->delete();
     }
 };

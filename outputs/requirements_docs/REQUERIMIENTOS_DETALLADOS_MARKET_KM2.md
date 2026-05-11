@@ -22,7 +22,7 @@ El sistema debe convertir el carrito en un pedido WhatsApp, guardar cabecera y d
 
 ### RG04. Stock Web
 
-El sistema controla `productos_presentaciones.stock_web` como stock disponible para la tienda virtual. No reemplaza el stock real de PECAN. Al crear un pedido se descuenta stock web; al cancelar se devuelve; al ajustar cantidades se descuenta o devuelve la diferencia.
+El sistema controla `presentaciones_producto.stock_web` como stock disponible para la tienda virtual. No reemplaza el stock real de PECAN. Al crear un pedido se descuenta stock web; al cancelar se devuelve; al ajustar cantidades se descuenta o devuelve la diferencia.
 
 ### RG05. Administracion Interna
 
@@ -78,7 +78,7 @@ Las acciones relevantes deben registrar usuario, rol, accion, entidad, descripci
 - Agregar, actualizar y retirar productos del carrito.
 - Recalcular precios, promociones y stock web en servidor durante checkout.
 - Validar sesion de cliente, direccion y zona de delivery.
-- Crear `pedidos_whatsapp` y `pedidos_whatsapp_detalles`.
+- Crear `pedidos_tienda` y `detalle_pedidos_tienda`.
 - Guardar `cantidad_solicitada`, `cantidad_confirmada`, `motivo_ajuste` y `estado_item`.
 - Redirigir al cliente a WhatsApp con el resumen.
 
@@ -114,28 +114,28 @@ Las acciones relevantes deben registrar usuario, rol, accion, entidad, descripci
 
 Tablas principales:
 
-- `clientes`
-- `carritos_web`
+- `clientes_web`
+- `carrito_items`
 - `productos`
-- `productos_presentaciones`
-- `productos_imagenes`
-- `categorias`
+- `presentaciones_producto`
+- `imagenes_producto`
+- `categorias_producto`
 - `unidades_medida`
 - `promociones`
-- `promocion_productos`
-- `promocion_categorias`
-- `pedidos_whatsapp`
-- `pedidos_whatsapp_detalles`
-- `stock_web_movimientos`
-- `auditoria_operativa`
-- `banners_web`
-- `zonas_delivery`
-- `storefront_settings`
-- `usuarios`
-- `roles`
-- `modulos`
-- `permisos_rol`
-- `permisos_usuario`
+- `promociones_productos`
+- `promociones_categorias`
+- `pedidos_tienda`
+- `detalle_pedidos_tienda`
+- `movimientos_stock_web`
+- `auditoria_sistema`
+- `banners_tienda`
+- `zonas_entrega`
+- `configuracion_tienda`
+- `usuarios_internos`
+- `roles_sistema`
+- `modulos_sistema`
+- `permisos_por_rol`
+- `permisos_por_usuario`
 - `personal_access_tokens`
 - `sessions`
 - `cache`
@@ -144,10 +144,10 @@ Tablas principales:
 
 Campos clave del pedido:
 
-- `pedidos_whatsapp.referencia_atencion` guarda una referencia interna de pago o atencion por WhatsApp. No representa boleta, factura ni comprobante SUNAT.
-- `pedidos_whatsapp_detalles.cantidad_solicitada` conserva lo pedido por el cliente.
-- `pedidos_whatsapp_detalles.cantidad_confirmada` conserva lo validado por el operador contra PECAN/tienda.
-- `pedidos_whatsapp_detalles.motivo_ajuste` explica cualquier cambio de cantidad.
+- `pedidos_tienda.referencia_atencion` guarda una referencia interna de pago o atencion por WhatsApp. No representa boleta, factura ni comprobante SUNAT.
+- `detalle_pedidos_tienda.cantidad_solicitada` conserva lo pedido por el cliente.
+- `detalle_pedidos_tienda.cantidad_confirmada` conserva lo validado por el operador contra PECAN/tienda.
+- `detalle_pedidos_tienda.motivo_ajuste` explica cualquier cambio de cantidad.
 
 ## Criterios De Aceptacion
 

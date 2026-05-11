@@ -5,7 +5,7 @@ namespace Modules\Auth\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Modelo Eloquent para la tabla 'roles'.
+ * Modelo Eloquent para la tabla 'roles_sistema'.
  *
  * @property int $id_rol
  * @property string $nombre_rol
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Role extends Model
 {
-    protected $table = 'roles';
+    protected $table = 'roles_sistema';
     protected $primaryKey = 'id_rol';
     public $timestamps = false;
 

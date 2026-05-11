@@ -7,7 +7,7 @@ use Modules\Auth\Models\Usuario;
 
 class PedidoWhatsapp extends Model
 {
-    protected $table = 'pedidos_whatsapp';
+    protected $table = 'pedidos_tienda';
     protected $primaryKey = 'id_pedido_whatsapp';
 
     protected $fillable = [

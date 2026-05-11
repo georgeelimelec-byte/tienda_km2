@@ -5,7 +5,7 @@ namespace Modules\Auth\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Modelo Eloquent para la tabla 'permisos_rol' (PK compuesta).
+ * Modelo Eloquent para la tabla 'permisos_por_rol' (PK compuesta).
  *
  * @property int $id_rol
  * @property int $id_modulo
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PermisoRol extends Model
 {
-    protected $table = 'permisos_rol';
+    protected $table = 'permisos_por_rol';
     public $incrementing = false;
     public $timestamps = false;
 

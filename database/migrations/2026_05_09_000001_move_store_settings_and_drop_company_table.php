@@ -9,33 +9,33 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('storefront_settings')) {
-            Schema::table('storefront_settings', function (Blueprint $table) {
-                if (! Schema::hasColumn('storefront_settings', 'whatsapp_number')) {
+        if (Schema::hasTable('configuracion_tienda')) {
+            Schema::table('configuracion_tienda', function (Blueprint $table) {
+                if (! Schema::hasColumn('configuracion_tienda', 'whatsapp_number')) {
                     $table->string('whatsapp_number', 24)->nullable()->after('footer_text');
                 }
 
-                if (! Schema::hasColumn('storefront_settings', 'contact_phone')) {
+                if (! Schema::hasColumn('configuracion_tienda', 'contact_phone')) {
                     $table->string('contact_phone', 24)->nullable()->after('whatsapp_number');
                 }
 
-                if (! Schema::hasColumn('storefront_settings', 'contact_email')) {
+                if (! Schema::hasColumn('configuracion_tienda', 'contact_email')) {
                     $table->string('contact_email', 120)->nullable()->after('contact_phone');
                 }
 
-                if (! Schema::hasColumn('storefront_settings', 'currency')) {
+                if (! Schema::hasColumn('configuracion_tienda', 'currency')) {
                     $table->string('currency', 10)->default('PEN')->after('contact_email');
                 }
 
-                if (! Schema::hasColumn('storefront_settings', 'included_tax_percent')) {
+                if (! Schema::hasColumn('configuracion_tienda', 'included_tax_percent')) {
                     $table->decimal('included_tax_percent', 5, 2)->default(18.00)->after('currency');
                 }
 
-                if (! Schema::hasColumn('storefront_settings', 'business_hours')) {
+                if (! Schema::hasColumn('configuracion_tienda', 'business_hours')) {
                     $table->string('business_hours', 160)->nullable()->after('included_tax_percent');
                 }
 
-                if (! Schema::hasColumn('storefront_settings', 'operational_message')) {
+                if (! Schema::hasColumn('configuracion_tienda', 'operational_message')) {
                     $table->text('operational_message')->nullable()->after('business_hours');
                 }
             });
@@ -44,8 +44,8 @@ return new class extends Migration
         if (Schema::hasTable('empresa_configuracion')) {
             $company = DB::table('empresa_configuracion')->first();
 
-            if ($company && Schema::hasTable('storefront_settings')) {
-                DB::table('storefront_settings')->updateOrInsert(
+            if ($company && Schema::hasTable('configuracion_tienda')) {
+                DB::table('configuracion_tienda')->updateOrInsert(
                     ['id' => 1],
                     [
                         'store_name' => $company->nombre_comercial ?: 'Market KM2',

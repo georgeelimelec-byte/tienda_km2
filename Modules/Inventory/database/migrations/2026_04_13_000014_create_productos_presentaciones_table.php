@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Migracion para la tabla 'productos_presentaciones'.
+ * Migracion para la tabla 'presentaciones_producto'.
  * Es la entidad central del inventario web: cada variante de un producto
  * tiene precio, precio referencial, stock web y codigo de barras.
  */
@@ -13,7 +13,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('productos_presentaciones', function (Blueprint $table) {
+        Schema::create('presentaciones_producto', function (Blueprint $table) {
             $table->increments('id_presentacion');
             $table->unsignedInteger('id_producto');
             $table->unsignedInteger('id_unidad')->default(1);
@@ -38,6 +38,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('productos_presentaciones');
+        Schema::dropIfExists('presentaciones_producto');
     }
 };

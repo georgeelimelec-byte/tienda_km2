@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('storefront_settings', function (Blueprint $table) {
+        Schema::create('configuracion_tienda', function (Blueprint $table) {
             $table->id();
             $table->string('store_name', 80)->default('Market KM2');
             $table->string('store_tagline', 120)->default('Minimarket & Cafe');
@@ -34,6 +34,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('storefront_settings');
+        Schema::dropIfExists('configuracion_tienda');
     }
 };

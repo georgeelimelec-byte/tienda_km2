@@ -8,7 +8,7 @@ use Modules\Inventory\Models\ProductoPresentacion;
 
 class StockWebMovimiento extends Model
 {
-    protected $table = 'stock_web_movimientos';
+    protected $table = 'movimientos_stock_web';
     protected $primaryKey = 'id_movimiento';
 
     protected $fillable = [

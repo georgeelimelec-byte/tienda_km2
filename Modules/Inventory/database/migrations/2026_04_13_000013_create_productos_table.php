@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('estado', ['Activo', 'Inactivo'])->default('Activo');
 
             $table->foreign('id_categoria')
-                ->references('id_categoria')->on('categorias');
+                ->references('id_categoria')->on('categorias_producto');
         });
     }
 

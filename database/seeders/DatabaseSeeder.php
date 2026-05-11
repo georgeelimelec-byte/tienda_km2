@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             ['id_rol' => 3, 'nombre_rol' => 'Atencion WhatsApp', 'nivel_acceso' => 3, 'estado' => 'Activo'],
             ['id_rol' => 4, 'nombre_rol' => 'Operador WhatsApp', 'nivel_acceso' => 4, 'estado' => 'Activo'],
         ] as $role) {
-            DB::table('roles')->updateOrInsert(['id_rol' => $role['id_rol']], $role);
+            DB::table('roles_sistema')->updateOrInsert(['id_rol' => $role['id_rol']], $role);
         }
     }
 
@@ -43,14 +43,14 @@ class DatabaseSeeder extends Seeder
             ['id_modulo' => 5, 'nombre' => 'Configuracion', 'descripcion' => 'Datos comerciales, apariencia y ajustes del sistema', 'estado' => 'Activo'],
             ['id_modulo' => 6, 'nombre' => 'Usuarios', 'descripcion' => 'Usuarios, roles y permisos internos', 'estado' => 'Activo'],
         ] as $module) {
-            DB::table('modulos')->updateOrInsert(['id_modulo' => $module['id_modulo']], $module);
+            DB::table('modulos_sistema')->updateOrInsert(['id_modulo' => $module['id_modulo']], $module);
         }
     }
 
     private function seedPermissions(): void
     {
         for ($moduleId = 1; $moduleId <= 6; $moduleId++) {
-            DB::table('permisos_rol')->updateOrInsert(
+            DB::table('permisos_por_rol')->updateOrInsert(
                 ['id_rol' => 1, 'id_modulo' => $moduleId],
                 ['leer' => 1, 'crear' => 1, 'editar' => 1, 'eliminar' => 1]
             );
@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
             ['id_rol' => 4, 'id_modulo' => 1, 'leer' => 1, 'crear' => 0, 'editar' => 1, 'eliminar' => 0],
             ['id_rol' => 4, 'id_modulo' => 4, 'leer' => 1, 'crear' => 0, 'editar' => 0, 'eliminar' => 0],
         ] as $permission) {
-            DB::table('permisos_rol')->updateOrInsert(
+            DB::table('permisos_por_rol')->updateOrInsert(
                 ['id_rol' => $permission['id_rol'], 'id_modulo' => $permission['id_modulo']],
                 $permission
             );
@@ -89,7 +89,7 @@ class DatabaseSeeder extends Seeder
 
     private function seedAdminUser(): void
     {
-        DB::table('usuarios')->updateOrInsert(
+        DB::table('usuarios_internos')->updateOrInsert(
             ['id_usuario' => 1],
             [
                 'id_rol' => 1,

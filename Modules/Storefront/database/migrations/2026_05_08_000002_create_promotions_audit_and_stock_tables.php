@@ -17,25 +17,25 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('stock_web_movimientos');
-        Schema::dropIfExists('auditoria_operativa');
-        Schema::dropIfExists('promocion_categorias');
-        Schema::dropIfExists('promocion_productos');
+        Schema::dropIfExists('movimientos_stock_web');
+        Schema::dropIfExists('auditoria_sistema');
+        Schema::dropIfExists('promociones_categorias');
+        Schema::dropIfExists('promociones_productos');
         Schema::dropIfExists('promociones');
     }
 
     private function alignPresentationColumns(): void
     {
-        if (! Schema::hasTable('productos_presentaciones')) {
+        if (! Schema::hasTable('presentaciones_producto')) {
             return;
         }
 
-        if (Schema::hasColumn('productos_presentaciones', 'precio_oferta') && ! Schema::hasColumn('productos_presentaciones', 'precio_referencial')) {
-            Schema::table('productos_presentaciones', function (Blueprint $table) {
+        if (Schema::hasColumn('presentaciones_producto', 'precio_oferta') && ! Schema::hasColumn('presentaciones_producto', 'precio_referencial')) {
+            Schema::table('presentaciones_producto', function (Blueprint $table) {
                 $table->decimal('precio_referencial', 10, 2)->nullable()->after('precio');
             });
 
-            DB::table('productos_presentaciones')
+            DB::table('presentaciones_producto')
                 ->whereNotNull('precio_oferta')
                 ->whereColumn('precio_oferta', '<', 'precio')
                 ->update([
@@ -43,24 +43,24 @@ return new class extends Migration
                     'precio' => DB::raw('precio_oferta'),
                 ]);
 
-            DB::table('productos_presentaciones')
+            DB::table('presentaciones_producto')
                 ->whereNotNull('precio_oferta')
                 ->whereColumn('precio_oferta', '>=', 'precio')
                 ->update(['precio_referencial' => DB::raw('precio_oferta')]);
 
-            Schema::table('productos_presentaciones', function (Blueprint $table) {
+            Schema::table('presentaciones_producto', function (Blueprint $table) {
                 $table->dropColumn('precio_oferta');
             });
         }
 
-        if (Schema::hasColumn('productos_presentaciones', 'stock') && ! Schema::hasColumn('productos_presentaciones', 'stock_web')) {
-            Schema::table('productos_presentaciones', function (Blueprint $table) {
+        if (Schema::hasColumn('presentaciones_producto', 'stock') && ! Schema::hasColumn('presentaciones_producto', 'stock_web')) {
+            Schema::table('presentaciones_producto', function (Blueprint $table) {
                 $table->renameColumn('stock', 'stock_web');
             });
         }
 
-        if (Schema::hasColumn('productos_presentaciones', 'stock_minimo') && ! Schema::hasColumn('productos_presentaciones', 'stock_web_minimo')) {
-            Schema::table('productos_presentaciones', function (Blueprint $table) {
+        if (Schema::hasColumn('presentaciones_producto', 'stock_minimo') && ! Schema::hasColumn('presentaciones_producto', 'stock_web_minimo')) {
+            Schema::table('presentaciones_producto', function (Blueprint $table) {
                 $table->renameColumn('stock_minimo', 'stock_web_minimo');
             });
         }
@@ -68,39 +68,39 @@ return new class extends Migration
 
     private function alignOrderColumns(): void
     {
-        if (! Schema::hasTable('pedidos_whatsapp')) {
+        if (! Schema::hasTable('pedidos_tienda')) {
             return;
         }
 
         if (DB::connection()->getDriverName() === 'mysql') {
-            DB::statement("ALTER TABLE pedidos_whatsapp MODIFY estado VARCHAR(30) NOT NULL DEFAULT 'Pendiente'");
+            DB::statement("ALTER TABLE pedidos_tienda MODIFY estado VARCHAR(30) NOT NULL DEFAULT 'Pendiente'");
         }
 
-        DB::table('pedidos_whatsapp')
+        DB::table('pedidos_tienda')
             ->where('estado', 'En Reparto')
             ->update(['estado' => 'En Delivery']);
 
-        if (Schema::hasTable('pedidos_whatsapp_detalles')) {
-            Schema::table('pedidos_whatsapp_detalles', function (Blueprint $table) {
-                if (! Schema::hasColumn('pedidos_whatsapp_detalles', 'cantidad_solicitada')) {
+        if (Schema::hasTable('detalle_pedidos_tienda')) {
+            Schema::table('detalle_pedidos_tienda', function (Blueprint $table) {
+                if (! Schema::hasColumn('detalle_pedidos_tienda', 'cantidad_solicitada')) {
                     $table->integer('cantidad_solicitada')->default(0)->after('precio_unitario');
                 }
 
-                if (! Schema::hasColumn('pedidos_whatsapp_detalles', 'cantidad_confirmada')) {
+                if (! Schema::hasColumn('detalle_pedidos_tienda', 'cantidad_confirmada')) {
                     $table->integer('cantidad_confirmada')->default(0)->after('cantidad_solicitada');
                 }
 
-                if (! Schema::hasColumn('pedidos_whatsapp_detalles', 'motivo_ajuste')) {
+                if (! Schema::hasColumn('detalle_pedidos_tienda', 'motivo_ajuste')) {
                     $table->text('motivo_ajuste')->nullable()->after('subtotal');
                 }
 
-                if (! Schema::hasColumn('pedidos_whatsapp_detalles', 'estado_item')) {
+                if (! Schema::hasColumn('detalle_pedidos_tienda', 'estado_item')) {
                     $table->string('estado_item', 30)->default('Solicitado')->after('motivo_ajuste');
                 }
             });
 
-            if (Schema::hasColumn('pedidos_whatsapp_detalles', 'cantidad')) {
-                DB::table('pedidos_whatsapp_detalles')
+            if (Schema::hasColumn('detalle_pedidos_tienda', 'cantidad')) {
+                DB::table('detalle_pedidos_tienda')
                     ->where('cantidad_solicitada', 0)
                     ->update([
                         'cantidad_solicitada' => DB::raw('cantidad'),
@@ -126,8 +126,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('promocion_productos')) {
-            Schema::create('promocion_productos', function (Blueprint $table) {
+        if (! Schema::hasTable('promociones_productos')) {
+            Schema::create('promociones_productos', function (Blueprint $table) {
                 $table->id('id_promocion_producto');
                 $table->unsignedInteger('id_promocion');
                 $table->unsignedInteger('id_producto');
@@ -137,22 +137,22 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('promocion_categorias')) {
-            Schema::create('promocion_categorias', function (Blueprint $table) {
+        if (! Schema::hasTable('promociones_categorias')) {
+            Schema::create('promociones_categorias', function (Blueprint $table) {
                 $table->id('id_promocion_categoria');
                 $table->unsignedInteger('id_promocion');
                 $table->unsignedInteger('id_categoria');
                 $table->unique(['id_promocion', 'id_categoria'], 'promo_categoria_unique');
                 $table->foreign('id_promocion')->references('id_promocion')->on('promociones')->cascadeOnDelete();
-                $table->foreign('id_categoria')->references('id_categoria')->on('categorias')->cascadeOnDelete();
+                $table->foreign('id_categoria')->references('id_categoria')->on('categorias_producto')->cascadeOnDelete();
             });
         }
     }
 
     private function createAuditTables(): void
     {
-        if (! Schema::hasTable('auditoria_operativa')) {
-            Schema::create('auditoria_operativa', function (Blueprint $table) {
+        if (! Schema::hasTable('auditoria_sistema')) {
+            Schema::create('auditoria_sistema', function (Blueprint $table) {
                 $table->id('id_auditoria');
                 $table->unsignedInteger('id_usuario')->nullable();
                 $table->string('rol', 80)->nullable();
@@ -166,12 +166,12 @@ return new class extends Migration
                 $table->string('dispositivo', 255)->nullable();
                 $table->timestamps();
 
-                $table->foreign('id_usuario')->references('id_usuario')->on('usuarios')->nullOnDelete();
+                $table->foreign('id_usuario')->references('id_usuario')->on('usuarios_internos')->nullOnDelete();
             });
         }
 
-        if (! Schema::hasTable('stock_web_movimientos')) {
-            Schema::create('stock_web_movimientos', function (Blueprint $table) {
+        if (! Schema::hasTable('movimientos_stock_web')) {
+            Schema::create('movimientos_stock_web', function (Blueprint $table) {
                 $table->id('id_movimiento');
                 $table->unsignedInteger('id_presentacion');
                 $table->unsignedInteger('id_pedido_whatsapp')->nullable();
@@ -183,9 +183,9 @@ return new class extends Migration
                 $table->unsignedInteger('id_usuario')->nullable();
                 $table->timestamps();
 
-                $table->foreign('id_presentacion')->references('id_presentacion')->on('productos_presentaciones')->cascadeOnDelete();
-                $table->foreign('id_pedido_whatsapp')->references('id_pedido_whatsapp')->on('pedidos_whatsapp')->nullOnDelete();
-                $table->foreign('id_usuario')->references('id_usuario')->on('usuarios')->nullOnDelete();
+                $table->foreign('id_presentacion')->references('id_presentacion')->on('presentaciones_producto')->cascadeOnDelete();
+                $table->foreign('id_pedido_whatsapp')->references('id_pedido_whatsapp')->on('pedidos_tienda')->nullOnDelete();
+                $table->foreign('id_usuario')->references('id_usuario')->on('usuarios_internos')->nullOnDelete();
             });
         }
     }

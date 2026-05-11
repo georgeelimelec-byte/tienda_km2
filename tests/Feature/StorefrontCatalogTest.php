@@ -72,13 +72,13 @@ class StorefrontCatalogTest extends TestCase
         $response->assertStatus(302);
         $this->assertStringContainsString('https://wa.me/', $response->headers->get('Location'));
 
-        $this->assertDatabaseHas('pedidos_whatsapp_detalles', [
+        $this->assertDatabaseHas('detalle_pedidos_tienda', [
             'id_presentacion' => $presentation->id_presentacion,
             'cantidad_solicitada' => 2,
             'cantidad_confirmada' => 2,
         ]);
 
-        $this->assertDatabaseHas('productos_presentaciones', [
+        $this->assertDatabaseHas('presentaciones_producto', [
             'id_presentacion' => $presentation->id_presentacion,
             'stock_web' => 38,
         ]);
@@ -105,7 +105,7 @@ class StorefrontCatalogTest extends TestCase
             ])
             ->assertRedirect();
 
-        $this->assertDatabaseHas('categorias', [
+        $this->assertDatabaseHas('categorias_producto', [
             'nombre' => 'Jugos naturales',
             'id_categoria_padre' => $parent->id_categoria,
             'estado' => 'Activo',
@@ -145,7 +145,7 @@ class StorefrontCatalogTest extends TestCase
                 'cantidad' => 1,
             ]);
 
-        $this->assertDatabaseHas('carritos_web', [
+        $this->assertDatabaseHas('carrito_items', [
             'id_cliente' => $cliente->id_cliente,
             'id_presentacion' => $presentation->id_presentacion,
             'cantidad' => 1,
@@ -177,7 +177,7 @@ class StorefrontCatalogTest extends TestCase
             ])
             ->assertRedirect();
 
-        $this->assertDatabaseHas('banners_web', [
+        $this->assertDatabaseHas('banners_tienda', [
             'titulo' => 'Promo desayuno KM2',
             'imagen_url' => 'https://example.com/banner-desayuno.jpg',
             'estado' => 'Activo',
@@ -195,7 +195,7 @@ class StorefrontCatalogTest extends TestCase
             ])
             ->assertRedirect();
 
-        $this->assertDatabaseHas('banners_web', [
+        $this->assertDatabaseHas('banners_tienda', [
             'id_banner' => $bannerId,
             'titulo' => 'Promo desayuno actualizado',
             'imagen_url' => 'https://example.com/banner-actualizado.jpg',
@@ -243,14 +243,14 @@ class StorefrontCatalogTest extends TestCase
             ])
             ->assertRedirect();
 
-        $this->assertDatabaseHas('productos_presentaciones', [
+        $this->assertDatabaseHas('presentaciones_producto', [
             'id_presentacion' => $presentation->id_presentacion,
             'precio' => 5.50,
             'precio_referencial' => 6.50,
             'stock_web' => 30,
         ]);
 
-        $this->assertDatabaseHas('productos_imagenes', [
+        $this->assertDatabaseHas('imagenes_producto', [
             'id_producto' => $product->id_producto,
             'imagen_url' => 'https://example.com/cafe-barra.jpg',
         ]);

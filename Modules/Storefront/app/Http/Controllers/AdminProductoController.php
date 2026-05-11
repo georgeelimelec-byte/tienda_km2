@@ -30,7 +30,7 @@ class AdminProductoController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string',
-            'id_categoria' => 'required|exists:categorias,id_categoria',
+            'id_categoria' => 'required|exists:categorias_producto,id_categoria',
             'precio_venta' => 'required|numeric|min:0',
             'precio_referencial' => 'nullable|numeric|min:0|gt:precio_venta',
             'stock_web' => 'required|integer|min:0',
@@ -90,7 +90,7 @@ class AdminProductoController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string',
-            'id_categoria' => 'required|exists:categorias,id_categoria',
+            'id_categoria' => 'required|exists:categorias_producto,id_categoria',
             'precio_venta' => 'required|numeric|min:0',
             'precio_referencial' => 'nullable|numeric|min:0|gt:precio_venta',
             'stock_web' => 'required|integer|min:0',

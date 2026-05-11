@@ -23,10 +23,10 @@ return new class extends Migration
 
         Schema::enableForeignKeyConstraints();
 
-        if (Schema::hasTable('clientes')) {
-            Schema::table('clientes', function (Blueprint $table) {
+        if (Schema::hasTable('clientes_web')) {
+            Schema::table('clientes_web', function (Blueprint $table) {
                 foreach (['limite_credito', 'credito_usado', 'puntos_acumulados'] as $column) {
-                    if (Schema::hasColumn('clientes', $column)) {
+                    if (Schema::hasColumn('clientes_web', $column)) {
                         $table->dropColumn($column);
                     }
                 }

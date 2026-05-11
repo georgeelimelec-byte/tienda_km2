@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Categoria extends Model
 {
-    protected $table = 'categorias';
+    protected $table = 'categorias_producto';
     protected $primaryKey = 'id_categoria';
     public $timestamps = false;
 

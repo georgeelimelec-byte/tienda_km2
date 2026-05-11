@@ -20,9 +20,9 @@ class AdminReportsController extends Controller
         $ordersCount = (clone $pedidosBase)->count();
         $pendingCount = (clone $pedidosBase)->where('estado', 'Pendiente')->count();
         $itemsSold = PedidoWhatsappDetalle::query()
-            ->join('pedidos_whatsapp', 'pedidos_whatsapp.id_pedido_whatsapp', '=', 'pedidos_whatsapp_detalles.id_pedido_whatsapp')
-            ->whereBetween('pedidos_whatsapp.created_at', [$from, $to])
-            ->sum('pedidos_whatsapp_detalles.cantidad_confirmada');
+            ->join('pedidos_tienda', 'pedidos_tienda.id_pedido_whatsapp', '=', 'detalle_pedidos_tienda.id_pedido_whatsapp')
+            ->whereBetween('pedidos_tienda.created_at', [$from, $to])
+            ->sum('detalle_pedidos_tienda.cantidad_confirmada');
 
         $statusSummary = (clone $pedidosBase)
             ->select('estado')
@@ -32,22 +32,22 @@ class AdminReportsController extends Controller
             ->get();
 
         $zoneSummary = PedidoWhatsapp::query()
-            ->leftJoin('zonas_delivery', 'zonas_delivery.id_zona', '=', 'pedidos_whatsapp.id_zona_delivery')
-            ->whereBetween('pedidos_whatsapp.created_at', [$from, $to])
-            ->selectRaw('COALESCE(zonas_delivery.nombre, "Sin zona") as zona_nombre')
+            ->leftJoin('zonas_entrega', 'zonas_entrega.id_zona', '=', 'pedidos_tienda.id_zona_delivery')
+            ->whereBetween('pedidos_tienda.created_at', [$from, $to])
+            ->selectRaw('COALESCE(zonas_entrega.nombre, "Sin zona") as zona_nombre')
             ->selectRaw('COUNT(*) as total_pedidos')
-            ->selectRaw('SUM(pedidos_whatsapp.total_pedido) as total_ventas')
+            ->selectRaw('SUM(pedidos_tienda.total_pedido) as total_ventas')
             ->groupBy('zona_nombre')
             ->orderByDesc('total_ventas')
             ->get();
 
         $topProducts = PedidoWhatsappDetalle::query()
-            ->join('pedidos_whatsapp', 'pedidos_whatsapp.id_pedido_whatsapp', '=', 'pedidos_whatsapp_detalles.id_pedido_whatsapp')
-            ->whereBetween('pedidos_whatsapp.created_at', [$from, $to])
-            ->select('pedidos_whatsapp_detalles.nombre_producto')
-            ->selectRaw('SUM(pedidos_whatsapp_detalles.cantidad_confirmada) as unidades')
-            ->selectRaw('SUM(pedidos_whatsapp_detalles.subtotal) as total')
-            ->groupBy('pedidos_whatsapp_detalles.nombre_producto')
+            ->join('pedidos_tienda', 'pedidos_tienda.id_pedido_whatsapp', '=', 'detalle_pedidos_tienda.id_pedido_whatsapp')
+            ->whereBetween('pedidos_tienda.created_at', [$from, $to])
+            ->select('detalle_pedidos_tienda.nombre_producto')
+            ->selectRaw('SUM(detalle_pedidos_tienda.cantidad_confirmada) as unidades')
+            ->selectRaw('SUM(detalle_pedidos_tienda.subtotal) as total')
+            ->groupBy('detalle_pedidos_tienda.nombre_producto')
             ->orderByDesc('unidades')
             ->limit(10)
             ->get();

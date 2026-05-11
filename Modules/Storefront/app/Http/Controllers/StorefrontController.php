@@ -167,7 +167,7 @@ class StorefrontController extends Controller
             'whatsapp' => 'required|string|max:20',
             'direccion' => 'required|string',
             'referencia' => 'nullable|string',
-            'id_zona' => 'required|integer|exists:zonas_delivery,id_zona',
+            'id_zona' => 'required|integer|exists:zonas_entrega,id_zona',
             'cart' => 'required|json',
         ]);
 
@@ -255,7 +255,7 @@ class StorefrontController extends Controller
 
                 $audit->log(
                     'crear_pedido_web',
-                    'pedidos_whatsapp',
+                    'pedidos_tienda',
                     $pedido->id_pedido_whatsapp,
                     "Cliente {$pedido->cliente_nombre} creo el pedido {$pedido->codigo_pedido} desde la tienda virtual",
                     null,
@@ -309,7 +309,7 @@ class StorefrontController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:150',
-            'email' => 'required|email|unique:clientes,email',
+            'email' => 'required|email|unique:clientes_web,email',
             'whatsapp' => 'required|string|max:20',
             'direccion' => 'nullable|string|max:500',
             'password' => 'required|string|min:6|confirmed',

@@ -16,7 +16,7 @@ Los modulos activos se declaran en `modules_statuses.json`.
 
 1. El cliente navega la tienda virtual, inicia sesion o se registra, y agrega productos al carrito.
 2. El checkout recalcula precios, promociones y `stock_web` desde la base de datos.
-3. El sistema crea `pedidos_whatsapp` y `pedidos_whatsapp_detalles` con cantidades solicitadas y confirmadas.
+3. El sistema crea `pedidos_tienda` y `detalle_pedidos_tienda` con cantidades solicitadas y confirmadas.
 4. Al crear el pedido se reserva `stock_web`; si se cancela, el stock web retorna.
 5. El cliente es redirigido a WhatsApp con el resumen del pedido.
 6. El equipo interno gestiona el pedido desde `/admin/pedidos` en tabla operativa, no Kanban.
@@ -26,15 +26,15 @@ Los modulos activos se declaran en `modules_statuses.json`.
 
 Tablas principales del alcance actual:
 
-- `clientes`
-- `productos`, `productos_presentaciones`, `productos_imagenes`
-- `categorias`, `unidades_medida`
-- `carritos_web`
-- `pedidos_whatsapp`, `pedidos_whatsapp_detalles`
-- `promociones`, `promocion_productos`, `promocion_categorias`
-- `auditoria_operativa`, `stock_web_movimientos`
-- `banners_web`, `zonas_delivery`, `storefront_settings`
-- `usuarios`, `roles`, `modulos`, `permisos_rol`, `permisos_usuario`
+- `clientes_web`
+- `productos`, `presentaciones_producto`, `imagenes_producto`
+- `categorias_producto`, `unidades_medida`
+- `carrito_items`
+- `pedidos_tienda`, `detalle_pedidos_tienda`
+- `promociones`, `promociones_productos`, `promociones_categorias`
+- `auditoria_sistema`, `movimientos_stock_web`
+- `banners_tienda`, `zonas_entrega`, `configuracion_tienda`
+- `usuarios_internos`, `roles_sistema`, `modulos_sistema`, `permisos_por_rol`, `permisos_por_usuario`
 - `personal_access_tokens`, `sessions`, `cache`, `cache_locks`, `migrations`
 
 Las migraciones `2026_05_06_*` y `2026_05_07_*` limpian columnas y tablas legacy o sin flujo real en instalaciones existentes.
@@ -51,7 +51,7 @@ npm run build
 php artisan serve
 ```
 
-El numero de WhatsApp, horario, moneda e impuesto incluido se configuran desde `/admin/configuracion` y se guardan en `storefront_settings`.
+El numero de WhatsApp, horario, moneda e impuesto incluido se configuran desde `/admin/configuracion` y se guardan en `configuracion_tienda`.
 
 ## Validacion
 

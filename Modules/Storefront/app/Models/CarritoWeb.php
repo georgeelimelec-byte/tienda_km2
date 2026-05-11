@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarritoWeb extends Model
 {
-    protected $table = 'carritos_web';
+    protected $table = 'carrito_items';
     protected $primaryKey = 'id_carrito';
     public $timestamps = false;
     protected $fillable = ['id_cliente', 'id_presentacion', 'cantidad'];

@@ -5,14 +5,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Migración para la tabla 'productos_imagenes'.
+ * Migración para la tabla 'imagenes_producto'.
  * Galería de imágenes para la tienda virtual (múltiples por producto).
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('productos_imagenes', function (Blueprint $table) {
+        Schema::create('imagenes_producto', function (Blueprint $table) {
             $table->increments('id_imagen');
             $table->unsignedInteger('id_producto');
             $table->string('imagen_url', 255);
@@ -26,6 +26,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('productos_imagenes');
+        Schema::dropIfExists('imagenes_producto');
     }
 };

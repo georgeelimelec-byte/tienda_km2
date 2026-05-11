@@ -5,7 +5,7 @@ namespace Modules\Auth\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Modelo Eloquent para la tabla 'modulos'.
+ * Modelo Eloquent para la tabla 'modulos_sistema'.
  *
  * @property int $id_modulo
  * @property string $nombre
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Modulo extends Model
 {
-    protected $table = 'modulos';
+    protected $table = 'modulos_sistema';
     protected $primaryKey = 'id_modulo';
     public $timestamps = false;
 

@@ -48,7 +48,7 @@ class PromotionPricingService
         return Promocion::activas()
             ->where(function ($query) use ($product, $categoryIds) {
                 $query->whereHas('productos', fn ($productQuery) => $productQuery->where('productos.id_producto', $product->id_producto))
-                    ->orWhereHas('categorias', fn ($categoryQuery) => $categoryQuery->whereIn('categorias.id_categoria', $categoryIds));
+                    ->orWhereHas('categorias', fn ($categoryQuery) => $categoryQuery->whereIn('categorias_producto.id_categoria', $categoryIds));
             })
             ->get();
     }

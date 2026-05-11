@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class StorefrontSetting extends Model
 {
+    protected $table = 'configuracion_tienda';
+
     protected $fillable = [
         'store_name',
         'store_tagline',

@@ -7,7 +7,7 @@ use Modules\Auth\Models\Usuario;
 
 class AuditoriaOperativa extends Model
 {
-    protected $table = 'auditoria_operativa';
+    protected $table = 'auditoria_sistema';
     protected $primaryKey = 'id_auditoria';
 
     protected $fillable = [

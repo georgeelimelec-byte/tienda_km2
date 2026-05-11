@@ -35,7 +35,7 @@ class AuthApiController extends Controller
     {
         $request->validate([
             'nombre' => 'required|max:150',
-            'email' => 'required|email|unique:clientes,email',
+            'email' => 'required|email|unique:clientes_web,email',
             'telefono' => 'nullable|max:20',
             'password' => 'required|string|min:6',
         ]);

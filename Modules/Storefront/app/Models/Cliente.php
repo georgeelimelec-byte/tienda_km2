@@ -9,7 +9,7 @@ class Cliente extends Authenticatable
 {
     use HasApiTokens;
 
-    protected $table = 'clientes';
+    protected $table = 'clientes_web';
     protected $primaryKey = 'id_cliente';
     public $timestamps = false;
     protected $fillable = [

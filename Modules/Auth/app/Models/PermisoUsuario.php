@@ -5,7 +5,7 @@ namespace Modules\Auth\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Modelo Eloquent para la tabla 'permisos_usuario' (PK compuesta).
+ * Modelo Eloquent para la tabla 'permisos_por_usuario' (PK compuesta).
  * Valores NULL significan "hereda del rol".
  *
  * @property int $id_usuario
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PermisoUsuario extends Model
 {
-    protected $table = 'permisos_usuario';
+    protected $table = 'permisos_por_usuario';
     public $incrementing = false;
     public $timestamps = false;
 

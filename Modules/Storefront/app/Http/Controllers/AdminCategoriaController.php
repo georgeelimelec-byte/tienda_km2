@@ -31,7 +31,7 @@ class AdminCategoriaController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:100',
-            'id_categoria_padre' => 'nullable|exists:categorias,id_categoria',
+            'id_categoria_padre' => 'nullable|exists:categorias_producto,id_categoria',
             'estado' => 'required|in:Activo,Inactivo',
         ]);
 
@@ -50,7 +50,7 @@ class AdminCategoriaController extends Controller
 
         $data = $request->validate([
             'nombre' => 'required|string|max:100',
-            'id_categoria_padre' => 'nullable|exists:categorias,id_categoria',
+            'id_categoria_padre' => 'nullable|exists:categorias_producto,id_categoria',
             'estado' => 'required|in:Activo,Inactivo',
         ]);
 

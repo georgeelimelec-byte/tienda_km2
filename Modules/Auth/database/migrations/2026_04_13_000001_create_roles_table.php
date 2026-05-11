@@ -5,14 +5,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Migración para la tabla 'roles'.
+ * Migración para la tabla 'roles_sistema'.
  * Define los roles del sistema administrativo de la tienda WhatsApp.
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('roles_sistema', function (Blueprint $table) {
             $table->increments('id_rol');
             $table->string('nombre_rol', 50);
             $table->integer('nivel_acceso');
@@ -22,6 +22,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('roles_sistema');
     }
 };

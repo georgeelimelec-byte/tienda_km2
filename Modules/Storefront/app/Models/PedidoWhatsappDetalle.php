@@ -8,7 +8,7 @@ use Modules\Inventory\Models\ProductoPresentacion;
 
 class PedidoWhatsappDetalle extends Model
 {
-    protected $table = 'pedidos_whatsapp_detalles';
+    protected $table = 'detalle_pedidos_tienda';
     protected $primaryKey = 'id_detalle';
 
     protected $fillable = [

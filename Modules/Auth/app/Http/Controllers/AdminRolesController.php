@@ -60,8 +60,8 @@ class AdminRolesController extends Controller
     public function assign(Request $request)
     {
         $data = $request->validate([
-            'id_usuario' => ['required', 'integer', Rule::exists('usuarios', 'id_usuario')],
-            'id_rol' => ['required', 'integer', Rule::exists('roles', 'id_rol')],
+            'id_usuario' => ['required', 'integer', Rule::exists('usuarios_internos', 'id_usuario')],
+            'id_rol' => ['required', 'integer', Rule::exists('roles_sistema', 'id_rol')],
         ]);
 
         $user = Usuario::findOrFail($data['id_usuario']);
@@ -94,7 +94,7 @@ class AdminRolesController extends Controller
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('roles', 'nombre_rol')->ignore($roleId, 'id_rol'),
+                Rule::unique('roles_sistema', 'nombre_rol')->ignore($roleId, 'id_rol'),
             ],
             'nivel_acceso' => ['required', 'integer', 'min:1', 'max:99'],
             'estado' => ['required', Rule::in(['Activo', 'Inactivo'])],

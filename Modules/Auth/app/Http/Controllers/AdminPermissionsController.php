@@ -39,7 +39,7 @@ class AdminPermissionsController extends Controller
         foreach ($modules as $module) {
             $modulePermissions = $request->input("permissions.{$module->id_modulo}", []);
 
-            DB::table('permisos_rol')->updateOrInsert(
+            DB::table('permisos_por_rol')->updateOrInsert(
                 ['id_rol' => $role->id_rol, 'id_modulo' => $module->id_modulo],
                 [
                     'leer' => !empty($modulePermissions['leer']),
@@ -73,14 +73,14 @@ class AdminPermissionsController extends Controller
             }
 
             if (collect($payload)->filter(fn ($value) => $value !== null)->isEmpty()) {
-                DB::table('permisos_usuario')
+                DB::table('permisos_por_usuario')
                     ->where('id_usuario', $user->id_usuario)
                     ->where('id_modulo', $module->id_modulo)
                     ->delete();
                 continue;
             }
 
-            DB::table('permisos_usuario')->updateOrInsert(
+            DB::table('permisos_por_usuario')->updateOrInsert(
                 ['id_usuario' => $user->id_usuario, 'id_modulo' => $module->id_modulo],
                 $payload
             );

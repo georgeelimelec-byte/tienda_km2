@@ -48,7 +48,7 @@ class CategoryManager extends Component
     {
         $this->validate([
             'nombre' => 'required|string|max:255',
-            'id_categoria_padre' => 'nullable|exists:categorias,id_categoria',
+            'id_categoria_padre' => 'nullable|exists:categorias_producto,id_categoria',
         ]);
 
         // Evitar que una categoría sea padre de sí misma

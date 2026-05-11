@@ -9,16 +9,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('carrito_compras_web') && ! Schema::hasTable('carritos_web')) {
-            Schema::rename('carrito_compras_web', 'carritos_web');
+        if (Schema::hasTable('carrito_compras_web') && ! Schema::hasTable('carrito_items')) {
+            Schema::rename('carrito_compras_web', 'carrito_items');
         }
 
         if (
-            Schema::hasTable('productos_presentaciones')
-            && Schema::hasColumn('productos_presentaciones', 'costo_compra')
-            && ! Schema::hasColumn('productos_presentaciones', 'costo_reposicion')
+            Schema::hasTable('presentaciones_producto')
+            && Schema::hasColumn('presentaciones_producto', 'costo_compra')
+            && ! Schema::hasColumn('presentaciones_producto', 'costo_reposicion')
         ) {
-            Schema::table('productos_presentaciones', function (Blueprint $table) {
+            Schema::table('presentaciones_producto', function (Blueprint $table) {
                 $table->renameColumn('costo_compra', 'costo_reposicion');
             });
         }
@@ -60,7 +60,7 @@ return new class extends Migration
 
     private function normalizeCartForeignKeys(): void
     {
-        if (! Schema::hasTable('carritos_web') || DB::connection()->getDriverName() !== 'mysql') {
+        if (! Schema::hasTable('carrito_items') || DB::connection()->getDriverName() !== 'mysql') {
             return;
         }
 
@@ -68,28 +68,28 @@ return new class extends Migration
             'carrito_compras_web_id_cliente_foreign',
             'carrito_compras_web_id_presentacion_foreign',
         ] as $legacyKey) {
-            if ($this->foreignKeyExists('carritos_web', $legacyKey)) {
-                Schema::table('carritos_web', function (Blueprint $table) use ($legacyKey) {
+            if ($this->foreignKeyExists('carrito_items', $legacyKey)) {
+                Schema::table('carrito_items', function (Blueprint $table) use ($legacyKey) {
                     $table->dropForeign($legacyKey);
                 });
             }
         }
 
-        if (! $this->foreignKeyExists('carritos_web', 'carritos_web_id_cliente_foreign')) {
-            Schema::table('carritos_web', function (Blueprint $table) {
-                $table->foreign('id_cliente', 'carritos_web_id_cliente_foreign')
+        if (! $this->foreignKeyExists('carrito_items', 'carrito_items_id_cliente_foreign')) {
+            Schema::table('carrito_items', function (Blueprint $table) {
+                $table->foreign('id_cliente', 'carrito_items_id_cliente_foreign')
                     ->references('id_cliente')
-                    ->on('clientes')
+                    ->on('clientes_web')
                     ->cascadeOnDelete()
                     ->cascadeOnUpdate();
             });
         }
 
-        if (! $this->foreignKeyExists('carritos_web', 'carritos_web_id_presentacion_foreign')) {
-            Schema::table('carritos_web', function (Blueprint $table) {
-                $table->foreign('id_presentacion', 'carritos_web_id_presentacion_foreign')
+        if (! $this->foreignKeyExists('carrito_items', 'carrito_items_id_presentacion_foreign')) {
+            Schema::table('carrito_items', function (Blueprint $table) {
+                $table->foreign('id_presentacion', 'carrito_items_id_presentacion_foreign')
                     ->references('id_presentacion')
-                    ->on('productos_presentaciones')
+                    ->on('presentaciones_producto')
                     ->cascadeOnDelete()
                     ->cascadeOnUpdate();
             });

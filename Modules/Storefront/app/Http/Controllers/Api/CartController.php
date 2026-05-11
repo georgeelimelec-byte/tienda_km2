@@ -32,7 +32,7 @@ class CartController extends Controller
         }
 
         $data = $request->validate([
-            'id_presentacion' => 'required|exists:productos_presentaciones,id_presentacion',
+            'id_presentacion' => 'required|exists:presentaciones_producto,id_presentacion',
             'cantidad' => 'required|integer|min:1',
         ]);
 

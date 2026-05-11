@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductoImagen extends Model
 {
-    protected $table = 'productos_imagenes';
+    protected $table = 'imagenes_producto';
     protected $primaryKey = 'id_imagen';
     public $timestamps = false;
     protected $fillable = ['id_producto', 'id_presentacion', 'imagen_url', 'orden'];

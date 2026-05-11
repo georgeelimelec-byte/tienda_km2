@@ -5,7 +5,7 @@ namespace Modules\Inventory\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Modelo Eloquent para la tabla 'productos_presentaciones'.
+ * Modelo Eloquent para la tabla 'presentaciones_producto'.
  * Entidad central del inventario web: cada variante tiene su propio stock web, precio y barcode.
  *
  * @property int $id_presentacion
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ProductoPresentacion extends Model
 {
-    protected $table = 'productos_presentaciones';
+    protected $table = 'presentaciones_producto';
     protected $primaryKey = 'id_presentacion';
     public $timestamps = false;
 

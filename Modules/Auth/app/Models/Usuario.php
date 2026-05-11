@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
- * Modelo Eloquent para la tabla 'usuarios'.
+ * Modelo Eloquent para la tabla 'usuarios_internos'.
  *
  * Extiende Authenticatable para compatibilidad con el sistema de auth de Laravel.
  * Usa HasApiTokens de Sanctum para autenticación API de la tienda virtual.
@@ -24,7 +24,7 @@ class Usuario extends Authenticatable
 {
     use HasApiTokens;
 
-    protected $table = 'usuarios';
+    protected $table = 'usuarios_internos';
     protected $primaryKey = 'id_usuario';
     public $timestamps = false;
 

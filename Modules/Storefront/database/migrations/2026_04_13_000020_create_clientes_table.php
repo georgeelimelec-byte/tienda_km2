@@ -5,14 +5,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Migración para la tabla 'clientes'.
+ * Migración para la tabla 'clientes_web'.
  * Clientes de tienda virtual y pedidos por WhatsApp.
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('clientes', function (Blueprint $table) {
+        Schema::create('clientes_web', function (Blueprint $table) {
             $table->increments('id_cliente');
             $table->enum('tipo_documento', ['DNI', 'RUC', 'CE', 'Sin Documento'])->default('Sin Documento');
             $table->string('numero_documento', 15)->nullable();
@@ -29,6 +29,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('clientes');
+        Schema::dropIfExists('clientes_web');
     }
 };

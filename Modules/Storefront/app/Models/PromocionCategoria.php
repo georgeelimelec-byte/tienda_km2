@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PromocionCategoria extends Model
 {
-    protected $table = 'promocion_categorias';
+    protected $table = 'promociones_categorias';
     protected $primaryKey = 'id_promocion_categoria';
     public $timestamps = false;
 

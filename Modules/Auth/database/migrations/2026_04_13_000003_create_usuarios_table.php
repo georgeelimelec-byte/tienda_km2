@@ -5,14 +5,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Migracion para la tabla 'usuarios'.
+ * Migracion para la tabla 'usuarios_internos'.
  * Usuarios del sistema para administracion de tienda, pedidos y catalogo.
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('usuarios', function (Blueprint $table) {
+        Schema::create('usuarios_internos', function (Blueprint $table) {
             $table->increments('id_usuario');
             $table->unsignedInteger('id_rol');
             $table->string('nombres', 100);
@@ -23,13 +23,13 @@ return new class extends Migration
             $table->timestamp('fecha_registro')->useCurrent();
 
             $table->foreign('id_rol')
-                ->references('id_rol')->on('roles')
+                ->references('id_rol')->on('roles_sistema')
                 ->onUpdate('cascade');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('usuarios');
+        Schema::dropIfExists('usuarios_internos');
     }
 };

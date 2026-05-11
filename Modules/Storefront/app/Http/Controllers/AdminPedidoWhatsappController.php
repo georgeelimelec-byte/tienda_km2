@@ -91,7 +91,7 @@ class AdminPedidoWhatsappController extends Controller
 
                 $audit->log(
                     'actualizar_estado_pedido',
-                    'pedidos_whatsapp',
+                    'pedidos_tienda',
                     $pedido->id_pedido_whatsapp,
                     "Pedido {$pedido->codigo_pedido} cambio de {$previousStatus} a {$pedido->estado}",
                     $old,
@@ -156,7 +156,7 @@ class AdminPedidoWhatsappController extends Controller
 
             $audit->log(
                 'ajustar_item_pedido',
-                'pedidos_whatsapp_detalles',
+                'detalle_pedidos_tienda',
                 $detalle->id_detalle,
                 "Se ajusto {$detalle->nombre_producto} en el pedido {$pedido->codigo_pedido} de {$oldQuantity} a {$newQuantity}",
                 $old,

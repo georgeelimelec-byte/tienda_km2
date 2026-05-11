@@ -32,7 +32,7 @@ class Promocion extends Model
     {
         return $this->belongsToMany(
             Producto::class,
-            'promocion_productos',
+            'promociones_productos',
             'id_promocion',
             'id_producto'
         );
@@ -42,7 +42,7 @@ class Promocion extends Model
     {
         return $this->belongsToMany(
             Categoria::class,
-            'promocion_categorias',
+            'promociones_categorias',
             'id_promocion',
             'id_categoria'
         );

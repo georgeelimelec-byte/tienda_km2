@@ -120,13 +120,13 @@ class AdminUsersController extends Controller
             : ['required', 'string', 'min:6', 'confirmed'];
 
         return $request->validate([
-            'id_rol' => ['required', 'integer', Rule::exists('roles', 'id_rol')],
+            'id_rol' => ['required', 'integer', Rule::exists('roles_sistema', 'id_rol')],
             'nombres' => ['required', 'string', 'max:100'],
             'email' => [
                 'nullable',
                 'email',
                 'max:100',
-                Rule::unique('usuarios', 'email')->ignore($userId, 'id_usuario'),
+                Rule::unique('usuarios_internos', 'email')->ignore($userId, 'id_usuario'),
             ],
             'password' => $passwordRules,
             'foto_url' => ['nullable', 'string', 'max:255'],

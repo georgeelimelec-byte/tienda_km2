@@ -8,7 +8,7 @@ return new class extends Migration
     public function up(): void
     {
         foreach ($this->modules() as $module) {
-            DB::table('modulos')->updateOrInsert(
+            DB::table('modulos_sistema')->updateOrInsert(
                 ['id_modulo' => $module['id_modulo']],
                 [
                     'nombre' => $module['nombre'],
@@ -19,7 +19,7 @@ return new class extends Migration
         }
 
         foreach ($this->roles() as $role) {
-            DB::table('roles')->updateOrInsert(
+            DB::table('roles_sistema')->updateOrInsert(
                 ['id_rol' => $role['id_rol']],
                 [
                     'nombre_rol' => $role['nombre_rol'],
@@ -31,7 +31,7 @@ return new class extends Migration
 
         foreach ($this->permissions() as $roleId => $modules) {
             foreach ($modules as $moduleId => $permissions) {
-                DB::table('permisos_rol')->updateOrInsert(
+                DB::table('permisos_por_rol')->updateOrInsert(
                     ['id_rol' => $roleId, 'id_modulo' => $moduleId],
                     $permissions
                 );

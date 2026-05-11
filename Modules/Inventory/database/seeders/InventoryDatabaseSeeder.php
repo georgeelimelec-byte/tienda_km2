@@ -44,7 +44,7 @@ class InventoryDatabaseSeeder extends Seeder
             ['id_categoria' => 8, 'id_categoria_padre' => 1, 'nombre' => 'Lacteos y refrigerados', 'estado' => 'Activo'],
             ['id_categoria' => 9, 'id_categoria_padre' => 1, 'nombre' => 'Cuidado y limpieza', 'estado' => 'Activo'],
         ] as $category) {
-            DB::table('categorias')->updateOrInsert(['id_categoria' => $category['id_categoria']], $category);
+            DB::table('categorias_producto')->updateOrInsert(['id_categoria' => $category['id_categoria']], $category);
         }
     }
 

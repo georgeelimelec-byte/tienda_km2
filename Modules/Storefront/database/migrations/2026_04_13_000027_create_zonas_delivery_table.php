@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('zonas_delivery', function (Blueprint $table) {
+        Schema::create('zonas_entrega', function (Blueprint $table) {
             $table->increments('id_zona');
             $table->string('nombre', 100);
             $table->decimal('tarifa', 10, 2)->default(0);
@@ -19,6 +19,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('zonas_delivery');
+        Schema::dropIfExists('zonas_entrega');
     }
 };
